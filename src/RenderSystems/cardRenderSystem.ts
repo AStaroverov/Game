@@ -1,6 +1,6 @@
 import { Scene } from 'three';
 
-import { TILE_SIZE } from '../CONST';
+import { RENDER_CARD_SIZE, TILE_SIZE } from '../CONST';
 import { Card } from '../Entities/Card';
 import { Player } from '../Entities/Player';
 import { RenderTile } from '../RenderEntities/RenderTile';
@@ -13,24 +13,24 @@ export function cardRenderSystem(
     scene: Scene,
     { card, player }: { card: Card; player: Player },
 ): void {
-    const size = TILE_SIZE;
-    const matrixSize = 10;
     const renderTiles: Matrix<RenderTile> = new Matrix(
-        matrixSize,
-        matrixSize,
+        RENDER_CARD_SIZE,
+        RENDER_CARD_SIZE,
         (x, y) =>
             new RenderTile({
-                ...point(x * size, y * size),
-                size,
+                ...point(x * TILE_SIZE, y * TILE_SIZE),
+                size: TILE_SIZE,
                 color: 0x000000,
                 visible: false,
             }),
     );
 
     const tick = () => {
-        console.log('>> -----');
-        card.getSlice(player.x, player.y, 3).forEach((tile, x, y) => {
-            console.log('>>', tile);
+        card.getSlice(
+            player.x,
+            player.y,
+            Math.floor(RENDER_CARD_SIZE / 2),
+        ).forEach((tile, x, y) => {
             const render = renderTiles.get(x, y);
 
             render.update({

@@ -1,26 +1,14 @@
-import { defaults } from 'lodash';
-
 import { Matrix } from '../../utils/matrix';
 
 export enum ETileType {
-    empty,
-    road,
-    item,
+    empty = 'empty',
+    passable = 'passable',
+    impassable = 'impassable',
 }
 export type TTile = {
     type: ETileType;
     interactive: boolean;
     color: number;
-};
-
-export type TOptions = {
-    n: number;
-    m: number;
-};
-
-const DEFAULT_OPTIONS = {
-    n: 10,
-    m: 10,
 };
 
 const GET_EMPTY_TILE = () => ({
@@ -30,15 +18,17 @@ const GET_EMPTY_TILE = () => ({
 });
 
 export class Card {
+    n: number;
+    m: number;
     offset = { x: 0, y: 0 };
 
-    private options: TOptions;
     private tiles: Matrix<TTile>;
 
     constructor(options: { n: number; m: number }) {
-        this.options = defaults(DEFAULT_OPTIONS, options);
+        this.n = options.n;
+        this.m = options.n;
         this.tiles = fillEmptyTiles(
-            new Matrix<TTile>(this.options.n, this.options.m, GET_EMPTY_TILE),
+            new Matrix<TTile>(this.n, this.m, GET_EMPTY_TILE),
         );
     }
 
@@ -62,7 +52,7 @@ export class Card {
     }
 
     move(x: number, y: number): void {
-        const { n, m } = this.options;
+        const { n, m } = this;
         const dX = -x;
         const dY = -y;
         const tiles = new Matrix<TTile>(n, m, GET_EMPTY_TILE);
@@ -83,10 +73,22 @@ export class Card {
 function fillEmptyTiles(tiles: Matrix<TTile>): Matrix<TTile> {
     tiles.forEach((item) => {
         if (item.type === ETileType.empty) {
-            item.type = ETileType.road;
-            item.color = 0xffffff * Math.random();
+            item.type =
+                Math.random() > 0.3 ? ETileType.passable : ETileType.impassable;
+            item.color = getTileColor(item.type);
         }
     });
 
     return tiles;
+}
+
+function getTileColor(type: ETileType): number {
+    switch (type) {
+        case ETileType.passable:
+            return 0x03ac12;
+        case ETileType.impassable:
+            return 0x000000;
+        default:
+            return 0xffffff;
+    }
 }

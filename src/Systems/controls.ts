@@ -1,9 +1,15 @@
 import { filter, fromEvent, map } from 'rxjs';
 
-import { Card } from '../Entities/Card';
+import { Card, ETileType } from '../Entities/Card';
 import { Player } from '../Entities/Player';
 
-export function controlsSystem(entities: { card: Card; player: Player }): void {
+export function controlsSystem({
+    card,
+    player,
+}: {
+    card: Card;
+    player: Player;
+}): void {
     fromEvent<KeyboardEvent>(document, 'keydown')
         .pipe(
             filter((e) => {
@@ -22,7 +28,14 @@ export function controlsSystem(entities: { card: Card; player: Player }): void {
             }),
         )
         .subscribe(([x, y]) => {
-            entities.card.move(-x, -y);
-            entities.player.move(x, y);
+            const tile = card.getTile(
+                player.x - card.offset.x + x,
+                player.y - card.offset.y + y,
+            );
+
+            if (tile.type === ETileType.passable) {
+                card.move(-x, -y);
+                player.move(x, y);
+            }
         });
 }

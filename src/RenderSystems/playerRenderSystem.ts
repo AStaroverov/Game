@@ -1,6 +1,6 @@
 import { Scene } from 'three';
 
-import { TILE_SIZE } from '../CONST';
+import { RENDER_CARD_SIZE, TILE_SIZE } from '../CONST';
 import { Card } from '../Entities/Card';
 import { Player } from '../Entities/Player';
 import { RenderPlayer } from '../RenderEntities/RenderPlayer';
@@ -14,8 +14,8 @@ export function playerRenderSystem(
     const renderPlayer = new RenderPlayer({ x: 0, y: 0 });
     const tick = () => {
         renderPlayer.update({
-            x: (player.x - card.offset.x) * TILE_SIZE,
-            y: (player.y - card.offset.y) * TILE_SIZE,
+            x: Math.floor(RENDER_CARD_SIZE / 2) * TILE_SIZE,
+            y: Math.floor(RENDER_CARD_SIZE / 2) * TILE_SIZE,
         });
     };
 

@@ -10,7 +10,7 @@ export class RenderPlayer implements RenderEntity<Props> {
 
     constructor(props: Props) {
         const geometry = new BoxGeometry(20, 20, 20);
-        const material = new MeshBasicMaterial({ color: 0 });
+        const material = new MeshBasicMaterial({ color: 0xff0000 });
         this.mesh = new Mesh(geometry, material);
 
         this.update(props);

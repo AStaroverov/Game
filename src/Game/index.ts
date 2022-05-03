@@ -1,3 +1,4 @@
+import { CARD_SIZE } from '../CONST';
 import { Card } from '../Entities/Card';
 import { Player } from '../Entities/Player';
 import { Renderer } from '../Renderer';
@@ -11,8 +12,11 @@ export function game(): void {
     const renderer = new Renderer(ticker);
 
     // Entities
-    const card = new Card({ n: 10, m: 10 });
-    const player = new Player({ x: 3, y: 3 });
+    const card = new Card({ n: CARD_SIZE, m: CARD_SIZE });
+    const player = new Player({
+        x: Math.ceil(CARD_SIZE / 2),
+        y: Math.ceil(CARD_SIZE / 2),
+    });
 
     // Systems
     controlsSystem({ card, player });
