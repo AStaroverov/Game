@@ -6,6 +6,7 @@ const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin');
 const {
     getSharedWorkerLoader,
     getWorkerLoader,
+    getImageLoader,
     getGLSLLoader,
     getTsLoader,
     getResolve,
@@ -31,6 +32,7 @@ module.exports = {
                 test: /\.css$/i,
                 use: ['style-loader', 'css-loader'],
             },
+            getImageLoader(),
             getGLSLLoader(),
             getTsLoader({ tsx: true }),
             getWorkerLoader(),

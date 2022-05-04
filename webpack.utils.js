@@ -3,25 +3,23 @@ const path = require('path');
 module.exports = {
     getResolve,
     getTsLoader,
-    createConfigProperties,
+    getImageLoader,
     getWorkerLoader,
     getSharedWorkerLoader,
     getGLSLLoader,
 };
 
-function createConfigProperties(pathToApp) {
-    return {
-        entry: path.join(__dirname, `/src/${pathToApp}/index.ts`),
-        html: {
-            template: path.join(__dirname, `/src/${pathToApp}/index.ejs`),
-        },
-    };
-}
-
 function getResolve() {
     return {
         mainFields: ['browser', 'module', 'main'],
         extensions: ['.js', '.mjs', '.wasm', '.ts', '.tsx', '.json', '.glsl'],
+    };
+}
+
+function getImageLoader() {
+    return {
+        test: /\.(png|svg|jpg|jpeg|gif)$/i,
+        type: 'asset/resource',
     };
 }
 

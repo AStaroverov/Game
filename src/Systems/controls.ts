@@ -33,7 +33,7 @@ export function controlsSystem({
                 player.y - card.offset.y + y,
             );
 
-            if (tile.type === ETileType.passable) {
+            if (tile?.type === ETileType.passable) {
                 card.move(-x, -y);
                 player.move(x, y);
             }

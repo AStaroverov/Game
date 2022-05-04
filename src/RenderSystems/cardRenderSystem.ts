@@ -1,10 +1,10 @@
 import { Scene } from 'three';
 
 import { RENDER_CARD_SIZE, TILE_SIZE } from '../CONST';
-import { Card } from '../Entities/Card';
+import { Card, ETileType } from '../Entities/Card';
 import { Player } from '../Entities/Player';
 import { RenderTile } from '../RenderEntities/RenderTile';
-import { Matrix } from '../utils/matrix';
+import { Matrix } from '../utils/Matrix';
 import { point } from '../utils/shape';
 import { FrameTasks } from '../utils/TasksScheduler/frameTasks';
 
@@ -20,8 +20,8 @@ export function cardRenderSystem(
             new RenderTile({
                 ...point(x * TILE_SIZE, y * TILE_SIZE),
                 size: TILE_SIZE,
-                color: 0x000000,
                 visible: false,
+                type: ETileType.empty,
             }),
     );
 
@@ -33,9 +33,9 @@ export function cardRenderSystem(
         ).forEach((tile, x, y) => {
             const render = renderTiles.get(x, y);
 
-            render.update({
+            render?.update({
                 visible: tile !== undefined,
-                color: tile.color,
+                type: tile?.type,
             });
         });
     };

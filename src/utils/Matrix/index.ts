@@ -14,7 +14,7 @@ export class Matrix<T> {
             const x = i % this.n;
             const y = (i / this.n) | 0;
 
-            each(this.get(x, y), x, y);
+            each(this.get(x, y)!, x, y);
         });
 
         return this;
@@ -30,16 +30,17 @@ export class Matrix<T> {
 
     map(mapper: (item: T, x: number, y: number) => T): Matrix<T> {
         return new Matrix<T>(this.n, this.m, (x, y) =>
-            mapper(this.get(x, y), x, y),
+            mapper(this.get(x, y)!, x, y),
         );
     }
 
-    get(x: number, y: number): T {
+    get(x: number, y: number): T | undefined {
         return this.buffer[x + y * this.n];
     }
 
-    set(x: number, y: number, item: T): T {
-        return (this.buffer[x + y * this.n] = item);
+    set(x: number, y: number, item: T): this {
+        this.buffer[x + y * this.n] = item;
+        return this;
     }
 
     toArray(): T[] {

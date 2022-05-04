@@ -35,7 +35,6 @@
     "fork-ts-checker-webpack-plugin": "^6.3.3",
     "hash-sum": "^2.0.0",
     "html-webpack-plugin": "^5.3.1",
-    "linq": "^4.0.0",
     "localforage": "^1.9.0",
     "lodash": "^4.17.20",
     "next-tick": "^1.1.0",

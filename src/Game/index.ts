@@ -12,11 +12,11 @@ export function game(): void {
     const renderer = new Renderer(ticker);
 
     // Entities
-    const card = new Card({ n: CARD_SIZE, m: CARD_SIZE });
-    const player = new Player({
-        x: Math.ceil(CARD_SIZE / 2),
-        y: Math.ceil(CARD_SIZE / 2),
-    });
+    const sx = Math.floor(CARD_SIZE / 2);
+    const sy = Math.floor(CARD_SIZE / 2);
+
+    const card = new Card({ n: CARD_SIZE, m: CARD_SIZE, sx, sy });
+    const player = new Player({ x: sx, y: sy });
 
     // Systems
     controlsSystem({ card, player });
