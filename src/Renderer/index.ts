@@ -1,5 +1,6 @@
 import { PerspectiveCamera, Scene, WebGLRenderer } from 'three';
 
+import { RENDER_CARD_SIZE, TILE_SIZE } from '../CONST';
 import { FrameTasks } from '../utils/TasksScheduler/frameTasks';
 
 export class Renderer {
@@ -18,6 +19,8 @@ export class Renderer {
 
         this.renderer.setSize(width, height);
         this.camera.position.z = 1000;
+        this.scene.position.x -= (TILE_SIZE * RENDER_CARD_SIZE) / 2;
+        this.scene.position.y -= (TILE_SIZE * RENDER_CARD_SIZE) / 2;
 
         ticker.addInterval(this.render, 1, { ctx: this });
     }
