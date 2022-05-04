@@ -8,13 +8,7 @@ module.exports = {
         },
     },
     plugins: ['unused-imports', 'simple-import-sort'],
-    settings: {
-        react: {
-            version: 'detect', // Tells eslint-plugin-react to automatically detect the version of React to use
-        },
-    },
     extends: [
-        'plugin:react/recommended', // Uses the recommended rules from @eslint-plugin-react
         'plugin:@typescript-eslint/recommended', // Uses the recommended rules from the @typescript-eslint/eslint-plugin
         'prettier',
         'prettier/prettier',
@@ -37,7 +31,5 @@ module.exports = {
         '@typescript-eslint/ban-ts-comment': 'off',
         '@typescript-eslint/no-var-requires': 'off',
         '@typescript-eslint/ban-types': 'off',
-        'react/display-name': 'off',
-        'react/prop-types': 'off',
     },
 };
