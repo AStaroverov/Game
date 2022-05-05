@@ -20,7 +20,7 @@ export class RenderTile implements RenderEntity<Props> {
 
     constructor(props: Props) {
         const geometry = new PlaneGeometry(props.size, props.size);
-        const material = new MeshBasicMaterial();
+        const material = new MeshBasicMaterial({ transparent: true });
 
         this.mesh = new Mesh(geometry, material);
         this.mesh.position.x = props.x;
