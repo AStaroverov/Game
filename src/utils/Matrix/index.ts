@@ -1,5 +1,6 @@
 export class Matrix<T> {
-    private buffer: T[];
+    buffer: T[];
+
     constructor(
         public n: number,
         public m: number,
@@ -45,5 +46,9 @@ export class Matrix<T> {
 
     toArray(): T[] {
         return this.buffer;
+    }
+
+    setSource(buffer: T[]): void {
+        this.buffer = buffer;
     }
 }

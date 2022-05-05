@@ -1,4 +1,4 @@
-import { TasksManager } from './TasksManager';
+import { TasksManager, TCallbackId } from './TasksManager';
 
 export class FrameTasks extends TasksManager {
     constructor() {
@@ -12,9 +12,12 @@ export class FrameTasks extends TasksManager {
         });
     }
 
-    protected exec(): void {
-        // Delta between frames we measure in count, not in milliseconds
-        this.cbIds.forEach((id) => this.tryExecById(id, 1));
+    protected tryExecById(
+        id: TCallbackId,
+        metaDelta: number,
+        timeDelta: number,
+    ): void {
+        super.tryExecById(id, 1, timeDelta);
     }
 }
 

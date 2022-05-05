@@ -22,7 +22,7 @@ export class Renderer {
         this.scene.position.x -= (TILE_SIZE * RENDER_CARD_SIZE) / 2;
         this.scene.position.y -= (TILE_SIZE * RENDER_CARD_SIZE) / 2;
 
-        ticker.addInterval(this.render, 1, { ctx: this });
+        ticker.addInterval(this.render, 1, this);
     }
 
     private render(): void {

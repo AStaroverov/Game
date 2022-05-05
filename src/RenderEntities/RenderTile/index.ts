@@ -2,11 +2,11 @@ import { Mesh, MeshBasicMaterial, PlaneGeometry, TextureLoader } from 'three';
 
 import imageFence from '../../../assets/sprites/tilesets/fences.png';
 import imageGrass from '../../../assets/sprites/tilesets/grass.png';
-import { ETileType } from '../../Entities/Card';
+import { TileType } from '../../Components/TilesComponent';
 import { RenderEntity } from '../../types';
 import { Point } from '../../utils/shape';
 
-type Props = Point & { type?: ETileType; size: number; visible: boolean };
+type Props = Point & { type?: TileType; size: number; visible: boolean };
 
 const textureGrass = new TextureLoader().load(imageGrass);
 const textureFence = new TextureLoader().load(imageFence);
@@ -38,7 +38,7 @@ export class RenderTile implements RenderEntity<Props> {
 
         if (type) {
             this.mesh.material.setValues({
-                map: type === ETileType.passable ? textureGrass : textureFence,
+                map: type === TileType.passable ? textureGrass : textureFence,
             });
         }
     }

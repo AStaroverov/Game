@@ -1,14 +1,14 @@
-export class Player {
-    x = 0;
-    y = 0;
+import { createEntity } from '../../../lib/ECS/entities';
+import { CreateEntity } from '../../../lib/ECS/types';
+import { Direction } from '../../Components/direction';
+import { PositionComponent } from '../../Components/positionComponent';
+import { Point } from '../../utils/shape';
 
-    constructor(props: { x: number; y: number }) {
-        this.x = props.x;
-        this.y = props.y;
-    }
+export const PlayerEntity = createEntity((startPoint: Point) => [
+    PositionComponent(startPoint),
+    Direction(),
+]);
 
-    move(x: number, y: number): void {
-        this.x += x;
-        this.y += y;
-    }
-}
+export const isPlayerEntity = (
+    entity: CreateEntity,
+): entity is typeof PlayerEntity => entity === PlayerEntity;
