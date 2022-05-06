@@ -6,8 +6,8 @@ import { CardEntity } from '../Entities/Card';
 import { PlayerEntity } from '../Entities/Player';
 import { Renderer } from '../Renderer';
 import { cardRenderSystem } from '../RenderSystems/cardRenderSystem';
-import { playerRenderSystem } from '../RenderSystems/playerRenderSystem';
 import { controlsSystem } from '../Systems/controlsSystems';
+import { playerSystem } from '../Systems/playerSystem';
 import { frameTasks } from '../utils/TasksScheduler/frameTasks';
 
 export function game(): void {
@@ -32,7 +32,7 @@ export function game(): void {
 
     // Render Entities
     cardRenderSystem(ticker, renderer.scene, heap);
-    playerRenderSystem(ticker, renderer.scene);
+    playerSystem(ticker, renderer.scene, heap);
 
     document.body.append(renderer.renderer.domElement);
 }

@@ -1,11 +1,10 @@
-import { createComponent } from '../../lib/ECS/components';
 import { hasComponent } from '../../lib/ECS/entities';
 import { Entity } from '../../lib/ECS/types';
-import { newPoint, Point } from '../utils/shape';
+import { Vector } from '../utils/shape';
 
-export class PositionComponent extends createComponent(
-    (p: Point = newPoint(0, 0)) => p,
-) {}
+export class PositionComponent {
+    constructor(public x: number = 0, public y: number = 0) {}
+}
 
 export function hasPositionComponent(
     entity: Entity,
@@ -13,11 +12,7 @@ export function hasPositionComponent(
     return hasComponent(entity, PositionComponent);
 }
 
-export function positionMove(
-    p: PositionComponent,
-    dx: number,
-    dy: number,
-): void {
-    p.x += dx;
-    p.y += dy;
+export function positionMove(p: PositionComponent, v: Vector): void {
+    p.x += v.x;
+    p.y += v.y;
 }

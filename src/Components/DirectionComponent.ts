@@ -1,11 +1,15 @@
-import { createComponent } from '../../lib/ECS/components';
 import { hasComponent } from '../../lib/ECS/entities';
 import { Entity } from '../../lib/ECS/types';
-import { newVector, Vector } from '../utils/shape';
+import { Vector } from '../utils/shape';
 
-export class DirectionComponent extends createComponent(
-    (v: Vector = newVector(0, 0)) => v,
-) {}
+export class DirectionComponent {
+    constructor(public x: number = 0, public y: number = 0) {}
+}
+
+export function setDirection(component: DirectionComponent, v: Vector): void {
+    component.x = v.x;
+    component.y = v.y;
+}
 
 export function hasDirectionComponent(
     entity: Entity,

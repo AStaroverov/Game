@@ -1,12 +1,9 @@
-import { createComponent } from '../../lib/ECS/components';
 import { hasComponent } from '../../lib/ECS/entities';
 import { Entity } from '../../lib/ECS/types';
 
-export class SizeComponent extends createComponent(
-    (props: { w: number; h: number }) => {
-        return props;
-    },
-) {}
+export class SizeComponent {
+    constructor(public w: number, public h: number) {}
+}
 
 export function hasSizeComponent(
     entity: Entity,
