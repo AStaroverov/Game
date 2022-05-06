@@ -29,16 +29,24 @@ export function cardReliefSystem(
     const cardPosition = getComponent(cardEntity, PositionComponent);
     const cardTiles = getComponent(cardEntity, TilesMatrixComponent);
     const meshes = getComponent(cardEntity, ReliefMeshesMatrixComponent);
+    const treesCount = atlasTrees.list.length;
 
     addToScene();
     hideMeshes();
     ticker.addInterval(tick, 1);
 
-    const tileIndexToSalt = new Map<number, number>();
+    const tileIndexToSalt = new Map<
+        number,
+        { index: number; x: number; y: number }
+    >();
 
-    function getSalt(n: number, l: number): number {
+    function getSalt(n: number): { index: number; x: number; y: number } {
         if (!tileIndexToSalt.has(n)) {
-            tileIndexToSalt.set(n, Math.round(Math.random() * l));
+            tileIndexToSalt.set(n, {
+                index: Math.round(Math.random() * (treesCount - 1)),
+                x: Math.random() * 0.1 * (Math.random() > 0.5 ? -1 : 1),
+                y: Math.random() * 0.1 * (Math.random() > 0.5 ? -1 : 1),
+            });
         }
 
         return tileIndexToSalt.get(n)!;
@@ -74,18 +82,19 @@ export function cardReliefSystem(
             }
 
             mesh.visible = true;
-            mesh.position.x = x * TILE_SIZE;
-            mesh.position.y = y * TILE_SIZE;
-            mesh.position.z = RENDER_CARD_SIZE - y - 1;
 
-            const length = atlasTrees.list.length;
             const index =
                 x +
                 y * RENDER_CARD_SIZE -
                 (cardPosition.x + cardPosition.y * RENDER_CARD_SIZE);
-            const tree = atlasTrees.list[getSalt(index, length - 1)];
+            const salt = getSalt(index);
+            const tree = atlasTrees.list[salt.index];
 
             if (mesh.material.map !== tree.texture) {
+                mesh.position.x = (salt.x + x) * TILE_SIZE;
+                mesh.position.y = (salt.y + y) * TILE_SIZE;
+                mesh.position.z = RENDER_CARD_SIZE - y - 1;
+
                 mesh.geometry = new BoxGeometry(tree.w * 2, tree.h * 2, 10);
                 mesh.material.map = tree.texture;
                 mesh.material.needsUpdate = true;

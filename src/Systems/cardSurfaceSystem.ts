@@ -1,4 +1,4 @@
-import { Scene, TextureLoader } from 'three';
+import { Color, Scene, TextureLoader } from 'three';
 
 import imageGrass from '../../assets/sprites/tilesets/grass.png';
 import { getComponent } from '../../lib/ECS/entities';
@@ -17,6 +17,7 @@ import { PositionComponent } from '../Components/PositionComponent';
 import { CARD_SIZE, RENDER_CARD_SIZE, TILE_SIZE } from '../CONST';
 import { isCardEntity } from '../Entities/Card';
 import { isPlayerEntity } from '../Entities/Player';
+import { getRandomArbitrary } from '../utils/random';
 import { FrameTasks } from '../utils/TasksScheduler/frameTasks';
 
 const textureGrass = new TextureLoader().load(imageGrass);
@@ -49,6 +50,17 @@ export function cardSurfaceSystem(
         });
     }
 
+    const tileIndexToSalt = new Map<number, { color: Color }>();
+
+    function getSalt(n: number): { color: Color } {
+        if (!tileIndexToSalt.has(n)) {
+            const v = getRandomArbitrary(0.97, 1);
+            tileIndexToSalt.set(n, { color: new Color(v, v, v) });
+        }
+
+        return tileIndexToSalt.get(n)!;
+    }
+
     function updateSurface() {
         getMatrixSlice(
             cardTiles,
@@ -62,8 +74,21 @@ export function cardSurfaceSystem(
                 mesh.visible = true;
                 mesh.position.x = x * TILE_SIZE;
                 mesh.position.y = y * TILE_SIZE;
-                mesh.material.map = textureGrass;
-                mesh.material.needsUpdate = true;
+
+                const index =
+                    x +
+                    y * RENDER_CARD_SIZE -
+                    (cardPosition.x + cardPosition.y * RENDER_CARD_SIZE);
+                const salt = getSalt(index);
+
+                if (mesh.material.color !== salt.color) {
+                    mesh.material.color = salt.color;
+                }
+
+                if (mesh.material.map !== textureGrass) {
+                    mesh.material.map = textureGrass;
+                    mesh.material.needsUpdate = true;
+                }
             } else if (mesh) {
                 mesh.visible = false;
             }
