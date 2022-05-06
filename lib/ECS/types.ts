@@ -1,15 +1,10 @@
-export type Ref = (...args: unknown[]) => unknown;
-export type Component<P = unknown> = { ref: Ref; payload: P };
-export type CreateComponent<
-    P extends unknown[] = unknown[],
-    C extends Component = Component,
-> = (...props: P) => C;
+export interface Constructor<T = object> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    new (...args: any[]): T;
+    prototype: T;
+}
+export type Component<C extends object = object> = C;
 
 export type Entity<C extends Component = Component> = {
-    ref: Ref;
-    map: Map<C['ref'], C>;
+    components: Map<Constructor<C>, C>;
 };
-export type CreateEntity<
-    P extends unknown[] = unknown[],
-    E extends Entity = Entity,
-> = (...props: P) => E;

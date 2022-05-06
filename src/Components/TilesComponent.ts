@@ -2,6 +2,8 @@ import { uniq } from 'lodash';
 import { pipe } from 'lodash/fp';
 
 import { createComponent } from '../../lib/ECS/components';
+import { hasComponent } from '../../lib/ECS/entities';
+import { Entity } from '../../lib/ECS/types';
 import Enumerable from '../../lib/linq';
 import { Matrix } from '../utils/Matrix';
 import { Item, radialForEach } from '../utils/Matrix/utils';
@@ -17,30 +19,40 @@ export type Tile = {
     type: TileType;
 };
 
-export type Tiles = Matrix<Tile>;
+export type Tiles = { matrix: Matrix<Tile> };
 
 const GET_EMPTY_TILE = (): Tile => ({
     type: TileType.empty,
 });
 
-export const TilesComponent = createComponent(
+export class TilesComponent extends createComponent(
     (props: { w: number; h: number; sx: number; sy: number }) => {
-        return fillEmptyTiles(
-            new Matrix<Tile>(props.w, props.h, GET_EMPTY_TILE).set(
+        return {
+            matrix: new Matrix<Tile>(props.w, props.h, GET_EMPTY_TILE).set(
                 props.sx,
                 props.sy,
                 { type: TileType.passable },
             ),
-        );
+        };
     },
-);
+) {}
 
-export function getSize(tiles: Tiles): Size {
-    return newSize(tiles.n, tiles.m);
+export function hasTilesComponent(
+    entity: Entity,
+): entity is Entity<TilesComponent> {
+    return hasComponent(entity, TilesComponent);
 }
 
-export function getTile(tiles: Tiles, x: number, y: number): undefined | Tile {
-    return tiles.get(x, y);
+export function getSize({ matrix }: Tiles): Size {
+    return newSize(matrix.n, matrix.m);
+}
+
+export function getTile(
+    { matrix }: Tiles,
+    x: number,
+    y: number,
+): undefined | Tile {
+    return matrix.get(x, y);
 }
 
 export function getSlice(
@@ -57,38 +69,44 @@ export function getSlice(
 
     for (let i = -r; i <= r; i++) {
         for (let j = -r; j <= r; j++) {
-            slice.set(r + i, r + j, tiles.get(x + i, y + j));
+            slice.set(r + i, r + j, getTile(tiles, x + i, y + j));
         }
     }
 
     return slice;
 }
 
-export function tilesMove(tiles: Tiles, dx: number, dy: number): void {
-    const { n, m } = tiles;
+export function tilesMove({ matrix }: Tiles, dx: number, dy: number): void {
+    const { n, m } = matrix;
     const tmp = new Matrix<Tile>(n, m, GET_EMPTY_TILE);
 
     for (let i = 0; i < n; i++) {
         for (let j = 0; j < m; j++) {
-            const prevTile = tiles.get(i + dx, j + dy);
+            const prevTile = matrix.get(i + dx, j + dy);
             prevTile && tmp.set(i, j, prevTile);
         }
     }
 
-    tiles.setSource(tmp.buffer.slice());
+    matrix.setSource(tmp.buffer.slice());
 }
 
-function fillEmptyTiles(tiles: Matrix<Tile>): Matrix<Tile> {
+export function tilesFillEmpty({ matrix }: TilesComponent): void {
+    console.log('>> fillEmptyTiles');
     Enumerable.from(
-        radialForEach(tiles, Math.floor(tiles.m / 2), Math.floor(tiles.n / 2)),
+        radialForEach(
+            matrix,
+            Math.floor(matrix.m / 2),
+            Math.floor(matrix.n / 2),
+        ),
     )
         .skip(1)
         .where(
             (item): item is Item<Tile> => item?.value.type === TileType.empty,
         )
         .forEach(({ value, x, y }) => {
+            console.log('>> empty');
             const summedProbabilities = Enumerable.from(
-                radialForEach(tiles, x, y, 1),
+                radialForEach(matrix, x, y, 1),
             )
                 .skip(1)
                 .where((item): item is Item<Tile> => item !== undefined)
@@ -115,8 +133,6 @@ function fillEmptyTiles(tiles: Matrix<Tile>): Matrix<Tile> {
 
             value.type = type as TileType;
         });
-
-    return tiles;
 }
 
 type ProbabilityRecord<T extends string = string> = Record<T, number>;

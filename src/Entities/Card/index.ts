@@ -1,15 +1,14 @@
 import { createEntity } from '../../../lib/ECS/entities';
-import { CreateEntity } from '../../../lib/ECS/types';
-import { PositionComponent } from '../../Components/positionComponent';
+import { PositionComponent } from '../../Components/PositionComponent';
 import { TilesComponent } from '../../Components/TilesComponent';
 
-export const CardEntity = createEntity(
+export class CardEntity extends createEntity(
     (props: { w: number; h: number; sx: number; sy: number }) => [
-        PositionComponent(),
-        TilesComponent(props),
+        new PositionComponent(),
+        new TilesComponent(props),
     ],
-);
+) {}
 
 export const isCardEntity = (
-    entity: CreateEntity,
-): entity is typeof CardEntity => entity === CardEntity;
+    entity: CardEntity | unknown,
+): entity is CardEntity => entity instanceof CardEntity;

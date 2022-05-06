@@ -2,7 +2,7 @@ import { Scene } from 'three';
 
 import { getComponent } from '../../lib/ECS/entities';
 import { Heap } from '../../lib/ECS/heap';
-import { PositionComponent } from '../Components/positionComponent';
+import { PositionComponent } from '../Components/PositionComponent';
 import {
     getSlice,
     TilesComponent,
@@ -43,8 +43,8 @@ export function cardRenderSystem(
     const tick = () => {
         getSlice(
             cardTiles,
-            playerPosition.x - cardPosition.x,
-            playerPosition.y - cardPosition.y,
+            playerPosition.x + cardPosition.x,
+            playerPosition.y + cardPosition.y,
             Math.floor(RENDER_CARD_SIZE / 2),
         ).forEach((tile, x, y) => {
             const render = renderTiles.get(x, y);

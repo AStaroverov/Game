@@ -1,25 +1,33 @@
-import { Component, CreateComponent, CreateEntity, Entity } from './types';
+import { Component, Constructor, Entity } from './types';
 
-export function createEntity<P extends unknown[], C extends Component<unknown>>(
+export function createEntity<P extends unknown[], C extends Component>(
     filler: (...props: P) => C[],
-): CreateEntity<P, Entity<C>> {
-    function Entity(...props: P): Entity<C> {
-        return {
-            ref: Entity,
-            map: new Map(
-                filler(...props).map((component) => {
-                    return [component.ref, component];
-                }),
-            ),
-        };
-    }
+): new (...props: P) => Entity<C> {
+    return class {
+        components = new Map<Constructor<C>, C>();
 
-    return Entity;
+        constructor(...props: P) {
+            filler(...props).forEach((value) => {
+                this.components.set(
+                    // @ts-ignore
+                    value.__proto__.constructor as Constructor<C>,
+                    value,
+                );
+            });
+        }
+    };
 }
 
-export function getComponent<C extends Component, CE extends CreateComponent>(
-    entity: Entity<C>,
-    ref: CE,
-): ReturnType<CE>['payload'] {
-    return entity.map.get(ref)!['payload'] as ReturnType<CE>['payload'];
+export function getComponent<E extends Entity, C extends Component>(
+    entity: E,
+    Component: Constructor<C>,
+): C {
+    return entity.components.get(Component) as C;
+}
+
+export function hasComponent<E extends Entity, C extends Component>(
+    entity: E,
+    Component: Constructor<C>,
+): boolean {
+    return entity.components.has(Component);
 }

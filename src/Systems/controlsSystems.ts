@@ -5,10 +5,12 @@ import { Heap } from '../../lib/ECS/heap';
 import {
     PositionComponent,
     positionMove,
-} from '../Components/positionComponent';
+} from '../Components/PositionComponent';
 import {
     getTile,
     TilesComponent,
+    tilesFillEmpty,
+    tilesMove,
     TileType,
 } from '../Components/TilesComponent';
 import { isCardEntity } from '../Entities/Card';
@@ -17,8 +19,6 @@ import { isPlayerEntity } from '../Entities/Player';
 export function controlsSystem(heap: Heap): void {
     const playerEntity = [...heap.getEntities(isPlayerEntity)][0];
     const cardEntity = [...heap.getEntities(isCardEntity)][0];
-
-    debugger;
 
     fromEvent<KeyboardEvent>(document, 'keydown')
         .pipe(
@@ -47,13 +47,18 @@ export function controlsSystem(heap: Heap): void {
 
             const tile = getTile(
                 cardTiles,
-                playerPosition.x - cardPosition.x + x,
-                playerPosition.y - cardPosition.y + y,
+                playerPosition.x + cardPosition.x + x,
+                playerPosition.y + cardPosition.y + y,
             );
 
             if (tile?.type === TileType.passable) {
-                positionMove(cardPosition, -x, -y);
                 positionMove(playerPosition, x, y);
+                positionMove(cardPosition, -x, -y);
+                tilesMove(cardTiles, x, y);
+                tilesFillEmpty(cardTiles);
             }
+
+            console.log('>> playerPosition', playerPosition);
+            console.log('>> cardPosition', cardPosition);
         });
 }

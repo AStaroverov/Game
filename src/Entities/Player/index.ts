@@ -1,14 +1,13 @@
 import { createEntity } from '../../../lib/ECS/entities';
-import { CreateEntity } from '../../../lib/ECS/types';
-import { Direction } from '../../Components/direction';
-import { PositionComponent } from '../../Components/positionComponent';
+import { DirectionComponent } from '../../Components/DirectionComponent';
+import { PositionComponent } from '../../Components/PositionComponent';
 import { Point } from '../../utils/shape';
 
-export const PlayerEntity = createEntity((startPoint: Point) => [
-    PositionComponent(startPoint),
-    Direction(),
-]);
+export class PlayerEntity extends createEntity((startPoint: Point) => [
+    new PositionComponent(startPoint),
+    new DirectionComponent(),
+]) {}
 
 export const isPlayerEntity = (
-    entity: CreateEntity,
-): entity is typeof PlayerEntity => entity === PlayerEntity;
+    entity: PlayerEntity | unknown,
+): entity is PlayerEntity => entity instanceof PlayerEntity;
