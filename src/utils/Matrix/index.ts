@@ -1,21 +1,22 @@
+export type MatrixSeed<T> = (x: number, y: number) => T;
 export class Matrix<T> {
     buffer: T[];
 
     constructor(
-        public n: number,
-        public m: number,
-        seed: (x: number, y: number) => T,
+        public w: number,
+        public h: number,
+        public seed: MatrixSeed<T>,
     ) {
-        this.buffer = new Array(n * m).fill(null);
+        this.buffer = new Array(w * h).fill(null);
         this.fill((_, x, y) => seed(x, y));
     }
 
-    forEach(each: (item: T, x: number, y: number) => void): this {
+    forEach(each: (item: T, x: number, y: number, i: number) => void): this {
         this.buffer.forEach((_, i) => {
-            const x = i % this.n;
-            const y = (i / this.n) | 0;
+            const x = i % this.w;
+            const y = (i / this.w) | 0;
 
-            each(this.get(x, y)!, x, y);
+            each(this.get(x, y)!, x, y, i);
         });
 
         return this;
@@ -30,17 +31,21 @@ export class Matrix<T> {
     }
 
     map(mapper: (item: T, x: number, y: number) => T): Matrix<T> {
-        return new Matrix<T>(this.n, this.m, (x, y) =>
-            mapper(this.get(x, y)!, x, y),
-        );
+        const m = new Matrix<T>(this.w, this.h, this.seed);
+
+        m.forEach((_, x, y) => {
+            m.set(x, y, mapper(this.get(x, y), x, y));
+        });
+
+        return m;
     }
 
-    get(x: number, y: number): T | undefined {
-        return this.buffer[x + y * this.n];
+    get(x: number, y: number): T {
+        return this.buffer[x + y * this.w];
     }
 
     set(x: number, y: number, item: T): this {
-        this.buffer[x + y * this.n] = item;
+        this.buffer[x + y * this.w] = item;
         return this;
     }
 

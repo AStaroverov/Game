@@ -17,6 +17,7 @@ export class Renderer {
         const width = window.innerWidth;
         const height = window.innerHeight;
 
+        this.renderer.setPixelRatio(window.devicePixelRatio ?? 1);
         this.renderer.setSize(width, height);
         this.camera.position.z = 1000;
         this.scene.position.x -= (TILE_SIZE * RENDER_CARD_SIZE) / 2;

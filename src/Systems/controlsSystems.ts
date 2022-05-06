@@ -6,17 +6,17 @@ import {
     DirectionComponent,
     setDirection,
 } from '../Components/DirectionComponent';
+import { getMatrixCell } from '../Components/Matrix/MatrixComponent';
+import {
+    tilesFillEmpty,
+    TilesMatrixComponent,
+    tilesMove,
+    TileType,
+} from '../Components/Matrix/TilesMatrixComponent';
 import {
     PositionComponent,
     positionMove,
 } from '../Components/PositionComponent';
-import {
-    getTile,
-    TilesComponent,
-    tilesFillEmpty,
-    tilesMove,
-    TileType,
-} from '../Components/TilesComponent';
 import { isCardEntity } from '../Entities/Card';
 import { isPlayerEntity } from '../Entities/Player';
 import { mulVector, newVector } from '../utils/shape';
@@ -28,7 +28,7 @@ export function controlsSystem(heap: Heap): void {
     const playerPosition = getComponent(playerEntity, PositionComponent);
     const playerDirection = getComponent(playerEntity, DirectionComponent);
     const cardPosition = getComponent(cardEntity, PositionComponent);
-    const cardTiles = getComponent(cardEntity, TilesComponent);
+    const cardTiles = getComponent(cardEntity, TilesMatrixComponent);
 
     fromEvent<KeyboardEvent>(document, 'keydown')
         .pipe(
@@ -48,7 +48,7 @@ export function controlsSystem(heap: Heap): void {
             }),
         )
         .subscribe((vector) => {
-            const tile = getTile(
+            const tile = getMatrixCell(
                 cardTiles,
                 playerPosition.x + cardPosition.x + vector.x,
                 playerPosition.y + cardPosition.y + vector.y,

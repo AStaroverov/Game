@@ -1,0 +1,48 @@
+{"frames": {
+
+"tree_l_1.png":
+{
+	"frame": {"x":0,"y":0,"w":45,"h":67},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":45,"h":67},
+	"sourceSize": {"w":45,"h":67}
+},
+"tree_l_2.png":
+{
+	"frame": {"x":0,"y":67,"w":47,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":47,"h":64},
+	"sourceSize": {"w":47,"h":64}
+},
+"tree_m_1.png":
+{
+	"frame": {"x":0,"y":131,"w":25,"h":33},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":25,"h":33},
+	"sourceSize": {"w":25,"h":33}
+},
+"tree_m_2.png":
+{
+	"frame": {"x":25,"y":131,"w":25,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":25,"h":32},
+	"sourceSize": {"w":25,"h":32}
+}},
+"animations": {
+	"tree_l": ["tree_l_1.png","tree_l_2.png"],
+	"tree_m": ["tree_m_1.png","tree_m_2.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "trees.png",
+	"format": "RGBA8888",
+	"size": {"w":50,"h":164},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:3fd69caca5c882b36fb0dd6e2eb379cb:19972be583988cc26e16e3a1caf6784f:ead410b59bd7de5235399502333842d0$"
+}
+}

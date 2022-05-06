@@ -7,16 +7,15 @@ import { createEntity } from '../../../lib/ECS/entities';
 import { DirectionComponent } from '../../Components/DirectionComponent';
 import { MeshBasicComponent } from '../../Components/MeshBasicComponent';
 import { PositionComponent } from '../../Components/PositionComponent';
-import { Point } from '../../utils/shape';
 
 export const atlasPlayer = new Atlas(imageAtlasPlayer, dataAtlasPlayer);
 
-atlasPlayer.frames.forEach((frame) => {
+atlasPlayer.list.forEach((frame) => {
     frame.texture.magFilter = NearestFilter;
 });
 
-export class PlayerEntity extends createEntity((startPoint: Point) => [
-    new PositionComponent(startPoint.x, startPoint.y),
+export class PlayerEntity extends createEntity(() => [
+    new PositionComponent(),
     new DirectionComponent(),
     new MeshBasicComponent({
         geometry: new BoxGeometry(atlasPlayer.w * 3, atlasPlayer.h * 3, 20),

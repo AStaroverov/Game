@@ -1,12 +1,13 @@
 import { uniq } from 'lodash';
 import { pipe } from 'lodash/fp';
 
-import { hasComponent } from '../../lib/ECS/entities';
-import { Entity } from '../../lib/ECS/types';
-import Enumerable from '../../lib/linq';
-import { Matrix } from '../utils/Matrix';
-import { Item, radialForEach } from '../utils/Matrix/utils';
-import { newSize, Size, Vector } from '../utils/shape';
+import { hasComponent } from '../../../lib/ECS/entities';
+import { Entity } from '../../../lib/ECS/types';
+import Enumerable from '../../../lib/linq';
+import { Matrix } from '../../utils/Matrix';
+import { Item, radialForEach } from '../../utils/Matrix/utils';
+import { Size, Vector } from '../../utils/shape';
+import { MatrixComponent } from './MatrixComponent';
 
 export enum TileType {
     empty = 'empty',
@@ -22,63 +23,32 @@ const GET_EMPTY_TILE = (): Tile => ({
     type: TileType.empty,
 });
 
-export class TilesComponent {
-    matrix: Matrix<Tile>;
-
-    constructor(props: { w: number; h: number; sx: number; sy: number }) {
-        this.matrix = new Matrix<Tile>(props.w, props.h, GET_EMPTY_TILE).set(
-            props.sx,
-            props.sy,
-            { type: TileType.passable },
-        );
+export class TilesMatrixComponent extends MatrixComponent<Tile> {
+    constructor(props: Size) {
+        super({ ...props, seed: GET_EMPTY_TILE });
     }
 }
 
 export function hasTilesComponent(
     entity: Entity,
-): entity is Entity<TilesComponent> {
-    return hasComponent(entity, TilesComponent);
+): entity is Entity<TilesMatrixComponent> {
+    return hasComponent(entity, TilesMatrixComponent);
 }
 
-export function getSize({ matrix }: TilesComponent): Size {
-    return newSize(matrix.n, matrix.m);
-}
-
-export function getTile(
-    { matrix }: TilesComponent,
+export function tilesInit(
+    { matrix }: TilesMatrixComponent,
     x: number,
     y: number,
-): undefined | Tile {
-    return matrix.get(x, y);
+): void {
+    matrix.set(x, y, { type: TileType.passable });
 }
 
-export function getSlice(
-    tiles: TilesComponent,
-    x: number,
-    y: number,
-    r: number,
-): Matrix<undefined | Tile> {
-    const slice = new Matrix<undefined | Tile>(
-        r * 2 + 1,
-        r * 2 + 1,
-        GET_EMPTY_TILE,
-    );
+export function tilesMove({ matrix }: TilesMatrixComponent, v: Vector): void {
+    const { w, h } = matrix;
+    const tmp = new Matrix<Tile>(w, h, GET_EMPTY_TILE);
 
-    for (let i = -r; i <= r; i++) {
-        for (let j = -r; j <= r; j++) {
-            slice.set(r + i, r + j, getTile(tiles, x + i, y + j));
-        }
-    }
-
-    return slice;
-}
-
-export function tilesMove({ matrix }: TilesComponent, v: Vector): void {
-    const { n, m } = matrix;
-    const tmp = new Matrix<Tile>(n, m, GET_EMPTY_TILE);
-
-    for (let i = 0; i < n; i++) {
-        for (let j = 0; j < m; j++) {
+    for (let i = 0; i < w; i++) {
+        for (let j = 0; j < h; j++) {
             const prevTile = matrix.get(i + v.x, j + v.y);
             prevTile && tmp.set(i, j, prevTile);
         }
@@ -87,12 +57,12 @@ export function tilesMove({ matrix }: TilesComponent, v: Vector): void {
     matrix.setSource(tmp.buffer.slice());
 }
 
-export function tilesFillEmpty({ matrix }: TilesComponent): void {
+export function tilesFillEmpty({ matrix }: TilesMatrixComponent): void {
     Enumerable.from(
         radialForEach(
             matrix,
-            Math.floor(matrix.m / 2),
-            Math.floor(matrix.n / 2),
+            Math.floor(matrix.h / 2),
+            Math.floor(matrix.w / 2),
         ),
     )
         .skip(1)
