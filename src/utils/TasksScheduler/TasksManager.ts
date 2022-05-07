@@ -1,17 +1,24 @@
 import { Opaque } from '../../types';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type TCallback = (delta: number) => any;
-export type TCallbackId = Opaque<'CallbackId', number>;
-export type TCallbackMetadata = {
-    cb: TCallback;
+export enum CallbackType {
+    frame = 'frame',
+    time = 'time',
+}
+export type Callback = (delta: number, type: CallbackType) => unknown;
+export type CallbackId = Opaque<'CallbackId', number>;
+export type CallbackMetadata = {
+    cb: Callback;
     ctx: unknown | null;
-    delta: number;
+
+    type: CallbackType;
+    left: number;
+    past: number;
+
     delay: number;
     times: number;
 };
 
-function getIndex(): TCallbackId {
+function getIndex(): CallbackId {
     // @ts-ignore
     getIndex.index = (getIndex.index || 0) + 1;
     // @ts-ignore
@@ -19,8 +26,8 @@ function getIndex(): TCallbackId {
 }
 
 export class TasksManager {
-    protected cbIds: TCallbackId[] = [];
-    protected mapIndexToMetadata = new Map<TCallbackId, TCallbackMetadata>();
+    protected cbIds: CallbackId[] = [];
+    protected mapIndexToMetadata = new Map<CallbackId, CallbackMetadata>();
 
     protected lastTime: number = performance.now();
 
@@ -35,8 +42,9 @@ export class TasksManager {
     }
 
     addTask(
-        cb: TCallback,
+        cb: Callback,
         props: {
+            type?: CallbackType;
             delay?: number;
             times?: number;
             ctx?: unknown;
@@ -48,34 +56,22 @@ export class TasksManager {
         this.mapIndexToMetadata.set(id, {
             cb,
             ctx: null,
+            type: CallbackType.time,
             times: Infinity,
             delay: 0,
-            delta: props.delay || 0,
+
+            left: props.delay || 0,
+            past: 0,
+
             ...props,
         });
 
         return this.deleteTask.bind(this, id);
     }
 
-    addInterval(
-        cb: TCallback,
-        delay: number,
-        ctx: unknown = null,
-    ): VoidFunction {
-        return this.addTask(cb, { ctx, delay, times: Infinity });
-    }
-
-    addTimeout(
-        cb: TCallback,
-        delay: number,
-        ctx: unknown = null,
-    ): VoidFunction {
-        return this.addTask(cb, { ctx, delay, times: 1 });
-    }
-
-    protected deleteTask(id: TCallbackId): void {
+    protected deleteTask(id: CallbackId): void {
         if (this.mapIndexToMetadata.delete(id)) {
-            this.cbIds[this.cbIds.indexOf(id)] = NaN as TCallbackId;
+            this.cbIds[this.cbIds.indexOf(id)] = NaN as CallbackId;
         }
     }
 
@@ -86,7 +82,7 @@ export class TasksManager {
             this.lastTime = now;
         }
 
-        this.cbIds.forEach((id) => this.tryExecById(id, delta!, delta!));
+        this.cbIds.forEach((id) => this.tryExecById(id, delta!));
         this.tryClearDeletedCbIds();
     }
 
@@ -96,22 +92,20 @@ export class TasksManager {
         }
     }
 
-    protected tryExecById(
-        id: TCallbackId,
-        metaDelta: number,
-        timeDelta: number,
-    ): void {
+    protected tryExecById(id: CallbackId, timeDelta: number): void {
         const meta = this.mapIndexToMetadata.get(id);
 
         if (meta !== undefined) {
-            meta.delta -= metaDelta;
+            meta.left -= meta.type === CallbackType.time ? timeDelta : 1;
+            meta.past += meta.type === CallbackType.time ? timeDelta : 1;
 
-            if (meta.delta <= 0) {
+            if (meta.left <= 0) {
                 meta.times -= 1;
-                meta.cb.call(meta.ctx, timeDelta);
+                meta.cb.call(meta.ctx, meta.past, meta.type);
 
                 if (meta.times > 0) {
-                    meta.delta = meta.delay;
+                    meta.past = 0;
+                    meta.left = meta.delay;
                 } else {
                     this.deleteTask(id);
                 }

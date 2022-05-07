@@ -3,15 +3,18 @@ import { CARD_SIZE, RENDER_CARD_SIZE } from '../CONST';
 import { CardEntity } from '../Entities/Card';
 import { PlayerEntity } from '../Entities/Player';
 import { Renderer } from '../Renderer';
-import { cardReliefSystem } from '../Systems/cardReliefSystem';
-import { cardSurfaceSystem } from '../Systems/cardSurfaceSystem';
-import { controlsSystem } from '../Systems/controlsSystems';
+import { cardSystem } from '../Systems/cardSystem';
+import { colliderSystem } from '../Systems/colliderSystem';
+import { controlsSystem } from '../Systems/controlsSystem';
 import { playerSystem } from '../Systems/playerSystem';
+import { cardReliefSystem } from '../Systems/Renders/cardReliefSystem';
+import { cardSurfaceSystem } from '../Systems/Renders/cardSurfaceSystem';
+import { playerRenderSystem } from '../Systems/Renders/playerRenderSystem';
 import { newSize } from '../utils/shape';
-import { frameTasks } from '../utils/TasksScheduler/frameTasks';
+import { tasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function game(): void {
-    const ticker = frameTasks;
+    const ticker = tasksScheduler;
     const renderer = new Renderer(ticker);
     const heap = createHeap();
 
@@ -26,11 +29,17 @@ export function game(): void {
     heap.registerEntity(player);
 
     // Systems
+    controlsSystem(heap);
+
+    colliderSystem(heap, ticker);
+
+    playerSystem(heap, ticker);
+    cardSystem(heap, ticker);
+
+    // Render Systems
+    playerRenderSystem(ticker, renderer.scene, heap);
     cardSurfaceSystem(ticker, renderer.scene, heap);
     cardReliefSystem(ticker, renderer.scene, heap);
-    playerSystem(ticker, renderer.scene, heap);
-
-    controlsSystem(heap);
 
     document.body.append(renderer.renderer.domElement);
 }

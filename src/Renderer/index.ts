@@ -1,7 +1,7 @@
 import { PerspectiveCamera, Scene, WebGLRenderer } from 'three';
 
 import { RENDER_CARD_SIZE, TILE_SIZE } from '../CONST';
-import { FrameTasks } from '../utils/TasksScheduler/frameTasks';
+import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export class Renderer {
     scene = new Scene();
@@ -13,7 +13,7 @@ export class Renderer {
     );
     renderer = new WebGLRenderer();
 
-    constructor(ticker: FrameTasks) {
+    constructor(ticker: TasksScheduler) {
         const width = window.innerWidth;
         const height = window.innerHeight;
 
@@ -23,7 +23,7 @@ export class Renderer {
         this.scene.position.x -= (TILE_SIZE * RENDER_CARD_SIZE) / 2;
         this.scene.position.y -= (TILE_SIZE * RENDER_CARD_SIZE) / 2;
 
-        ticker.addInterval(this.render, 1, this);
+        ticker.addFrameInterval(this.render, 1, this);
     }
 
     private render(): void {
