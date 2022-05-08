@@ -1,7 +1,7 @@
-import { BoxGeometry, Mesh, MeshBasicMaterial } from 'three';
+import { Mesh, MeshBasicMaterial, PlaneGeometry } from 'three';
 
 export class MeshBasicComponent<
-    G extends BoxGeometry = BoxGeometry,
+    G extends PlaneGeometry = PlaneGeometry,
     M extends MeshBasicMaterial = MeshBasicMaterial,
 > {
     mesh: Mesh<G, M>;

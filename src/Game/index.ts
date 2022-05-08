@@ -6,17 +6,23 @@ import { Renderer } from '../Renderer';
 import { cardSystem } from '../Systems/cardSystem';
 import { colliderSystem } from '../Systems/colliderSystem';
 import { controlsSystem } from '../Systems/controlsSystem';
+import { enemySpawnSystem } from '../Systems/enemySpawnSystem';
 import { playerSystem } from '../Systems/playerSystem';
+import { atlasAnimationRenderSystem } from '../Systems/Renders/atlasAnimationRenderSystem';
 import { cardReliefSystem } from '../Systems/Renders/cardReliefSystem';
 import { cardSurfaceSystem } from '../Systems/Renders/cardSurfaceSystem';
+import { enemyRenderSystem } from '../Systems/Renders/enemyRenderSystem';
+import { meshesSystem } from '../Systems/Renders/meshesSystem';
 import { playerRenderSystem } from '../Systems/Renders/playerRenderSystem';
+import { positionBodyRenderSystem } from '../Systems/Renders/positionBodyRenderSystem';
+import { rotateBodyRenderSystem } from '../Systems/Renders/rotateBodyRenderSystem';
 import { newSize } from '../utils/shape';
 import { tasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function game(): void {
+    const heap = createHeap();
     const ticker = tasksScheduler;
     const renderer = new Renderer(ticker);
-    const heap = createHeap();
 
     // Entities
     const card = new CardEntity({
@@ -36,10 +42,20 @@ export function game(): void {
     playerSystem(heap, ticker);
     cardSystem(heap, ticker);
 
+    enemySpawnSystem(heap, ticker);
+
     // Render Systems
-    playerRenderSystem(ticker, renderer.scene, heap);
+    meshesSystem(ticker, renderer.scene, heap);
+
     cardSurfaceSystem(ticker, renderer.scene, heap);
     cardReliefSystem(ticker, renderer.scene, heap);
+
+    positionBodyRenderSystem(heap, ticker);
+    rotateBodyRenderSystem(heap, ticker);
+    atlasAnimationRenderSystem(heap, ticker);
+
+    playerRenderSystem(heap, ticker);
+    enemyRenderSystem(heap, ticker);
 
     document.body.append(renderer.renderer.domElement);
 }

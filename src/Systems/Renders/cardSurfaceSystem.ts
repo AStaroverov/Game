@@ -49,14 +49,7 @@ export function cardSurfaceSystem(
     tilesInit(cardTiles, sx, sy);
     tilesFillEmpty(cardTiles);
 
-    addToScene();
     ticker.addFrameInterval(updateSurface, 1);
-
-    function addToScene() {
-        cardMeshes.matrix.forEach((mesh) => {
-            scene.add(mesh);
-        });
-    }
 
     const tileIndexToSalt = new Map<number, { color: Color }>();
 

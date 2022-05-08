@@ -6,7 +6,7 @@ import {
     tilesMove,
 } from '../Components/Matrix/TilesMatrixComponent';
 import { PositionComponent } from '../Components/PositionComponent';
-import { START_POSITION } from '../CONST';
+import { CENTER_CARD_POSITION } from '../CONST';
 import { isCardEntity } from '../Entities/Card';
 import { isPlayerEntity } from '../Entities/Player';
 import { ufloor } from '../utils/math';
@@ -26,7 +26,7 @@ export function cardSystem(heap: Heap, ticker: TasksScheduler): void {
     function moveCard() {
         const playerPast = sumVector(
             playerPosition,
-            mulVector(START_POSITION, -1),
+            mulVector(CENTER_CARD_POSITION, -1),
         );
         const cardDelta = sumVector(playerPast, position);
         const nextPosition = sumVector(position, mulVector(cardDelta, -1));

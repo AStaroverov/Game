@@ -16,7 +16,7 @@ atlasPlayer.list.forEach((frame) => {
     frame.texture.magFilter = NearestFilter;
 });
 
-export class PlayerEntity extends createEntity(() => [
+export class EnemyEntity extends createEntity(() => [
     new PositionComponent(),
     new DirectionComponent(),
     new VelocityComponent(),
@@ -31,8 +31,8 @@ export class PlayerEntity extends createEntity(() => [
     }),
 ]) {}
 
-export function isPlayerEntity<T = PlayerEntity>(
-    entity: PlayerEntity | unknown,
-): entity is PlayerEntity {
-    return entity instanceof PlayerEntity;
+export function isEnemyEntity<T = EnemyEntity>(
+    entity: EnemyEntity | unknown,
+): entity is EnemyEntity {
+    return entity instanceof EnemyEntity;
 }

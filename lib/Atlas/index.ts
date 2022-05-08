@@ -20,17 +20,20 @@ type AtlasData = {
     frames: { [key: SpriteName]: SpriteData };
 };
 
-type Frame = {
+export type AtlasFrame = {
     w: number;
     h: number;
     texture: Texture;
 };
 
-export class Atlas<D extends AtlasData, K extends keyof D['frames']> {
+export class Atlas<
+    D extends AtlasData = AtlasData,
+    K extends keyof D['frames'] = keyof D['frames'],
+> {
     w: number;
     h: number;
-    map: Record<K, Frame>;
-    list: Frame[];
+    map: Record<K, AtlasFrame>;
+    list: AtlasFrame[];
 
     constructor(url: string, data: D) {
         const spriteData = Object.entries(data.frames);
@@ -38,7 +41,10 @@ export class Atlas<D extends AtlasData, K extends keyof D['frames']> {
         this.w = getMax(spriteData, 'w');
         this.h = getMax(spriteData, 'h');
         this.list = createFramesList(spriteData, data.meta);
-        this.map = createFramesMap(spriteData, this.list) as Record<K, Frame>;
+        this.map = createFramesMap(spriteData, this.list) as Record<
+            K,
+            AtlasFrame
+        >;
 
         new ImageLoader().load(url, (image) =>
             updateFramesImage(image, this.list),
@@ -53,7 +59,7 @@ function getMax<K>(entities: [K, SpriteData][], key: 'w' | 'h') {
 function createFramesList<K>(
     entities: [K, SpriteData][],
     meta: AtlasData['meta'],
-): Frame[] {
+): AtlasFrame[] {
     return entities.map(([name, { frame }]) => {
         const texture = new Texture();
 
@@ -68,15 +74,15 @@ function createFramesList<K>(
 
 function createFramesMap(
     entities: [SpriteName, SpriteData][],
-    list: Frame[],
-): Record<string, Frame> {
+    list: AtlasFrame[],
+): Record<string, AtlasFrame> {
     return list.reduce((acc, frame, i) => {
         acc[entities[i][0]] = frame;
         return acc;
-    }, {} as Record<string, Frame>);
+    }, {} as Record<string, AtlasFrame>);
 }
 
-function updateFramesImage(image: HTMLImageElement, frames: Frame[]) {
+function updateFramesImage(image: HTMLImageElement, frames: AtlasFrame[]) {
     frames.forEach((f) => {
         f.texture.image = image;
         f.texture.needsUpdate = true;

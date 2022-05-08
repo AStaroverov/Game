@@ -42,8 +42,6 @@ export function cardReliefSystem(
     const cardTiles = getComponent(cardEntity, TilesMatrixComponent);
     const meshes = getComponent(cardEntity, ReliefMeshesMatrixComponent);
 
-    addToScene();
-    hideMeshes();
     ticker.addFrameInterval(tick, 1);
 
     const tileIndexToSalt = new Map<
@@ -61,18 +59,6 @@ export function cardReliefSystem(
         }
 
         return tileIndexToSalt.get(n)!;
-    }
-
-    function addToScene() {
-        meshes.matrix.forEach((mesh) => {
-            scene.add(mesh);
-        });
-    }
-
-    function hideMeshes() {
-        meshes.matrix.forEach((mesh) => {
-            mesh.visible = false;
-        });
     }
 
     function tick() {
@@ -103,23 +89,23 @@ export function cardReliefSystem(
                         uflooredPosition.y * RENDER_CARD_SIZE);
                 const salt = getSalt(index);
                 const tree = atlasTrees.list[salt.index];
+                const treeSize = newVector(
+                    tree.w * TREES_MUL,
+                    tree.h * TREES_MUL,
+                );
 
                 mesh.visible = true;
                 mesh.position.x = floor(
                     (x - fractionPosition.x + salt.x) * TILE_SIZE,
                 );
                 mesh.position.y = floor(
-                    (tree.h * TREES_MUL > TILE_SIZE ? tree.h / 2 : 0) +
+                    (treeSize.y > TILE_SIZE ? tree.h / 2 : 0) +
                         (y - fractionPosition.y + salt.y) * TILE_SIZE,
                 );
 
                 if (mesh.material.map !== tree.texture) {
                     mesh.position.z = RENDER_CARD_SIZE - y - 1;
-                    mesh.geometry = new BoxGeometry(
-                        tree.w * TREES_MUL,
-                        tree.h * TREES_MUL,
-                        10,
-                    );
+                    mesh.geometry = new BoxGeometry(treeSize.x, treeSize.y, 10);
                     mesh.material.map = tree.texture;
                     mesh.material.needsUpdate = true;
                 }

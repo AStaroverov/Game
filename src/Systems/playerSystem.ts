@@ -3,12 +3,15 @@ import { Heap } from '../../lib/ECS/heap';
 import { DirectionComponent } from '../Components/DirectionComponent';
 import { PositionComponent } from '../Components/PositionComponent';
 import { VelocityComponent } from '../Components/VelocityComponent';
-import { START_POSITION } from '../CONST';
+import { CENTER_CARD_POSITION } from '../CONST';
 import { isPlayerEntity } from '../Entities/Player';
 import { mapVector, mulVector, setVector, sumVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
-export const PLAYER_START_POSITION = mapVector(START_POSITION, (v) => v + 0.5);
+export const PLAYER_START_POSITION = mapVector(
+    CENTER_CARD_POSITION,
+    (v) => v + 0.5,
+);
 
 export function playerSystem(heap: Heap, ticker: TasksScheduler): void {
     const playerEntity = [...heap.getEntities(isPlayerEntity)][0];

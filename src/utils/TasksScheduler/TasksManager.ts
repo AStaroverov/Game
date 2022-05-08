@@ -4,15 +4,14 @@ export enum CallbackType {
     frame = 'frame',
     time = 'time',
 }
-export type Callback = (delta: number, type: CallbackType) => unknown;
+export type Callback = (delta: number) => unknown;
 export type CallbackId = Opaque<'CallbackId', number>;
 export type CallbackMetadata = {
     cb: Callback;
     ctx: unknown | null;
 
     type: CallbackType;
-    left: number;
-    past: number;
+    delta: number;
 
     delay: number;
     times: number;
@@ -60,8 +59,7 @@ export class TasksManager {
             times: Infinity,
             delay: 0,
 
-            left: props.delay || 0,
-            past: 0,
+            delta: props.delay || 0,
 
             ...props,
         });
@@ -96,16 +94,14 @@ export class TasksManager {
         const meta = this.mapIndexToMetadata.get(id);
 
         if (meta !== undefined) {
-            meta.left -= meta.type === CallbackType.time ? timeDelta : 1;
-            meta.past += meta.type === CallbackType.time ? timeDelta : 1;
+            meta.delta -= timeDelta;
 
-            if (meta.left <= 0) {
+            if (meta.delta <= 0) {
                 meta.times -= 1;
-                meta.cb.call(meta.ctx, meta.past, meta.type);
+                meta.cb.call(meta.ctx, meta.delay - meta.delta);
 
                 if (meta.times > 0) {
-                    meta.past = 0;
-                    meta.left = meta.delay;
+                    meta.delta = meta.delay;
                 } else {
                     this.deleteTask(id);
                 }
