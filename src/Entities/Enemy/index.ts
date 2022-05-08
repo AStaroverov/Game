@@ -1,4 +1,4 @@
-import { BoxGeometry, MeshBasicMaterial, NearestFilter } from 'three';
+import { MeshBasicMaterial, NearestFilter, PlaneGeometry } from 'three';
 
 import dataAtlasPlayer from '../../../assets/atlases/player_idle.json';
 import imageAtlasPlayer from '../../../assets/atlases/player_idle.png';
@@ -21,7 +21,7 @@ export class EnemyEntity extends createEntity(() => [
     new DirectionComponent(),
     new VelocityComponent(),
     new MeshBasicComponent({
-        geometry: new BoxGeometry(atlasPlayer.w * 3, atlasPlayer.h * 3, 20),
+        geometry: new PlaneGeometry(atlasPlayer.w * 3, atlasPlayer.h * 3),
         material: new MeshBasicMaterial({ transparent: true, alphaTest: 0.5 }),
     }),
     new AtlasAnimationComponent({

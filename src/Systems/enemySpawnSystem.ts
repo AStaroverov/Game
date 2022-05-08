@@ -77,6 +77,7 @@ export function enemySpawnSystem(heap: Heap, ticker: TasksScheduler): void {
             );
 
             setVector(position, seedPosition);
+
             heap.registerEntity(enemy);
         } else {
             debugger;

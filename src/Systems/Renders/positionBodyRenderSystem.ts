@@ -4,8 +4,9 @@ import { Entity } from '../../../lib/ECS/types';
 import Enumerable from '../../../lib/linq';
 import { MeshBasicComponent } from '../../Components/MeshBasicComponent';
 import { PositionComponent } from '../../Components/PositionComponent';
-import { RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
+import { TILE_SIZE } from '../../CONST';
 import { isCardEntity } from '../../Entities/Card';
+import { worldYToPositionZ } from '../../utils/positionZ';
 import { Vector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 import { worldPositionToRenderPosition } from '../../utils/worldVectorToRenderVector';
@@ -38,8 +39,8 @@ export function positionBodyRenderSystem(
     }
 }
 
-function setPositionMesh(comp: MeshBasicComponent, position: Vector): void {
-    comp.mesh.position.x = (position.x - 0.5) * TILE_SIZE;
-    comp.mesh.position.y = (position.y - 0.5) * TILE_SIZE;
-    comp.mesh.position.z = Math.floor(RENDER_CARD_SIZE / 4);
+function setPositionMesh({ mesh }: MeshBasicComponent, position: Vector): void {
+    mesh.position.x = (position.x - 0.5) * TILE_SIZE;
+    mesh.position.y = (position.y - 0.5) * TILE_SIZE;
+    mesh.position.z = worldYToPositionZ(mesh.position.y);
 }

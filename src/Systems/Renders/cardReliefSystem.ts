@@ -1,4 +1,4 @@
-import { BoxGeometry, Scene } from 'three';
+import { PlaneGeometry, Scene } from 'three';
 
 import { getComponent } from '../../../lib/ECS/entities';
 import { Heap } from '../../../lib/ECS/heap';
@@ -16,6 +16,7 @@ import { RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { atlasTrees, isCardEntity } from '../../Entities/Card';
 import { isPlayerEntity } from '../../Entities/Player';
 import { floor, ufloor } from '../../utils/math';
+import { tileYToPositionZ } from '../../utils/positionZ';
 import { getRandomSign } from '../../utils/random';
 import {
     mapVector,
@@ -102,10 +103,10 @@ export function cardReliefSystem(
                     (treeSize.y > TILE_SIZE ? tree.h / 2 : 0) +
                         (y - fractionPosition.y + salt.y) * TILE_SIZE,
                 );
+                mesh.position.z = tileYToPositionZ(y);
 
                 if (mesh.material.map !== tree.texture) {
-                    mesh.position.z = RENDER_CARD_SIZE - y - 1;
-                    mesh.geometry = new BoxGeometry(treeSize.x, treeSize.y, 10);
+                    mesh.geometry = new PlaneGeometry(treeSize.x, treeSize.y);
                     mesh.material.map = tree.texture;
                     mesh.material.needsUpdate = true;
                 }
