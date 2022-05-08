@@ -32,10 +32,6 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":25,"h":32},
 	"sourceSize": {"w":25,"h":32}
 }},
-"animations": {
-	"tree_l": ["tree_l_1.png","tree_l_2.png"],
-	"tree_m": ["tree_m_1.png","tree_m_2.png"]
-},
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.0",

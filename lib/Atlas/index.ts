@@ -15,7 +15,7 @@ type AtlasData = {
         format: string; //'RGBA8888';
         size: { w: number; h: number };
         scale: string;
-        smartupdate: string;
+        smartupdate?: string;
     };
     frames: { [key: SpriteName]: SpriteData };
 };
@@ -65,7 +65,7 @@ function createFramesList<K>(
 
         texture.repeat.x = frame.w / meta.size.w;
         texture.repeat.y = frame.h / meta.size.h;
-        texture.offset.x = 1 - texture.repeat.x - frame.x / meta.size.w;
+        texture.offset.x = frame.x / meta.size.w;
         texture.offset.y = 1 - texture.repeat.y - frame.y / meta.size.h;
 
         return { name, w: frame.w, h: frame.h, texture };

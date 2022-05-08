@@ -1,7 +1,7 @@
 import { MeshBasicMaterial, NearestFilter, PlaneGeometry } from 'three';
 
-import dataAtlasPlayer from '../../../assets/atlases/player_idle.json';
-import imageAtlasPlayer from '../../../assets/atlases/player_idle.png';
+import dataAtlas from '../../../assets/atlases/skeleton_all.json';
+import imageAtlas from '../../../assets/atlases/skeleton_all.png';
 import { Atlas } from '../../../lib/Atlas';
 import { createEntity } from '../../../lib/ECS/entities';
 import { AtlasAnimationComponent } from '../../Components/AtlasAnimationComponent';
@@ -10,9 +10,9 @@ import { MeshBasicComponent } from '../../Components/MeshBasicComponent';
 import { PositionComponent } from '../../Components/PositionComponent';
 import { VelocityComponent } from '../../Components/VelocityComponent';
 
-export const atlasPlayer = new Atlas(imageAtlasPlayer, dataAtlasPlayer);
+export const atlas = new Atlas(imageAtlas, dataAtlas);
 
-atlasPlayer.list.forEach((frame) => {
+atlas.list.forEach((frame) => {
     frame.texture.magFilter = NearestFilter;
 });
 
@@ -21,13 +21,13 @@ export class EnemyEntity extends createEntity(() => [
     new DirectionComponent(),
     new VelocityComponent(),
     new MeshBasicComponent({
-        geometry: new PlaneGeometry(atlasPlayer.w * 3, atlasPlayer.h * 3),
+        geometry: new PlaneGeometry(atlas.w * 2.2, atlas.h * 2.2),
         material: new MeshBasicMaterial({ transparent: true, alphaTest: 0.5 }),
     }),
     new AtlasAnimationComponent({
+        atlas,
         time: 0,
         duration: 100,
-        atlas: atlasPlayer,
     }),
 ]) {}
 

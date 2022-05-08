@@ -27,7 +27,7 @@ export function enemySpawnSystem(heap: Heap, ticker: TasksScheduler): void {
         const enemies = [...heap.getEntities(isEnemyEntity)];
 
         clear(enemies);
-        if (enemies.length < 5) {
+        if (enemies.length < 1) {
             spawn();
         }
     }
