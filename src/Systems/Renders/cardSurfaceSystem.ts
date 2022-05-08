@@ -17,7 +17,7 @@ import { PositionComponent } from '../../Components/PositionComponent';
 import { CARD_SIZE, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { isCardEntity } from '../../Entities/Card';
 import { isPlayerEntity } from '../../Entities/Player';
-import { ufloor } from '../../utils/math';
+import { floor, ufloor } from '../../utils/math';
 import { getRandomArbitrary } from '../../utils/random';
 import {
     mapVector,
@@ -76,8 +76,12 @@ export function cardSurfaceSystem(
 
                 if (tile && mesh) {
                     mesh.visible = true;
-                    mesh.position.x = (x - fractionPosition.x) * TILE_SIZE;
-                    mesh.position.y = (y - fractionPosition.y) * TILE_SIZE;
+                    mesh.position.x = floor(
+                        (x - fractionPosition.x) * TILE_SIZE,
+                    );
+                    mesh.position.y = floor(
+                        (y - fractionPosition.y) * TILE_SIZE,
+                    );
 
                     const index =
                         x +
