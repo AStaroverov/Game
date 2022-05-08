@@ -17,14 +17,9 @@ import { PositionComponent } from '../../Components/PositionComponent';
 import { CARD_SIZE, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { isCardEntity } from '../../Entities/Card';
 import { isPlayerEntity } from '../../Entities/Player';
-import { floor, ufloor } from '../../utils/math';
+import { floor, round, ufloor } from '../../utils/math';
 import { getRandomArbitrary } from '../../utils/random';
-import {
-    mapVector,
-    newVector,
-    roundVector,
-    sumVector,
-} from '../../utils/shape';
+import { mapVector, newVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 const RENDER_RADIUS = Math.floor(RENDER_CARD_SIZE / 2);
@@ -63,7 +58,7 @@ export function cardSurfaceSystem(
     }
 
     function updateSurface() {
-        const abs = roundVector(sumVector(playerPosition, cardPosition));
+        const abs = mapVector(sumVector(playerPosition, cardPosition), round);
         const fractionPosition = newVector(
             -cardPosition.x % 1,
             -cardPosition.y % 1,

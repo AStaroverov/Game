@@ -21,15 +21,13 @@ export function enemySpawnSystem(heap: Heap, ticker: TasksScheduler): void {
     const cardTiles = getComponent(card, TilesMatrixComponent);
     const cardPosition = getComponent(card, PositionComponent);
 
-    const getEnemies = () => [...heap.getEntities(isEnemyEntity)];
-
     ticker.addTimeInterval(tick, 1000);
 
     function tick() {
-        const enemies = getEnemies();
+        const enemies = [...heap.getEntities(isEnemyEntity)];
 
         clear(enemies);
-        if (enemies.length < 1) {
+        if (enemies.length < 5) {
             spawn();
         }
     }
@@ -65,7 +63,7 @@ export function enemySpawnSystem(heap: Heap, ticker: TasksScheduler): void {
                 return (
                     value.type === TileType.passable &&
                     dist > 10 &&
-                    random() > 0.5
+                    random() > 0.9
                 );
             });
 

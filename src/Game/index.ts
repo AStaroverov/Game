@@ -7,7 +7,9 @@ import { cardSystem } from '../Systems/cardSystem';
 import { colliderSystem } from '../Systems/colliderSystem';
 import { controlsSystem } from '../Systems/controlsSystem';
 import { enemySpawnSystem } from '../Systems/enemySpawnSystem';
+import { enemySystem } from '../Systems/enemySystem';
 import { playerSystem } from '../Systems/playerSystem';
+import { positionBodySystem } from '../Systems/positionBodySystem';
 import { atlasAnimationRenderSystem } from '../Systems/Renders/atlasAnimationRenderSystem';
 import { cardReliefSystem } from '../Systems/Renders/cardReliefSystem';
 import { cardSurfaceSystem } from '../Systems/Renders/cardSurfaceSystem';
@@ -39,8 +41,11 @@ export function game(): void {
 
     colliderSystem(heap, ticker);
 
-    playerSystem(heap, ticker);
+    positionBodySystem(heap, ticker);
+
     cardSystem(heap, ticker);
+    playerSystem(heap, ticker);
+    enemySystem(heap, ticker);
 
     enemySpawnSystem(heap, ticker);
 

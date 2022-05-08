@@ -15,15 +15,10 @@ import { PositionComponent } from '../../Components/PositionComponent';
 import { RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { atlasTrees, isCardEntity } from '../../Entities/Card';
 import { isPlayerEntity } from '../../Entities/Player';
-import { floor, ufloor } from '../../utils/math';
+import { floor, round, ufloor } from '../../utils/math';
 import { tileYToPositionZ } from '../../utils/positionZ';
 import { getRandomSign } from '../../utils/random';
-import {
-    mapVector,
-    newVector,
-    roundVector,
-    sumVector,
-} from '../../utils/shape';
+import { mapVector, newVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 const TREES_MUL = 2;
@@ -63,7 +58,7 @@ export function cardReliefSystem(
     }
 
     function tick() {
-        const abs = roundVector(sumVector(playerPosition, cardPosition));
+        const abs = mapVector(sumVector(playerPosition, cardPosition), round);
         const fractionPosition = newVector(
             -cardPosition.x % 1,
             -cardPosition.y % 1,

@@ -9,7 +9,7 @@ import { isCardEntity } from '../../Entities/Card';
 import { worldYToPositionZ } from '../../utils/positionZ';
 import { Vector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
-import { worldPositionToRenderPosition } from '../../utils/worldVectorToRenderVector';
+import { worldToRenderPosition } from '../../utils/worldToRenderPosition';
 
 export function positionBodyRenderSystem(
     heap: Heap,
@@ -33,7 +33,7 @@ export function positionBodyRenderSystem(
 
             setPositionMesh(
                 mesh,
-                worldPositionToRenderPosition(position, cardPosition),
+                worldToRenderPosition(position, cardPosition),
             );
         });
     }

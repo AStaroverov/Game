@@ -53,6 +53,18 @@ export class Matrix<T> {
         return this.buffer;
     }
 
+    toNestedArray(): T[][] {
+        const m = new Array(this.h)
+            .fill(null)
+            .map(() => new Array(this.w).fill(null));
+
+        this.forEach((v, x, y) => {
+            m[x][y] = v;
+        });
+
+        return m;
+    }
+
     setSource(buffer: T[]): void {
         this.buffer = buffer;
     }
