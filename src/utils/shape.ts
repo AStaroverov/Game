@@ -33,4 +33,6 @@ export const negateVector = (v: Vector): Vector => mulVector(v, -1);
 export const isEqualVectors = (a: Vector, b: Vector): boolean =>
     a.x === b.x && a.y === b.y;
 
+export const stringVector = (v: Vector): string => `Vector{${v.x},${v.y}`;
+
 export const emptyVector = newVector(0, 0);

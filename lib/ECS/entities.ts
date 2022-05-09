@@ -1,6 +1,6 @@
 import { Component, Constructor, Entity } from './types';
 
-export function createEntity<P extends unknown[], C extends Component>(
+export function createEntity<P extends any[], C extends Component>(
     filler: (...props: P) => C[],
 ): new (...props: P) => Entity<C> {
     return class {
@@ -23,6 +23,17 @@ export function getComponent<E extends Entity, C extends Component>(
     Component: Constructor<C>,
 ): C {
     return entity.components.get(Component) as C;
+}
+
+export function* getComponents<E extends Entity, C extends Component>(
+    entity: E,
+    fn: (ref: Component) => ref is C,
+): IterableIterator<C> {
+    for (const component of entity.components.values()) {
+        if (fn(component)) {
+            yield component as C;
+        }
+    }
 }
 
 export function hasComponent<E extends Entity, C extends Component>(

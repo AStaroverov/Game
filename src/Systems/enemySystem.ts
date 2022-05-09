@@ -1,11 +1,12 @@
 import memoize from 'memoizee';
-import { AStarFinder, Grid } from 'pathfinding';
+import { BiAStarFinder, DiagonalMovement, Grid } from 'pathfinding';
 
 import { getComponent } from '../../lib/ECS/entities';
 import { Heap } from '../../lib/ECS/heap';
 import Enumerable from '../../lib/linq';
 import { DirectionComponent } from '../Components/DirectionComponent';
 import {
+    Tile,
     TilesMatrixComponent,
     TileType,
 } from '../Components/Matrix/TilesMatrixComponent';
@@ -17,13 +18,15 @@ import {
 import { isCardEntity } from '../Entities/Card';
 import { EnemyEntity, isEnemyEntity } from '../Entities/Enemy';
 import { isPlayerEntity } from '../Entities/Player';
-import { ceil, floor } from '../utils/math';
+import { floor, ufloor } from '../utils/math';
+import { Matrix } from '../utils/Matrix';
 import {
     isEqualVectors,
     mapVector,
     negateVector,
     newVector,
     setVector,
+    stringVector,
     sumVector,
     Vector,
 } from '../utils/shape';
@@ -38,7 +41,9 @@ export function enemySystem(heap: Heap, ticker: TasksScheduler): void {
     const player = [...heap.getEntities(isPlayerEntity)][0];
     const playerPosition = getComponent(player, PositionComponent);
 
-    const pathFinder = new AStarFinder();
+    const pathFinder = new BiAStarFinder({
+        diagonalMovement: DiagonalMovement.OnlyWhenNoObstacles,
+    });
 
     ticker.addFrameInterval(tick, 1);
 
@@ -53,7 +58,7 @@ export function enemySystem(heap: Heap, ticker: TasksScheduler): void {
         const direction = getComponent(enemy, DirectionComponent);
         const velocity = getComponent(enemy, VelocityComponent);
 
-        const cardTilePosition = mapVector(cardPosition, ceil);
+        const cardTilePosition = mapVector(cardPosition, ufloor);
         const enemyTilePosition = sumVector(
             mapVector(position, floor),
             cardTilePosition,
@@ -85,7 +90,7 @@ export function enemySystem(heap: Heap, ticker: TasksScheduler): void {
             );
 
             setVector(direction, nextDirection);
-            setVelocity(velocity, 0.08);
+            setVelocity(velocity, 0.05);
         }
     }
 
@@ -102,21 +107,27 @@ export function enemySystem(heap: Heap, ticker: TasksScheduler): void {
         {
             max: 100,
             normalizer: ([from, to, card]) =>
-                `${from.x}|${from.y}|${to.x}|${to.y}|${card.x}|${card.y}`,
+                `${stringVector(from)}${stringVector(to)}${stringVector(card)}`,
         },
     );
 
     const getMatrix = memoize(
-        (_: PositionComponent) => {
-            return cardTiles.matrix
-                .toNestedArray()
-                .map((arr) =>
-                    arr.map((v) => (v.type === TileType.passable ? 0 : 1)),
-                );
-        },
+        (_: PositionComponent) => matrixToNestedArray(cardTiles.matrix),
         {
-            max: 1,
-            normalizer: ([p]: [PositionComponent]) => `${p.x}|${p.y}`,
+            max: 100,
+            normalizer: ([p]: [PositionComponent]) => stringVector(p),
         },
     );
+}
+
+function matrixToNestedArray<T extends Tile>(matrix: Matrix<T>): number[][] {
+    const m = new Array(matrix.h)
+        .fill(null)
+        .map(() => new Array(matrix.w).fill(null));
+
+    matrix.forEach((v, x, y) => {
+        m[y][x] = v.type === TileType.passable ? 0 : 1;
+    });
+
+    return m;
 }
