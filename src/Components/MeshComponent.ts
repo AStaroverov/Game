@@ -1,12 +1,12 @@
 import { Mesh, MeshBasicMaterial, PlaneGeometry } from 'three';
 
-export class MeshBasicComponent<
+export class MeshComponent<
     G extends PlaneGeometry = PlaneGeometry,
     M extends MeshBasicMaterial = MeshBasicMaterial,
 > {
-    mesh: Mesh<G, M>;
+    object: Mesh<G, M>;
 
     constructor(props: { geometry: G; material: M }) {
-        this.mesh = new Mesh(props.geometry, props.material);
+        this.object = new Mesh(props.geometry, props.material);
     }
 }

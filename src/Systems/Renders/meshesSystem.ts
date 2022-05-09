@@ -1,12 +1,17 @@
 import { Scene } from 'three';
 
-import { getComponent, hasComponent } from '../../../lib/ECS/entities';
+import {
+    getComponent,
+    getComponents,
+    hasComponent,
+} from '../../../lib/ECS/entities';
 import { Heap } from '../../../lib/ECS/heap';
 import { Entity } from '../../../lib/ECS/types';
 import Enumerable from '../../../lib/linq';
 import { ReliefMeshesMatrixComponent } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
 import { SurfaceMeshesMatrixComponent } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
-import { MeshBasicComponent } from '../../Components/MeshBasicComponent';
+import { MeshComponent } from '../../Components/MeshComponent';
+import { MeshGroupComponent } from '../../Components/MeshGroupComponent';
 import { PositionComponent } from '../../Components/PositionComponent';
 import { CENTER_CARD_POSITION, HALF_RENDER_CARD_SIZE } from '../../CONST';
 import { isCardEntity } from '../../Entities/Card';
@@ -40,28 +45,41 @@ export function meshesSystem(
         scene.add(...staticMeshes);
 
         const entities = heap.getEntities(
-            (e): e is Entity<MeshBasicComponent> =>
-                hasComponent(e, MeshBasicComponent),
+            (e): e is Entity<MeshComponent | MeshGroupComponent> =>
+                hasComponent(e, MeshComponent) ||
+                hasComponent(e, MeshGroupComponent),
         );
 
         Enumerable.from(entities).forEach((entity) => {
-            const { mesh } = getComponent(entity, MeshBasicComponent);
             const position = getComponent(entity, PositionComponent);
+            const meshes = getComponents(
+                entity,
+                (component): component is MeshComponent | MeshGroupComponent =>
+                    component instanceof MeshComponent ||
+                    component instanceof MeshGroupComponent,
+            );
 
-            scene.add(mesh);
-
-            if (position) {
-                const diff = sumVector(
+            const diff =
+                position &&
+                sumVector(
                     position,
                     mulVector(CENTER_CARD_POSITION, -1),
                     cardPosition,
                 );
-
-                mesh.visible = !(
-                    abs(diff.x) > HALF_RENDER_CARD_SIZE ||
-                    abs(diff.y) > HALF_RENDER_CARD_SIZE
+            const visible =
+                position &&
+                !(
+                    abs(diff.x) > HALF_RENDER_CARD_SIZE + 5 ||
+                    abs(diff.y) > HALF_RENDER_CARD_SIZE + 5
                 );
-            }
+
+            Enumerable.from(meshes).forEach((mesh) => {
+                mesh && scene.add(mesh.object);
+
+                if (visible !== undefined) {
+                    mesh.object.visible = visible;
+                }
+            });
         });
     }
 }

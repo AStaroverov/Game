@@ -6,7 +6,7 @@ import {
     AtlasAnimationComponent,
     updateAtlasAnimation,
 } from '../../Components/AtlasAnimationComponent';
-import { MeshBasicComponent } from '../../Components/MeshBasicComponent';
+import { MeshComponent } from '../../Components/MeshComponent';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 export function atlasAnimationRenderSystem(
@@ -17,13 +17,13 @@ export function atlasAnimationRenderSystem(
 
     function tick(delta: number) {
         const entities = heap.getEntities(
-            (e): e is Entity<MeshBasicComponent | AtlasAnimationComponent> =>
-                hasComponent(e, MeshBasicComponent) &&
+            (e): e is Entity<MeshComponent | AtlasAnimationComponent> =>
+                hasComponent(e, MeshComponent) &&
                 hasComponent(e, AtlasAnimationComponent),
         );
 
         Enumerable.from(entities).forEach((entity) => {
-            const mesh = getComponent(entity, MeshBasicComponent);
+            const mesh = getComponent(entity, MeshComponent);
             const animation = getComponent(entity, AtlasAnimationComponent);
 
             animate(delta, mesh, animation);
@@ -33,13 +33,13 @@ export function atlasAnimationRenderSystem(
 
 function animate(
     delta: number,
-    component: MeshBasicComponent,
+    component: MeshComponent,
     animation: AtlasAnimationComponent,
 ): void {
     updateAtlasAnimation(animation, delta);
 
-    if (component.mesh.material.map !== animation.atlasFrame.texture) {
-        component.mesh.material.map = animation.atlasFrame.texture;
-        component.mesh.material.needsUpdate = true;
+    if (component.object.material.map !== animation.atlasFrame.texture) {
+        component.object.material.map = animation.atlasFrame.texture;
+        component.object.material.needsUpdate = true;
     }
 }
