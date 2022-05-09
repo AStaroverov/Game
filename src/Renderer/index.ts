@@ -1,15 +1,26 @@
-import { PerspectiveCamera, Scene, WebGLRenderer } from 'three';
+import { OrthographicCamera, Scene, WebGLRenderer } from 'three';
 
 import { RENDER_CARD_SIZE, TILE_SIZE } from '../CONST';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
+const min = Math.min(window.innerWidth, window.innerHeight) * 1.4;
+const width = min;
+const height = min;
+const aspect = window.innerWidth / window.innerHeight;
+
 export class Renderer {
     scene = new Scene();
-    camera = new PerspectiveCamera(
-        75,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        1000,
+    // camera = new PerspectiveCamera(
+    //     75,
+    //     window.innerWidth / window.innerHeight,
+    //     0.1,
+    //     1000,
+    // );
+    camera = new OrthographicCamera(
+        (width * aspect) / -2,
+        (width * aspect) / 2,
+        height / 2,
+        height / -2,
     );
     renderer = new WebGLRenderer();
 
