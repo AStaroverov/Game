@@ -1,27 +1,23 @@
-import { Component, Entity } from './types';
+import { Entity } from './types';
 
 export interface Heap {
+    entities: Set<Entity>;
     registerEntity<E extends Entity>(entity: E): void;
     unregisterEntity<E extends Entity>(entity: E): void;
     getEntities<T extends Entity>(
         fn: (ref: Entity) => ref is T,
     ): IterableIterator<T>;
-    getComponents<T extends Component>(
-        fn: (ref: Component) => ref is T,
-    ): IterableIterator<T>;
 }
+
 export function createHeap(): Heap {
     const entities = new Set<Entity>();
-    const components = new Set<Component>();
 
     function registerEntity<E extends Entity>(entity: E): void {
         entities.add(entity);
-        entity.components.forEach((value) => components.add(value));
     }
 
     function unregisterEntity<E extends Entity>(entity: E): void {
         entities.delete(entity);
-        entity.components.forEach((value) => components.delete(value));
     }
 
     function* getEntities<T extends Entity>(
@@ -34,20 +30,33 @@ export function createHeap(): Heap {
         }
     }
 
-    function* getComponents<T extends Component>(
-        fn: (ref: Component) => ref is T,
-    ): IterableIterator<T> {
-        for (const component of components.values()) {
-            if (fn(component)) {
-                yield component as T;
-            }
-        }
-    }
-
     return {
+        entities,
+        getEntities,
         registerEntity,
         unregisterEntity,
-        getEntities,
-        getComponents,
+        // getComponents: getHeapComponents,
     };
+}
+
+export function registerEntity<E extends Entity>(heap: Heap, entity: E): void {
+    heap.entities.add(entity);
+}
+
+export function unregisterEntity<E extends Entity>(
+    heap: Heap,
+    entity: E,
+): void {
+    heap.entities.delete(entity);
+}
+
+export function* getEntities<T extends Entity>(
+    heap: Heap,
+    fn: (ref: Entity) => ref is T,
+): IterableIterator<T> {
+    for (const entity of heap.entities.values()) {
+        if (fn(entity)) {
+            yield entity as T;
+        }
+    }
 }

@@ -15,3 +15,5 @@ export const CENTER_RENDER_POSITION = newVector(
     Math.floor(HALF_RENDER_CARD_SIZE),
     Math.floor(HALF_RENDER_CARD_SIZE),
 );
+
+export const HEAL_BAR_Z = 100;

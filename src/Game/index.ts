@@ -14,10 +14,11 @@ import { atlasAnimationRenderSystem } from '../Systems/Renders/atlasAnimationRen
 import { cardReliefSystem } from '../Systems/Renders/cardReliefSystem';
 import { cardSurfaceSystem } from '../Systems/Renders/cardSurfaceSystem';
 import { enemyRenderSystem } from '../Systems/Renders/enemyRenderSystem';
+import { healBarRenderSystem } from '../Systems/Renders/healBarRenderSystem';
 import { meshesSystem } from '../Systems/Renders/meshesSystem';
 import { playerRenderSystem } from '../Systems/Renders/playerRenderSystem';
-import { positionBodyRenderSystem } from '../Systems/Renders/positionBodyRenderSystem';
-import { rotateBodyRenderSystem } from '../Systems/Renders/rotateBodyRenderSystem';
+import { positionRenderSystem } from '../Systems/Renders/positionRenderSystem';
+import { rotateRenderSystem } from '../Systems/Renders/rotateRenderSystem';
 import { newSize } from '../utils/shape';
 import { tasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
@@ -55,12 +56,14 @@ export function game(): void {
     cardSurfaceSystem(ticker, renderer.scene, heap);
     cardReliefSystem(ticker, renderer.scene, heap);
 
-    positionBodyRenderSystem(heap, ticker);
-    rotateBodyRenderSystem(heap, ticker);
+    positionRenderSystem(heap, ticker);
+    rotateRenderSystem(heap, ticker);
     atlasAnimationRenderSystem(heap, ticker);
 
     playerRenderSystem(heap, ticker);
     enemyRenderSystem(heap, ticker);
+
+    healBarRenderSystem(heap, ticker);
 
     document.body.append(renderer.renderer.domElement);
 }

@@ -6,9 +6,13 @@ import { Atlas } from '../../../lib/Atlas';
 import { createEntity } from '../../../lib/ECS/entities';
 import { AtlasAnimationComponent } from '../../Components/AtlasAnimationComponent';
 import { DirectionComponent } from '../../Components/DirectionComponent';
-import { MeshBasicComponent } from '../../Components/MeshBasicComponent';
+import { HealBarMeshComponent } from '../../Components/HealBarMeshComponent';
+import { HealComponent } from '../../Components/HealComponent';
+import { MeshComponent } from '../../Components/MeshComponent';
 import { PositionComponent } from '../../Components/PositionComponent';
 import { VelocityComponent } from '../../Components/VelocityComponent';
+import { VisualSizeComponent } from '../../Components/VisualSizeComponent';
+import { TILE_SIZE } from '../../CONST';
 
 export const atlasPlayer = new Atlas(imageAtlasPlayer, dataAtlasPlayer);
 
@@ -17,10 +21,11 @@ atlasPlayer.list.forEach((frame) => {
 });
 
 export class PlayerEntity extends createEntity(() => [
+    new VisualSizeComponent(TILE_SIZE, TILE_SIZE),
     new PositionComponent(),
     new DirectionComponent(),
     new VelocityComponent(),
-    new MeshBasicComponent({
+    new MeshComponent({
         geometry: new PlaneGeometry(atlasPlayer.w * 3, atlasPlayer.h * 3),
         material: new MeshBasicMaterial({ transparent: true, alphaTest: 0.5 }),
     }),
@@ -29,6 +34,8 @@ export class PlayerEntity extends createEntity(() => [
         duration: 100,
         atlas: atlasPlayer,
     }),
+    new HealComponent(100),
+    new HealBarMeshComponent(),
 ]) {}
 
 export function isPlayerEntity<T = PlayerEntity>(
