@@ -8,12 +8,12 @@ import {
 import { Heap } from '../../../lib/ECS/heap';
 import { Entity } from '../../../lib/ECS/types';
 import Enumerable from '../../../lib/linq';
-import { SpotLightMeshComponent } from '../../Components/LightComponent';
 import { ReliefMeshesMatrixComponent } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
 import { SurfaceMeshesMatrixComponent } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
-import { MeshComponent } from '../../Components/MeshComponent';
-import { MeshGroupComponent } from '../../Components/MeshGroupComponent';
 import { PositionComponent } from '../../Components/PositionComponent';
+import { SpotLightMeshComponent } from '../../Components/Renders/LightComponent';
+import { MeshComponent } from '../../Components/Renders/MeshComponent';
+import { MeshGroupComponent } from '../../Components/Renders/MeshGroupComponent';
 import { CENTER_CARD_POSITION, HALF_RENDER_CARD_SIZE } from '../../CONST';
 import { isCardEntity } from '../../Entities/Card';
 import { isGlobalLightEntity } from '../../Entities/GlobalLight';

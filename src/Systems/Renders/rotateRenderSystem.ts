@@ -3,7 +3,7 @@ import { Heap } from '../../../lib/ECS/heap';
 import { Entity } from '../../../lib/ECS/types';
 import Enumerable from '../../../lib/linq';
 import { DirectionComponent } from '../../Components/DirectionComponent';
-import { MeshComponent } from '../../Components/MeshComponent';
+import { MeshComponent } from '../../Components/Renders/MeshComponent';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 export function rotateRenderSystem(heap: Heap, ticker: TasksScheduler): void {

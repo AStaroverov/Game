@@ -1,6 +1,6 @@
 import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
 
-import { HEAL_BAR_Z } from '../CONST';
+import { HEAL_BAR_Z } from '../../CONST';
 import { MeshGroupComponent } from './MeshGroupComponent';
 
 export class HealBarMeshComponent extends MeshGroupComponent {

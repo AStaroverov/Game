@@ -6,7 +6,7 @@ import {
     AtlasAnimationComponent,
     updateAtlasAnimation,
 } from '../../Components/AtlasAnimationComponent';
-import { MeshComponent } from '../../Components/MeshComponent';
+import { MeshComponent } from '../../Components/Renders/MeshComponent';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 export function atlasAnimationRenderSystem(

@@ -1,7 +1,7 @@
 import { SpotLight } from 'three';
 
 import { Entity } from '../../../lib/ECS/entities';
-import { SpotLightMeshComponent } from '../../Components/LightComponent';
+import { SpotLightMeshComponent } from '../../Components/Renders/LightComponent';
 import { CENTER_RENDER_POSITION, TILE_SIZE } from '../../CONST';
 import { newVector, sumVector } from '../../utils/shape';
 
