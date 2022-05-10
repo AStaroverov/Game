@@ -1,4 +1,4 @@
-import { Mesh, MeshBasicMaterial, PlaneGeometry } from 'three';
+import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
 
 import { HEAL_BAR_Z } from '../CONST';
 import { MeshGroupComponent } from './MeshGroupComponent';
@@ -6,15 +6,15 @@ import { MeshGroupComponent } from './MeshGroupComponent';
 export class HealBarMeshComponent extends MeshGroupComponent {
     healMesh = new Mesh(
         new PlaneGeometry(60, 6),
-        new MeshBasicMaterial({
+        new MeshLambertMaterial({
             transparent: true,
             color: 0xff0000,
             opacity: 0.7,
         }),
     );
-    backgroundMesh = new Mesh<PlaneGeometry, MeshBasicMaterial>(
+    backgroundMesh = new Mesh<PlaneGeometry, MeshLambertMaterial>(
         new PlaneGeometry(64, 10),
-        new MeshBasicMaterial({
+        new MeshLambertMaterial({
             transparent: true,
             color: 0x000000,
             opacity: 0.3,

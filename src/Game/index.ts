@@ -1,6 +1,7 @@
 import { createHeap } from '../../lib/ECS/heap';
 import { CARD_SIZE, RENDER_CARD_SIZE } from '../CONST';
 import { CardEntity } from '../Entities/Card';
+import { GlobalLightEntity } from '../Entities/GlobalLight';
 import { PlayerEntity } from '../Entities/Player';
 import { Renderer } from '../Renderer';
 import { cardSystem } from '../Systems/cardSystem';
@@ -28,12 +29,14 @@ export function game(): void {
     const renderer = new Renderer(ticker);
 
     // Entities
+    const light = new GlobalLightEntity();
     const card = new CardEntity({
         tileSize: newSize(CARD_SIZE),
         meshSize: newSize(RENDER_CARD_SIZE),
     });
     const player = new PlayerEntity();
 
+    heap.registerEntity(light);
     heap.registerEntity(card);
     heap.registerEntity(player);
 

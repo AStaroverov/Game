@@ -1,4 +1,4 @@
-import { MeshBasicMaterial, NearestFilter, PlaneGeometry } from 'three';
+import { MeshLambertMaterial, NearestFilter, PlaneGeometry } from 'three';
 
 import dataAtlas from '../../../assets/atlases/skeleton_all.json';
 import imageAtlas from '../../../assets/atlases/skeleton_all.png';
@@ -27,7 +27,10 @@ export class EnemyEntity extends createEntity((maxHP = 1) => [
     new VelocityComponent(),
     new MeshComponent({
         geometry: new PlaneGeometry(atlas.w * 2.2, atlas.h * 2.2),
-        material: new MeshBasicMaterial({ transparent: true, alphaTest: 0.5 }),
+        material: new MeshLambertMaterial({
+            transparent: true,
+            alphaTest: 0.5,
+        }),
     }),
     new AtlasAnimationComponent({
         atlas,

@@ -8,6 +8,7 @@ import {
 import { Heap } from '../../../lib/ECS/heap';
 import { Entity } from '../../../lib/ECS/types';
 import Enumerable from '../../../lib/linq';
+import { SpotLightMeshComponent } from '../../Components/LightComponent';
 import { ReliefMeshesMatrixComponent } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
 import { SurfaceMeshesMatrixComponent } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
 import { MeshComponent } from '../../Components/MeshComponent';
@@ -15,6 +16,7 @@ import { MeshGroupComponent } from '../../Components/MeshGroupComponent';
 import { PositionComponent } from '../../Components/PositionComponent';
 import { CENTER_CARD_POSITION, HALF_RENDER_CARD_SIZE } from '../../CONST';
 import { isCardEntity } from '../../Entities/Card';
+import { isGlobalLightEntity } from '../../Entities/GlobalLight';
 import { abs } from '../../utils/math';
 import { mulVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
@@ -24,9 +26,10 @@ export function meshesSystem(
     scene: Scene,
     heap: Heap,
 ): void {
+    const globalLightEntity = [...heap.getEntities(isGlobalLightEntity)][0];
+    const spotLight = getComponent(globalLightEntity, SpotLightMeshComponent);
     const cardEntity = [...heap.getEntities(isCardEntity)][0];
     const cardPosition = getComponent(cardEntity, PositionComponent);
-
     const surfaceMeshes = getComponent(
         cardEntity,
         SurfaceMeshesMatrixComponent,
@@ -34,6 +37,8 @@ export function meshesSystem(
     const reliefMeshes = getComponent(cardEntity, ReliefMeshesMatrixComponent);
 
     const staticMeshes = [
+        spotLight.object,
+        spotLight.object.target,
         ...surfaceMeshes.matrix.toArray(),
         ...reliefMeshes.matrix.toArray(),
     ];

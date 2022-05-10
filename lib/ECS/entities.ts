@@ -1,4 +1,4 @@
-import { Component, Constructor, Entity } from './types';
+import { Component, Constructor } from './types';
 
 export function createEntity<P extends any[], C extends Component>(
     filler: (...props: P) => C[],
@@ -16,6 +16,20 @@ export function createEntity<P extends any[], C extends Component>(
             });
         }
     };
+}
+
+export class Entity<C extends Component = Component> {
+    components = new Map<Constructor<C>, C>();
+
+    constructor(components: C[]) {
+        components.forEach((value) => {
+            this.components.set(
+                // @ts-ignore
+                value.__proto__.constructor as Constructor<C>,
+                value,
+            );
+        });
+    }
 }
 
 export function getComponent<E extends Entity, C extends Component>(

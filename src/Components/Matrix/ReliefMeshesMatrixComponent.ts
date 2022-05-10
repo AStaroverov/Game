@@ -1,10 +1,10 @@
-import { Mesh, MeshBasicMaterial, PlaneGeometry } from 'three';
+import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
 
 import { Size } from '../../utils/shape';
 import { MatrixComponent } from './MatrixComponent';
 
 export class ReliefMeshesMatrixComponent extends MatrixComponent<
-    Mesh<PlaneGeometry, MeshBasicMaterial>
+    Mesh<PlaneGeometry, MeshLambertMaterial>
 > {
     constructor({ w, h }: Size) {
         super({
@@ -13,7 +13,7 @@ export class ReliefMeshesMatrixComponent extends MatrixComponent<
             seed: () => {
                 return new Mesh(
                     new PlaneGeometry(),
-                    new MeshBasicMaterial({
+                    new MeshLambertMaterial({
                         transparent: true,
                         alphaTest: 0.5,
                     }),

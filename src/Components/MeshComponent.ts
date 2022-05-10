@@ -1,8 +1,8 @@
-import { Mesh, MeshBasicMaterial, PlaneGeometry } from 'three';
+import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
 
 export class MeshComponent<
     G extends PlaneGeometry = PlaneGeometry,
-    M extends MeshBasicMaterial = MeshBasicMaterial,
+    M extends MeshLambertMaterial = MeshLambertMaterial,
 > {
     object: Mesh<G, M>;
 

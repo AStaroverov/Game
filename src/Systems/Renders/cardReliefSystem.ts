@@ -98,7 +98,7 @@ export function cardReliefSystem(
                     (treeSize.y > TILE_SIZE ? tree.h / 2 : 0) +
                         (y - fractionPosition.y + salt.y) * TILE_SIZE,
                 );
-                mesh.position.z = tileYToPositionZ(y);
+                mesh.position.z = tileYToPositionZ(y + x / RENDER_CARD_SIZE);
 
                 if (mesh.material.map !== tree.texture) {
                     mesh.geometry = new PlaneGeometry(treeSize.x, treeSize.y);

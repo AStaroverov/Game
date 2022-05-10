@@ -1,4 +1,5 @@
 import { OrthographicCamera, Scene, WebGLRenderer } from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import { RENDER_CARD_SIZE, TILE_SIZE } from '../CONST';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
@@ -28,8 +29,16 @@ export class Renderer {
         const width = window.innerWidth;
         const height = window.innerHeight;
 
-        this.renderer.setPixelRatio(window.devicePixelRatio ?? 1);
+        const controls = new OrbitControls(
+            this.camera,
+            this.renderer.domElement,
+        );
+        controls.minDistance = 20;
+        controls.maxDistance = 500;
+        controls.enablePan = false;
+
         this.renderer.setSize(width, height);
+        this.renderer.setPixelRatio(window.devicePixelRatio ?? 1);
         this.camera.position.z = 1000;
         this.scene.position.x -= (TILE_SIZE * RENDER_CARD_SIZE) / 2;
         this.scene.position.y -= (TILE_SIZE * RENDER_CARD_SIZE) / 2;
