@@ -5,7 +5,12 @@ import {
     getComponent,
     hasComponent,
 } from './entities';
-import { createHeap, getEntities, getEntity, registerEntity } from './heap';
+import {
+    createHeap,
+    filterEntities,
+    getEntities,
+    registerEntity,
+} from './heap';
 
 const ComponentAAA = createComponentConstructor('ComponentAAA', (v: string) => {
     return {
@@ -34,13 +39,13 @@ const entityBBB = EntityBBB();
 registerEntity(heap, entityAAA);
 registerEntity(heap, entityBBB);
 
-const _entityBBB = getEntity(heap, EntityBBB);
-const _componentBBB = getComponent(_entityBBB!, ComponentBBB);
+const _entityBBB = getEntities(heap, EntityBBB);
+const _componentBBB = getComponent(_entityBBB[0]!, ComponentBBB);
 
-const _entityAAA = getEntity(heap, EntityAAA);
-// const __componentBBB = getComponent(_entityAAA!, ComponentBBB);
+const _entityAAA = getEntities(heap, EntityAAA);
+// const __componentBBB = getComponent(_entityAAA[0]!, ComponentBBB);
 
-const entitiesWithComponentAAA = getEntities(
+const entitiesWithComponentAAA = filterEntities(
     heap,
     (e): e is EntityWith<typeof ComponentAAA> => hasComponent(e, ComponentAAA),
 );
