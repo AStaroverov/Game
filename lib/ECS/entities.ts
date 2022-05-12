@@ -1,58 +1,87 @@
-import { Component, Constructor } from './types';
+import {
+    Component,
+    ComponentConstructor,
+    ExtractComponentBody,
+    ExtractComponentTag,
+    ExtractConstructorComponentBody,
+    ExtractConstructorComponentTag,
+} from './components';
+import { $tag } from './tag';
 
-export function createEntity<P extends any[], C extends Component>(
-    filler: (...props: P) => C[],
-): new (...props: P) => Entity<C> {
-    return class {
-        components = new Map<Constructor<C>, C>();
+export type Entity<
+    Tag extends string = string,
+    Comps extends Component = Component,
+> = {
+    [$tag]: Tag;
+    components: Record<string, Comps>;
+};
 
-        constructor(...props: P) {
-            filler(...props).forEach((value) => {
-                this.components.set(
-                    // @ts-ignore
-                    value.__proto__.constructor as Constructor<C>,
-                    value,
-                );
-            });
-        }
-    };
-}
+export type EntityConstructor<
+    Tag extends string = string,
+    Props extends any[] = any[],
+    Comps extends Component = Component,
+> = {
+    (...props: Props): Entity<Tag, Comps>;
+    [$tag]: Tag;
+};
 
-export class Entity<C extends Component = Component> {
-    components = new Map<Constructor<C>, C>();
+export type EntityWith<CC extends ComponentConstructor> = Entity<
+    string,
+    Component<
+        ExtractConstructorComponentTag<CC>,
+        ExtractConstructorComponentBody<CC>
+    >
+>;
 
-    constructor(components: C[]) {
-        components.forEach((value) => {
-            this.components.set(
+export type ExtractEntityComponents<E extends Entity> = E extends Entity<
+    string,
+    infer Comps
+>
+    ? Comps
+    : never;
+
+export function createEntityConstructor<
+    Tag extends string = string,
+    Props extends any[] = any[],
+    Comps extends Component = Component,
+>(
+    tag: Tag,
+    filler: (...props: Props) => Comps[],
+): EntityConstructor<Tag, Props, Comps> {
+    const wrapped = (...props: Props) => {
+        return {
+            [$tag]: tag,
+            components: filler(...props).reduce((acc, component) => {
                 // @ts-ignore
-                value.__proto__.constructor as Constructor<C>,
-                value,
-            );
-        });
-    }
+                acc[component[$tag]] = component;
+                return acc;
+            }, {} as Record<Comps[typeof $tag], Comps>),
+        };
+    };
+
+    // @ts-ignore
+    wrapped[$tag] = tag;
+
+    return wrapped as EntityConstructor<Tag, Props, Comps>;
 }
 
-export function getComponent<E extends Entity, C extends Component>(
+export function getComponent<
+    E extends Entity,
+    C extends ExtractEntityComponents<E>,
+>(
     entity: E,
-    Component: Constructor<C>,
+    Component: ComponentConstructor<
+        ExtractComponentTag<C>,
+        any[],
+        ExtractComponentBody<C>
+    >,
 ): C {
-    return entity.components.get(Component) as C;
+    return entity.components[Component[$tag]] as C;
 }
 
-export function* getComponents<E extends Entity, C extends Component>(
+export function hasComponent<E extends Entity, CC extends ComponentConstructor>(
     entity: E,
-    fn: (ref: Component) => ref is C,
-): IterableIterator<C> {
-    for (const component of entity.components.values()) {
-        if (fn(component)) {
-            yield component as C;
-        }
-    }
-}
-
-export function hasComponent<E extends Entity, C extends Component>(
-    entity: E,
-    Component: Constructor<C>,
+    Component: CC,
 ): boolean {
-    return entity.components.has(Component);
+    return Component[$tag] in entity.components;
 }

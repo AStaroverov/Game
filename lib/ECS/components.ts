@@ -1,17 +1,52 @@
-interface IComponent<P extends unknown, C extends object = object> {
-    new (props: P): C;
-}
+import { $tag } from './tag';
 
-export function createComponent<P extends unknown, C extends object = object>(
-    creator: (props: P) => C,
-): IComponent<P, C> {
-    return class {
-        constructor(props: P) {
-            Object.assign(this, creator(props));
-        }
-    } as IComponent<P, C>;
-}
+export type Component<
+    Tag extends string = string,
+    Body extends object = object,
+> = { [$tag]: Tag } & Body;
 
-export class Component<P> {
-    constructor(public payload: P) {}
+export type ComponentConstructor<
+    Tag extends string = string,
+    Props extends any[] = any[],
+    Body extends object = object,
+> = {
+    (...props: Props): Component<Tag, Body>;
+    [$tag]: Tag;
+};
+
+export type ExtractComponentTag<CC extends Component> = CC extends Component<
+    infer Tag
+>
+    ? Tag
+    : never;
+
+export type ExtractComponentBody<CC extends Component> = CC extends Component<
+    string,
+    infer Body
+>
+    ? Body
+    : never;
+
+export type ExtractConstructorComponentTag<CC extends ComponentConstructor> =
+    CC extends ComponentConstructor<infer Tag> ? Tag : never;
+
+export type ExtractConstructorComponentBody<CC extends ComponentConstructor> =
+    CC extends ComponentConstructor<string, any[], infer Body> ? Body : never;
+
+export function createComponentConstructor<
+    Tag extends string = string,
+    Props extends any[] = any[],
+    Body extends object = object,
+>(
+    tag: Tag,
+    get: (...props: Props) => Body,
+): ComponentConstructor<Tag, Props, Body> {
+    const wrapped = (...props: Props) => {
+        return { ...get(...props), [$tag]: tag };
+    };
+
+    // @ts-ignore
+    wrapped[$tag] = tag;
+
+    return wrapped as ComponentConstructor<Tag, Props, Body>;
 }
