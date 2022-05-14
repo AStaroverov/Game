@@ -1,13 +1,8 @@
-import {
-    ComponentType,
-    createComponentConstructor,
-} from '../../lib/ECS/components';
+import { createComponent } from '../../lib/ECS/Component';
 import { Size } from '../utils/shape';
-import { SizeConstructor } from './Size';
+import { createSizeComponent } from './Size';
 
-export type VisualSizeComponent = ComponentType<typeof VisualSizeConstructor>;
-
-export const VisualSizeConstructor = createComponentConstructor(
-    'VisualSizeConstructor',
-    (size: Size) => SizeConstructor(size),
-);
+export const VisualSizeComponentID = 'VISUAL_SIZE' as const;
+export type VisualSizeComponent = ReturnType<typeof createVisualSizeComponent>;
+export const createVisualSizeComponent = (size: Size) =>
+    createComponent(VisualSizeComponentID, createSizeComponent(size));

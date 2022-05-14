@@ -1,7 +1,7 @@
 import { uniq } from 'lodash';
 import { pipe } from 'lodash/fp';
 
-import { createComponent } from '../../../lib/ECS/component';
+import { createComponent } from '../../../lib/ECS/Component';
 import Enumerable from '../../../lib/linq';
 import { Matrix } from '../../utils/Matrix';
 import { Item, radialForEach } from '../../utils/Matrix/utils';
@@ -22,31 +22,23 @@ const GET_EMPTY_TILE = (): Tile => ({
     type: TileType.empty,
 });
 
-export const TilesMatrixStructID = <const>'TilesMatrix';
-
-const ccc = createComponent(
-    TilesMatrixStructID,
-    createMatrixComponent({ w: 1, h: 1, seed: GET_EMPTY_TILE }),
-);
-
-export type TilesMatrixComponent = ReturnType<typeof createTilesMatrixStruct>;
-export const createTilesMatrixStruct = (props: Size) =>
+export const TilesMatrixID = 'TILES_MATRIX' as const;
+export type TilesMatrix = ReturnType<typeof createTilesMatrix>;
+export const createTilesMatrix = (props: Size) =>
     createComponent(
-        TilesMatrixStructID,
+        TilesMatrixID,
         createMatrixComponent({ ...props, seed: GET_EMPTY_TILE }),
     );
 
-export const hasTilesComponent = hasComponent(TilesMatrixConstructor);
-
 export function tilesInit(
-    { matrix }: TilesMatrixComponent,
+    { matrix }: TilesMatrix['body'],
     x: number,
     y: number,
 ): void {
     matrix.set(x, y, { type: TileType.passable });
 }
 
-export function tilesMove({ matrix }: TilesMatrixComponent, v: Vector): void {
+export function tilesMove({ matrix }: TilesMatrix['body'], v: Vector): void {
     const { w, h } = matrix;
     const tmp = new Matrix<Tile>(w, h, GET_EMPTY_TILE);
 
@@ -60,7 +52,7 @@ export function tilesMove({ matrix }: TilesMatrixComponent, v: Vector): void {
     matrix.setSource(tmp.buffer.slice());
 }
 
-export function tilesFillEmpty({ matrix }: TilesMatrixComponent): void {
+export function tilesFillEmpty({ matrix }: TilesMatrix['body']): void {
     Enumerable.from(
         radialForEach(
             matrix,

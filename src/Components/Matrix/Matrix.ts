@@ -1,8 +1,9 @@
-import { Component, createComponent } from '../../../lib/ECS/component';
+import { Component, createComponent } from '../../../lib/ECS/Component';
+import { Like } from '../../../lib/ECS/types';
 import { Matrix, MatrixSeed } from '../../utils/Matrix';
 import { newSize, Size } from '../../utils/shape';
 
-export const MatrixComponentID = <const>'MATRIX';
+export const MatrixComponentID = 'MATRIX' as const;
 export type MatrixComponent<T = unknown> = Component<
     typeof MatrixComponentID,
     {
@@ -10,33 +11,34 @@ export type MatrixComponent<T = unknown> = Component<
         matrix: Matrix<T>;
     }
 >;
-export const createMatrixComponent = <T = unknown>(
+
+export const createMatrixComponent = <T>(
     props: Size & { seed: MatrixSeed<T> },
-) => {
-    return createComponent(MatrixComponentID, {
+): MatrixComponent<T> =>
+    createComponent(MatrixComponentID, {
         seed: props.seed,
         matrix: new Matrix<T>(props.w, props.h, props.seed),
     });
-};
 
-export function getMatrixSize({ matrix }: MatrixComponent): Size {
+export type ExtractMatrixType<M> = M extends Like<MatrixComponent<infer T>>
+    ? T
+    : never;
+
+export function getMatrixSize({ matrix }: MatrixComponent['body']): Size {
     return newSize(matrix.w, matrix.h);
 }
 
-export function getMatrixCell<C extends MatrixComponent, T = MatrixComponent>(
-    { matrix }: C,
-    x: number,
-    y: number,
-): undefined | T {
+export function getMatrixCell<
+    C extends Like<MatrixComponent>,
+    T = ExtractMatrixType<C>,
+>({ matrix }: C['body'], x: number, y: number): undefined | T {
     return matrix.get(x, y) as undefined | T;
 }
 
-export function getMatrixSlice<C extends MatrixComponent, T = MatrixComponent>(
-    comp: C,
-    x: number,
-    y: number,
-    r: number,
-): Matrix<undefined | T> {
+export function getMatrixSlice<
+    C extends Like<MatrixComponent>,
+    T = ExtractMatrixType<C>,
+>(comp: C['body'], x: number, y: number, r: number): Matrix<undefined | T> {
     const slice = new Matrix<undefined | T>(
         r * 2 + 1,
         r * 2 + 1,

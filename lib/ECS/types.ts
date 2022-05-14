@@ -1,8 +1,12 @@
-import { Component } from './component';
-import { Entity } from './entity';
+import { Entity } from './Entity';
+import { ExtractBody, Struct } from './Struct';
 
-export type ExtractTag<S> = S extends Component<infer Tag>
+export type ExtractTag<T> = T extends Struct<infer Tag>
     ? Tag
-    : S extends Entity<infer Tag>
+    : T extends Entity<infer Tag>
     ? Tag
     : never;
+
+export type Like<C extends Struct> =
+    | Struct<ExtractTag<C>, ExtractBody<C>>
+    | Struct<any, ExtractBody<C>, ExtractTag<C>>;

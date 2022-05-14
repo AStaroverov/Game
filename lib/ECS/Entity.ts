@@ -1,12 +1,9 @@
-import { $tag as $component, Component } from './component';
+import { $tag as $component, Struct } from './Struct';
 import { ExtractTag } from './types';
 
 export const $tag = '__ENTITY__' as const;
 
-export type Entity<
-    Tag extends string = string,
-    Comp extends Component = Component,
-> = {
+export type Entity<Tag extends string = any, Comp extends Struct = Struct> = {
     [$tag]: Tag;
     components: Record<ExtractTag<Comp>, Comp>;
 };
@@ -14,15 +11,16 @@ export type Entity<
 export type ExtractComponents<E extends Entity> = E extends Entity<any, infer C>
     ? C
     : never;
-export type ExtractComponentsByTag<
-    C extends Component,
-    T extends string,
-> = C extends Component<T> ? C : never;
 
-export function createEntity<
-    Tag extends string = string,
-    Comp extends Component = Component,
->(tag: Tag, components: Comp[]): Entity<Tag, Comp> {
+export type ExtractComponentsByTag<
+    C extends Struct,
+    T extends string,
+> = C extends Struct<T> ? C : never;
+
+export function createEntity<Tag extends string, Comp extends Struct>(
+    tag: Tag,
+    components: Comp[],
+): Entity<Tag, Comp> {
     return {
         [$tag]: tag,
         components: components.reduce((acc, component) => {
@@ -46,6 +44,14 @@ export function getComponent<
     T extends ExtractTag<C>,
 >(e: E, componentTag: T): ExtractComponentsByTag<C, T> {
     return e.components[componentTag] as ExtractComponentsByTag<C, T>;
+}
+
+export function getComponentBody<
+    E extends Entity,
+    C extends ExtractComponents<E>,
+    T extends ExtractTag<C>,
+>(e: E, componentTag: T): ExtractComponentsByTag<C, T>['body'] {
+    return getComponent(e, componentTag)['body'];
 }
 
 export function hasComponent<

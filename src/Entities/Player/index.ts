@@ -3,15 +3,13 @@ import { MeshLambertMaterial, NearestFilter, PlaneGeometry } from 'three';
 import dataAtlasPlayer from '../../../assets/atlases/player_idle.json';
 import imageAtlasPlayer from '../../../assets/atlases/player_idle.png';
 import { Atlas } from '../../../lib/Atlas';
-import { createEntity } from '../../../lib/ECS/entities';
+import { createEntity } from '../../../lib/ECS/Entity';
 import { AtlasAnimationConstructor } from '../../Components/AtlasAnimation';
 import { DirectionComponent } from '../../Components/DirectionComponent';
 import { HealConstructor } from '../../Components/Heal';
-import { PositionConstructor } from '../../Components/Position';
 import { HealBarMeshComponent } from '../../Components/Renders/HealBarMeshComponent';
 import { MeshComponent } from '../../Components/Renders/MeshComponent';
 import { VelocityConstructor } from '../../Components/Velocity';
-import { VisualSizeConstructor } from '../../Components/VisualSize';
 import { TILE_SIZE } from '../../CONST';
 
 export const atlasPlayer = new Atlas(imageAtlasPlayer, dataAtlasPlayer);
@@ -20,9 +18,10 @@ atlasPlayer.list.forEach((frame) => {
     frame.texture.magFilter = NearestFilter;
 });
 
-export class PlayerEntity extends createEntity(() => [
-    new VisualSizeConstructor(TILE_SIZE, TILE_SIZE),
-    new PositionConstructor(),
+export const PlayerEntityID = 'PlayerEntity' as const;
+export const PlayerEntity = createEntity(PlayerEntityID, () => [
+    createVisualSizeComponent(TILE_SIZE, TILE_SIZE),
+    createPositionComponent(),
     new DirectionComponent(),
     new VelocityConstructor(),
     new MeshComponent({

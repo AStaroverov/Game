@@ -4,7 +4,7 @@ import { Entity } from '../../../lib/ECS/types';
 import Enumerable from '../../../lib/linq';
 import { PositionConstructor } from '../../Components/Position';
 import { HealBarMeshComponent } from '../../Components/Renders/HealBarMeshComponent';
-import { VisualSizeConstructor } from '../../Components/VisualSize';
+import { VisualSizeConstructor } from '../../Components/VisualSizeComponent';
 import { TILE_SIZE } from '../../CONST';
 import { isCardEntity } from '../../Entities/Card';
 import { mulVector, newVector, setVector, sumVector } from '../../utils/shape';

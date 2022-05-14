@@ -44,20 +44,6 @@ isComponent(Component_1_ID, component_1);
 
 isComponent(Component_ALL_ID, componentALL);
 
-// const _s0 = getComponent(S0Key, s0);
-// const _s012 = getComponent(S1Key, s0);
-//
-// const _s1 = getComponent(S0Key, s1);
-// const _s11 = getComponent(S1Key, s1);
-//
-//getComponent(S012Key, s0);
-//getComponent(S012Key, s1);
-//getComponent(S012Key, s2);
-//
-//getComponent(S0Key, s012);
-//getComponent(S1Key, s012);
-//getComponent(S2Key, s012);
-
 const Entity_0_ID = 'Entity_0' as const;
 const Entity_0 = () =>
     createEntity(Entity_0_ID, [Component_0(), Component_1()]);
@@ -77,6 +63,11 @@ hasComponent(entity_0, Component_0_ID);
 hasComponent(entity_0, Component_1_ID);
 hasComponent(entity_0, Component_2_ID); // Error
 hasComponent(entity_0, Component_ALL_ID); // Error
+
+hasComponent(entity_1, Component_0_ID); // Error
+hasComponent(entity_1, Component_1_ID);
+hasComponent(entity_1, Component_2_ID);
+hasComponent(entity_1, Component_ALL_ID); // Error
 
 hasComponent(entity_2, Component_0_ID); // Error
 hasComponent(entity_2, Component_1_ID); // Error

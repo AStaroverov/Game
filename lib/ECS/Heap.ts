@@ -3,7 +3,7 @@ import {
     Entity,
     ExtractComponents,
     ExtractComponentsByTag,
-} from './entity';
+} from './Entity';
 import { ExtractTag } from './types';
 
 const EMPTY_ARRAY: any[] = [];

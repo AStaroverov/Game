@@ -11,7 +11,7 @@ import { PositionConstructor } from '../../Components/Position';
 import { HealBarMeshComponent } from '../../Components/Renders/HealBarMeshComponent';
 import { MeshComponent } from '../../Components/Renders/MeshComponent';
 import { VelocityConstructor } from '../../Components/Velocity';
-import { VisualSizeConstructor } from '../../Components/VisualSize';
+import { VisualSizeConstructor } from '../../Components/VisualSizeComponent';
 import { TILE_SIZE } from '../../CONST';
 
 export const atlas = new Atlas(imageAtlas, dataAtlas);

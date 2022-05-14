@@ -1,28 +1,7 @@
-import {
-    Component,
-    ComponentType,
-    createComponentConstructor,
-    isComponent,
-} from '../../lib/ECS/components';
-import { Entity, EntityWith, hasComponent } from '../../lib/ECS/entities';
+import { createComponent } from '../../lib/ECS/Component';
 import { Vector } from '../utils/shape';
 
-export type PositionComponent = ComponentType<typeof PositionConstructor>;
-export const PositionConstructor = createComponentConstructor(
-    'PositionConstructor',
-    (props?: Partial<Vector>) => {
-        return { x: props?.x ?? 0, y: props?.y ?? 0 };
-    },
-);
-
-export function isPositionComponent(
-    comp: PositionComponent | Component,
-): comp is PositionComponent {
-    return isComponent(comp, PositionConstructor);
-}
-
-export function hasPositionComponent(
-    entity: Entity,
-): entity is EntityWith<typeof PositionConstructor> {
-    return hasComponent(entity, PositionConstructor);
-}
+export const PositionID = 'POSITION' as const;
+export type Position = ReturnType<typeof createPosition>;
+export const createPosition = (props?: Partial<Vector>) =>
+    createComponent(PositionID, { x: props?.x ?? 0, y: props?.y ?? 0 });

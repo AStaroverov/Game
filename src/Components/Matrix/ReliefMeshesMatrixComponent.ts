@@ -1,15 +1,16 @@
 import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
 
+import { createComponent } from '../../../lib/ECS/Component';
 import { Size } from '../../utils/shape';
-import { MatrixConstructor } from './Matrix';
+import { createMatrixComponent } from './Matrix';
 
-export class ReliefMeshesMatrixComponent extends MatrixConstructor<
-    Mesh<PlaneGeometry, MeshLambertMaterial>
-> {
-    constructor({ w, h }: Size) {
-        super({
-            w,
-            h,
+export const ReliefMeshesMatrixID = 'RELIEF_MESHES_MATRIX' as const;
+export type ReliefMeshesMatrix = ReturnType<typeof createReliefMeshesMatrix>;
+export const createReliefMeshesMatrix = (props: Size) =>
+    createComponent(
+        ReliefMeshesMatrixID,
+        createMatrixComponent({
+            ...props,
             seed: () => {
                 return new Mesh(
                     new PlaneGeometry(),
@@ -19,6 +20,5 @@ export class ReliefMeshesMatrixComponent extends MatrixConstructor<
                     }),
                 );
             },
-        });
-    }
-}
+        }),
+    );

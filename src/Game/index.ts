@@ -1,16 +1,11 @@
-import { createHeap, registerEntity } from '../../lib/ECS/heap';
+import { registerEntity } from '../../lib/ECS/Heap';
 import { CARD_SIZE, RENDER_CARD_SIZE } from '../CONST';
-import { CardEntity } from '../Entities/Card';
-import { GlobalLightEntity } from '../Entities/GlobalLight';
-import { PlayerEntity } from '../Entities/Player';
-import { WorldEntity } from '../Entities/World';
+import { createCardEntity } from '../Entities/Card';
+import { heap } from '../heap';
 import { Renderer } from '../Renderer';
 import { cardSystem } from '../Systems/cardSystem';
-import { colliderSystem } from '../Systems/colliderSystem';
-import { controlsSystem } from '../Systems/controlsSystem';
 import { enemySpawnSystem } from '../Systems/enemySpawnSystem';
 import { enemySystem } from '../Systems/enemySystem';
-import { gameTimeSystem } from '../Systems/gameTimeSystem';
 import { playerSystem } from '../Systems/playerSystem';
 import { positionBodySystem } from '../Systems/positionBodySystem';
 import { atlasAnimationRenderSystem } from '../Systems/Renders/atlasAnimationRenderSystem';
@@ -27,29 +22,28 @@ import { newSize } from '../utils/shape';
 import { tasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function game(): void {
-    const heap = createHeap();
     const ticker = tasksScheduler;
     const renderer = new Renderer(ticker);
 
     // Entities
-    const light = new GlobalLightEntity();
-    const world = new WorldEntity();
-    const card = new CardEntity({
+    // const light = new GlobalLightEntity();
+    // const world = new WorldEntity();
+    const card = createCardEntity({
         tileSize: newSize(CARD_SIZE),
         meshSize: newSize(RENDER_CARD_SIZE),
     });
-    const player = new PlayerEntity();
+    // const player = new PlayerEntity();
 
-    registerEntity(heap, light);
-    registerEntity(heap, world);
+    // registerEntity(heap, light);
+    // registerEntity(heap, world);
     registerEntity(heap, card);
-    registerEntity(heap, player);
+    // registerEntity(heap, player);
 
     // Systems
-    controlsSystem(heap);
+    // controlsSystem(heap);
 
-    gameTimeSystem(heap, ticker);
-    colliderSystem(heap, ticker);
+    // gameTimeSystem(heap, ticker);
+    // colliderSystem(heap, ticker);
 
     positionBodySystem(heap, ticker);
 
