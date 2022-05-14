@@ -2,9 +2,9 @@ import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
 
 import { TILE_SIZE } from '../../CONST';
 import { Size } from '../../utils/shape';
-import { MatrixComponent } from './MatrixComponent';
+import { MatrixConstructor } from './Matrix';
 
-export class SurfaceMeshesMatrixComponent extends MatrixComponent<
+export class SurfaceMeshesMatrixComponent extends MatrixConstructor<
     Mesh<PlaneGeometry, MeshLambertMaterial>
 > {
     constructor({ w, h }: Size) {

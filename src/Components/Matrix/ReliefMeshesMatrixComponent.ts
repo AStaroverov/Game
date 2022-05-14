@@ -1,9 +1,9 @@
 import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
 
 import { Size } from '../../utils/shape';
-import { MatrixComponent } from './MatrixComponent';
+import { MatrixConstructor } from './Matrix';
 
-export class ReliefMeshesMatrixComponent extends MatrixComponent<
+export class ReliefMeshesMatrixComponent extends MatrixConstructor<
     Mesh<PlaneGeometry, MeshLambertMaterial>
 > {
     constructor({ w, h }: Size) {

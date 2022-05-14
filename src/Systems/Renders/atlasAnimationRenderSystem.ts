@@ -3,9 +3,9 @@ import { Heap } from '../../../lib/ECS/heap';
 import { Entity } from '../../../lib/ECS/types';
 import Enumerable from '../../../lib/linq';
 import {
-    AtlasAnimationComponent,
+    AtlasAnimationConstructor,
     updateAtlasAnimation,
-} from '../../Components/AtlasAnimationComponent';
+} from '../../Components/AtlasAnimation';
 import { MeshComponent } from '../../Components/Renders/MeshComponent';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
@@ -17,14 +17,14 @@ export function atlasAnimationRenderSystem(
 
     function tick(delta: number) {
         const entities = heap.getEntities(
-            (e): e is Entity<MeshComponent | AtlasAnimationComponent> =>
+            (e): e is Entity<MeshComponent | AtlasAnimationConstructor> =>
                 hasComponent(e, MeshComponent) &&
-                hasComponent(e, AtlasAnimationComponent),
+                hasComponent(e, AtlasAnimationConstructor),
         );
 
         Enumerable.from(entities).forEach((entity) => {
             const mesh = getComponent(entity, MeshComponent);
-            const animation = getComponent(entity, AtlasAnimationComponent);
+            const animation = getComponent(entity, AtlasAnimationConstructor);
 
             animate(delta, mesh, animation);
         });
@@ -34,7 +34,7 @@ export function atlasAnimationRenderSystem(
 function animate(
     delta: number,
     component: MeshComponent,
-    animation: AtlasAnimationComponent,
+    animation: AtlasAnimationConstructor,
 ): void {
     updateAtlasAnimation(animation, delta);
 

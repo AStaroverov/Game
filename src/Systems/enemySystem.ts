@@ -7,14 +7,11 @@ import Enumerable from '../../lib/linq';
 import { DirectionComponent } from '../Components/DirectionComponent';
 import {
     Tile,
-    TilesMatrixComponent,
+    TilesMatrixConstructor,
     TileType,
-} from '../Components/Matrix/TilesMatrixComponent';
-import { PositionComponent } from '../Components/PositionComponent';
-import {
-    setVelocity,
-    VelocityComponent,
-} from '../Components/VelocityComponent';
+} from '../Components/Matrix/TilesMatrix';
+import { PositionConstructor } from '../Components/Position';
+import { setVelocity, VelocityConstructor } from '../Components/Velocity';
 import { isCardEntity } from '../Entities/Card';
 import { EnemyEntity, isEnemyEntity } from '../Entities/Enemy';
 import { isPlayerEntity } from '../Entities/Player';
@@ -35,11 +32,11 @@ import { isInsideCard } from '../utils/tiles';
 
 export function enemySystem(heap: Heap, ticker: TasksScheduler): void {
     const card = [...heap.getEntities(isCardEntity)][0];
-    const cardTiles = getComponent(card, TilesMatrixComponent);
-    const cardPosition = getComponent(card, PositionComponent);
+    const cardTiles = getComponent(card, TilesMatrixConstructor);
+    const cardPosition = getComponent(card, PositionConstructor);
 
     const player = [...heap.getEntities(isPlayerEntity)][0];
-    const playerPosition = getComponent(player, PositionComponent);
+    const playerPosition = getComponent(player, PositionConstructor);
 
     const pathFinder = new BiAStarFinder({
         diagonalMovement: DiagonalMovement.OnlyWhenNoObstacles,
@@ -54,9 +51,9 @@ export function enemySystem(heap: Heap, ticker: TasksScheduler): void {
     }
 
     function setEnemyDirection(enemy: EnemyEntity) {
-        const position = getComponent(enemy, PositionComponent);
+        const position = getComponent(enemy, PositionConstructor);
         const direction = getComponent(enemy, DirectionComponent);
-        const velocity = getComponent(enemy, VelocityComponent);
+        const velocity = getComponent(enemy, VelocityConstructor);
 
         const cardTilePosition = mapVector(cardPosition, ufloor);
         const enemyTilePosition = sumVector(
@@ -112,10 +109,10 @@ export function enemySystem(heap: Heap, ticker: TasksScheduler): void {
     );
 
     const getMatrix = memoize(
-        (_: PositionComponent) => matrixToNestedArray(cardTiles.matrix),
+        (_: PositionConstructor) => matrixToNestedArray(cardTiles.matrix),
         {
             max: 100,
-            normalizer: ([p]: [PositionComponent]) => stringVector(p),
+            normalizer: ([p]: [PositionConstructor]) => stringVector(p),
         },
     );
 }

@@ -3,10 +3,10 @@ import { Heap } from '../../lib/ECS/heap';
 import Enumerable from '../../lib/linq';
 import {
     Tile,
-    TilesMatrixComponent,
+    TilesMatrixConstructor,
     TileType,
-} from '../Components/Matrix/TilesMatrixComponent';
-import { PositionComponent } from '../Components/PositionComponent';
+} from '../Components/Matrix/TilesMatrix';
+import { PositionConstructor } from '../Components/Position';
 import { CENTER_CARD_POSITION, HALF_CARD_SIZE } from '../CONST';
 import { isCardEntity } from '../Entities/Card';
 import { EnemyEntity, isEnemyEntity } from '../Entities/Enemy';
@@ -18,8 +18,8 @@ import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function enemySpawnSystem(heap: Heap, ticker: TasksScheduler): void {
     const card = [...heap.getEntities(isCardEntity)][0];
-    const cardTiles = getComponent(card, TilesMatrixComponent);
-    const cardPosition = getComponent(card, PositionComponent);
+    const cardTiles = getComponent(card, TilesMatrixConstructor);
+    const cardPosition = getComponent(card, PositionConstructor);
 
     ticker.addTimeInterval(tick, 1000);
 
@@ -34,7 +34,7 @@ export function enemySpawnSystem(heap: Heap, ticker: TasksScheduler): void {
 
     function clear(enemies: EnemyEntity[]) {
         enemies.forEach((enemy) => {
-            const position = getComponent(enemy, PositionComponent);
+            const position = getComponent(enemy, PositionConstructor);
             const diff = sumVector(
                 position,
                 mulVector(CENTER_CARD_POSITION, -1),
@@ -68,7 +68,7 @@ export function enemySpawnSystem(heap: Heap, ticker: TasksScheduler): void {
             });
 
         if (suitableItem) {
-            const position = getComponent(enemy, PositionComponent);
+            const position = getComponent(enemy, PositionConstructor);
             const seedPosition = sumVector(
                 suitableItem,
                 mulVector(cardPosition, -1),

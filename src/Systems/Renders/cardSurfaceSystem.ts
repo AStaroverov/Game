@@ -3,17 +3,14 @@ import { Color, Scene, TextureLoader } from 'three';
 import imageGrass from '../../../assets/sprites/tilesets/grass.png';
 import { getComponent } from '../../../lib/ECS/entities';
 import { Heap } from '../../../lib/ECS/heap';
-import {
-    getMatrixCell,
-    getMatrixSlice,
-} from '../../Components/Matrix/MatrixComponent';
+import { getMatrixCell, getMatrixSlice } from '../../Components/Matrix/Matrix';
 import { SurfaceMeshesMatrixComponent } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
 import {
     tilesFillEmpty,
     tilesInit,
-    TilesMatrixComponent,
-} from '../../Components/Matrix/TilesMatrixComponent';
-import { PositionComponent } from '../../Components/PositionComponent';
+    TilesMatrixConstructor,
+} from '../../Components/Matrix/TilesMatrix';
+import { PositionConstructor } from '../../Components/Position';
 import { CARD_SIZE, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { isCardEntity } from '../../Entities/Card';
 import { isPlayerEntity } from '../../Entities/Player';
@@ -33,9 +30,9 @@ export function cardSurfaceSystem(
     const playerEntity = [...heap.getEntities(isPlayerEntity)][0];
     const cardEntity = [...heap.getEntities(isCardEntity)][0];
 
-    const playerPosition = getComponent(playerEntity, PositionComponent);
-    const cardPosition = getComponent(cardEntity, PositionComponent);
-    const cardTiles = getComponent(cardEntity, TilesMatrixComponent);
+    const playerPosition = getComponent(playerEntity, PositionConstructor);
+    const cardPosition = getComponent(cardEntity, PositionConstructor);
+    const cardTiles = getComponent(cardEntity, TilesMatrixConstructor);
     const cardMeshes = getComponent(cardEntity, SurfaceMeshesMatrixComponent);
 
     const sx = Math.floor(CARD_SIZE / 2);

@@ -4,14 +4,14 @@ import dataAtlas from '../../../assets/atlases/skeleton_all.json';
 import imageAtlas from '../../../assets/atlases/skeleton_all.png';
 import { Atlas } from '../../../lib/Atlas';
 import { createEntity } from '../../../lib/ECS/entities';
-import { AtlasAnimationComponent } from '../../Components/AtlasAnimationComponent';
+import { AtlasAnimationConstructor } from '../../Components/AtlasAnimation';
 import { DirectionComponent } from '../../Components/DirectionComponent';
-import { HealComponent } from '../../Components/HealComponent';
-import { PositionComponent } from '../../Components/PositionComponent';
+import { HealConstructor } from '../../Components/Heal';
+import { PositionConstructor } from '../../Components/Position';
 import { HealBarMeshComponent } from '../../Components/Renders/HealBarMeshComponent';
 import { MeshComponent } from '../../Components/Renders/MeshComponent';
-import { VelocityComponent } from '../../Components/VelocityComponent';
-import { VisualSizeComponent } from '../../Components/VisualSizeComponent';
+import { VelocityConstructor } from '../../Components/Velocity';
+import { VisualSizeConstructor } from '../../Components/VisualSize';
 import { TILE_SIZE } from '../../CONST';
 
 export const atlas = new Atlas(imageAtlas, dataAtlas);
@@ -21,10 +21,10 @@ atlas.list.forEach((frame) => {
 });
 
 export class EnemyEntity extends createEntity((maxHP = 1) => [
-    new VisualSizeComponent(TILE_SIZE, TILE_SIZE),
-    new PositionComponent(),
+    new VisualSizeConstructor(TILE_SIZE, TILE_SIZE),
+    new PositionConstructor(),
     new DirectionComponent(),
-    new VelocityComponent(),
+    new VelocityConstructor(),
     new MeshComponent({
         geometry: new PlaneGeometry(atlas.w * 2.2, atlas.h * 2.2),
         material: new MeshLambertMaterial({
@@ -32,12 +32,12 @@ export class EnemyEntity extends createEntity((maxHP = 1) => [
             alphaTest: 0.5,
         }),
     }),
-    new AtlasAnimationComponent({
+    new AtlasAnimationConstructor({
         atlas,
         time: 0,
         duration: 100,
     }),
-    new HealComponent(maxHP),
+    new HealConstructor(maxHP),
     new HealBarMeshComponent(),
 ]) {}
 

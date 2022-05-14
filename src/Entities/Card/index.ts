@@ -3,11 +3,12 @@ import { NearestFilter } from 'three';
 import dataAtlasTrees from '../../../assets/atlases/trees.json';
 import imageAtlasTrees from '../../../assets/atlases/trees.png';
 import { Atlas } from '../../../lib/Atlas';
-import { createEntity } from '../../../lib/ECS/entities';
-import { ReliefMeshesMatrixComponent } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
-import { SurfaceMeshesMatrixComponent } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
-import { TilesMatrixComponent } from '../../Components/Matrix/TilesMatrixComponent';
-import { PositionComponent } from '../../Components/PositionComponent';
+import {
+    createEntityConstructor,
+    EntityType,
+    isEntity,
+} from '../../../lib/ECS/entities';
+import { PositionConstructor } from '../../Components/Position';
 import { Size } from '../../utils/shape';
 
 export const atlasTrees = new Atlas(imageAtlasTrees, dataAtlasTrees);
@@ -16,15 +17,15 @@ atlasTrees.list.forEach((frame) => {
     frame.texture.magFilter = NearestFilter;
 });
 
-export class CardEntity extends createEntity(
+export type CardEntity = EntityType<typeof CardEntityConstructor>;
+export const CardEntityConstructor = createEntityConstructor(
+    'CardConstructor',
     (props: { tileSize: Size; meshSize: Size }) => [
-        new PositionComponent(),
-        new TilesMatrixComponent(props.tileSize),
-        new SurfaceMeshesMatrixComponent(props.meshSize),
-        new ReliefMeshesMatrixComponent(props.meshSize),
+        PositionConstructor(),
+        TilesMatrixConstructor(props.tileSize),
+        SurfaceMeshesMatrixConstructor(props.meshSize),
+        ReliefMeshesMatrixConstructor(props.meshSize),
     ],
-) {}
+);
 
-export const isCardEntity = (
-    entity: CardEntity | unknown,
-): entity is CardEntity => entity instanceof CardEntity;
+export const isCardEntity = isEntity(CardEntityConstructor);

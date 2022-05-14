@@ -10,7 +10,7 @@ import { Entity } from '../../../lib/ECS/types';
 import Enumerable from '../../../lib/linq';
 import { ReliefMeshesMatrixComponent } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
 import { SurfaceMeshesMatrixComponent } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
-import { PositionComponent } from '../../Components/PositionComponent';
+import { PositionConstructor } from '../../Components/Position';
 import { SpotLightMeshComponent } from '../../Components/Renders/LightComponent';
 import { MeshComponent } from '../../Components/Renders/MeshComponent';
 import { MeshGroupComponent } from '../../Components/Renders/MeshGroupComponent';
@@ -29,7 +29,7 @@ export function meshesSystem(
     const globalLightEntity = [...heap.getEntities(isGlobalLightEntity)][0];
     const spotLight = getComponent(globalLightEntity, SpotLightMeshComponent);
     const cardEntity = [...heap.getEntities(isCardEntity)][0];
-    const cardPosition = getComponent(cardEntity, PositionComponent);
+    const cardPosition = getComponent(cardEntity, PositionConstructor);
     const surfaceMeshes = getComponent(
         cardEntity,
         SurfaceMeshesMatrixComponent,
@@ -56,7 +56,7 @@ export function meshesSystem(
         );
 
         Enumerable.from(entities).forEach((entity) => {
-            const position = getComponent(entity, PositionComponent);
+            const position = getComponent(entity, PositionConstructor);
             const meshes = getComponents(
                 entity,
                 (component): component is MeshComponent | MeshGroupComponent =>

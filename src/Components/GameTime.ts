@@ -1,3 +1,8 @@
-export class GameTimeComponent {
-    constructor(public time: number = 1) {}
-}
+import { createComponentConstructor } from '../../lib/ECS/components';
+
+export const GameTimeConstructor = createComponentConstructor(
+    'GameTimeConstructor',
+    (time = 1) => {
+        return { time };
+    },
+);

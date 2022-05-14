@@ -6,17 +6,14 @@ import {
     DirectionComponent,
     setDirection,
 } from '../Components/DirectionComponent';
-import {
-    setVelocity,
-    VelocityComponent,
-} from '../Components/VelocityComponent';
+import { setVelocity, VelocityConstructor } from '../Components/Velocity';
 import { isPlayerEntity } from '../Entities/Player';
 import { Vector } from '../utils/shape';
 
 export function controlsSystem(heap: Heap): void {
     const playerEntity = [...heap.getEntities(isPlayerEntity)][0];
     const playerDirection = getComponent(playerEntity, DirectionComponent);
-    const playerVelocity = getComponent(playerEntity, VelocityComponent);
+    const playerVelocity = getComponent(playerEntity, VelocityConstructor);
 
     const pressed = new Set();
 

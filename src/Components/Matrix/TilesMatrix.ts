@@ -1,13 +1,12 @@
 import { uniq } from 'lodash';
 import { pipe } from 'lodash/fp';
 
-import { hasComponent } from '../../../lib/ECS/entities';
-import { Entity } from '../../../lib/ECS/types';
+import { createComponent } from '../../../lib/ECS/component';
 import Enumerable from '../../../lib/linq';
 import { Matrix } from '../../utils/Matrix';
 import { Item, radialForEach } from '../../utils/Matrix/utils';
 import { Size, Vector } from '../../utils/shape';
-import { MatrixComponent } from './MatrixComponent';
+import { createMatrixComponent } from './Matrix';
 
 export enum TileType {
     empty = 'empty',
@@ -23,17 +22,21 @@ const GET_EMPTY_TILE = (): Tile => ({
     type: TileType.empty,
 });
 
-export class TilesMatrixComponent extends MatrixComponent<Tile> {
-    constructor(props: Size) {
-        super({ ...props, seed: GET_EMPTY_TILE });
-    }
-}
+export const TilesMatrixStructID = <const>'TilesMatrix';
 
-export function hasTilesComponent(
-    entity: Entity,
-): entity is Entity<TilesMatrixComponent> {
-    return hasComponent(entity, TilesMatrixComponent);
-}
+const ccc = createComponent(
+    TilesMatrixStructID,
+    createMatrixComponent({ w: 1, h: 1, seed: GET_EMPTY_TILE }),
+);
+
+export type TilesMatrixComponent = ReturnType<typeof createTilesMatrixStruct>;
+export const createTilesMatrixStruct = (props: Size) =>
+    createComponent(
+        TilesMatrixStructID,
+        createMatrixComponent({ ...props, seed: GET_EMPTY_TILE }),
+    );
+
+export const hasTilesComponent = hasComponent(TilesMatrixConstructor);
 
 export function tilesInit(
     { matrix }: TilesMatrixComponent,

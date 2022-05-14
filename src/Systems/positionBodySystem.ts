@@ -3,8 +3,8 @@ import { Heap } from '../../lib/ECS/heap';
 import { Entity } from '../../lib/ECS/types';
 import Enumerable from '../../lib/linq';
 import { DirectionComponent } from '../Components/DirectionComponent';
-import { PositionComponent } from '../Components/PositionComponent';
-import { VelocityComponent } from '../Components/VelocityComponent';
+import { PositionConstructor } from '../Components/Position';
+import { VelocityConstructor } from '../Components/Velocity';
 import { mulVector, setVector, sumVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
@@ -16,17 +16,17 @@ export function positionBodySystem(heap: Heap, ticker: TasksScheduler): void {
             (
                 e,
             ): e is Entity<
-                PositionComponent | DirectionComponent | VelocityComponent
+                PositionConstructor | DirectionComponent | VelocityConstructor
             > =>
-                hasComponent(e, PositionComponent) &&
+                hasComponent(e, PositionConstructor) &&
                 hasComponent(e, DirectionComponent) &&
-                hasComponent(e, VelocityComponent),
+                hasComponent(e, VelocityConstructor),
         );
 
         Enumerable.from(bodies).forEach((body) => {
-            const position = getComponent(body, PositionComponent);
+            const position = getComponent(body, PositionConstructor);
             const direction = getComponent(body, DirectionComponent);
-            const velocity = getComponent(body, VelocityComponent);
+            const velocity = getComponent(body, VelocityConstructor);
 
             setVector(
                 position,

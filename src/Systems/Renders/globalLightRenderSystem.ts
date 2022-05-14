@@ -1,6 +1,6 @@
 import { getComponent } from '../../../lib/ECS/entities';
 import { Heap } from '../../../lib/ECS/heap';
-import { GameTimeComponent } from '../../Components/GameTime';
+import { GameTimeConstructor } from '../../Components/GameTime';
 import { SpotLightMeshComponent } from '../../Components/Renders/LightComponent';
 import { isGlobalLightEntity } from '../../Entities/GlobalLight';
 import { isWorldEntity } from '../../Entities/World';
@@ -17,7 +17,7 @@ export function globalLightRenderSystem(
     const spotLight = getComponent(globalLight, SpotLightMeshComponent);
 
     const world = [...heap.getEntities(isWorldEntity)][0];
-    const gameTime = getComponent(world, GameTimeComponent);
+    const gameTime = getComponent(world, GameTimeConstructor);
 
     update();
     ticker.addTimeInterval(update, 1_000);

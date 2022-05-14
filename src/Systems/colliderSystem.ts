@@ -4,11 +4,11 @@ import { Entity } from '../../lib/ECS/types';
 import Enumerable from '../../lib/linq';
 import { DirectionComponent } from '../Components/DirectionComponent';
 import {
-    TilesMatrixComponent,
+    TilesMatrixConstructor,
     TileType,
-} from '../Components/Matrix/TilesMatrixComponent';
-import { PositionComponent } from '../Components/PositionComponent';
-import { VelocityComponent } from '../Components/VelocityComponent';
+} from '../Components/Matrix/TilesMatrix';
+import { PositionConstructor } from '../Components/Position';
+import { VelocityConstructor } from '../Components/Velocity';
 import { isCardEntity } from '../Entities/Card';
 import { floor, ufloor } from '../utils/math';
 import {
@@ -21,8 +21,8 @@ import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function colliderSystem(heap: Heap, ticker: TasksScheduler): void {
     const cardEntity = [...heap.getEntities(isCardEntity)][0];
-    const cardPosition = getComponent(cardEntity, PositionComponent);
-    const tiles = getComponent(cardEntity, TilesMatrixComponent);
+    const cardPosition = getComponent(cardEntity, PositionConstructor);
+    const tiles = getComponent(cardEntity, TilesMatrixConstructor);
 
     ticker.addFrameInterval(tick, 1);
 
@@ -31,17 +31,17 @@ export function colliderSystem(heap: Heap, ticker: TasksScheduler): void {
             (
                 e,
             ): e is Entity<
-                PositionComponent & DirectionComponent & VelocityComponent
+                PositionConstructor & DirectionComponent & VelocityConstructor
             > =>
-                hasComponent(e, PositionComponent) &&
+                hasComponent(e, PositionConstructor) &&
                 hasComponent(e, DirectionComponent) &&
-                hasComponent(e, VelocityComponent),
+                hasComponent(e, VelocityConstructor),
         );
 
         Enumerable.from(bodies).forEach((body) => {
             const direction = getComponent(body, DirectionComponent);
-            const position = getComponent(body, PositionComponent);
-            const velocity = getComponent(body, VelocityComponent);
+            const position = getComponent(body, PositionConstructor);
+            const velocity = getComponent(body, VelocityConstructor);
 
             if (velocity.v === 0) return;
 
