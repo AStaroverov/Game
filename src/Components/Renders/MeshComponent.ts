@@ -1,12 +1,16 @@
 import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
 
-export class MeshComponent<
-    G extends PlaneGeometry = PlaneGeometry,
-    M extends MeshLambertMaterial = MeshLambertMaterial,
-> {
-    object: Mesh<G, M>;
+import { createComponent } from '../../../lib/ECS/Component';
 
-    constructor(props: { geometry: G; material: M }) {
-        this.object = new Mesh(props.geometry, props.material);
-    }
-}
+export const MeshComponentID = 'MESH' as const;
+export type MeshComponent = ReturnType<typeof createMeshComponent>;
+export const createMeshComponent = <
+    G extends PlaneGeometry,
+    M extends MeshLambertMaterial,
+>(props: {
+    geometry: G;
+    material: M;
+}) =>
+    createComponent(MeshComponentID, {
+        object: new Mesh(props.geometry, props.material),
+    });

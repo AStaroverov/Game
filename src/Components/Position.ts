@@ -1,7 +1,10 @@
 import { createComponent } from '../../lib/ECS/Component';
-import { Vector } from '../utils/shape';
+import { newVector, Vector } from '../utils/shape';
 
-export const PositionID = 'POSITION' as const;
-export type Position = ReturnType<typeof createPosition>;
-export const createPosition = (props?: Partial<Vector>) =>
-    createComponent(PositionID, { x: props?.x ?? 0, y: props?.y ?? 0 });
+export const PositionComponentID = 'POSITION' as const;
+export type PositionComponent = ReturnType<typeof createPositionComponent>;
+export const createPositionComponent = (props?: Partial<Vector>) =>
+    createComponent(
+        PositionComponentID,
+        newVector(props?.x ?? 0, props?.y ?? 0),
+    );

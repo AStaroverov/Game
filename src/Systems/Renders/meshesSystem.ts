@@ -1,40 +1,48 @@
 import { Scene } from 'three';
 
 import {
+    Entity,
     getComponent,
-    getComponents,
+    getComponentBody,
     hasComponent,
-} from '../../../lib/ECS/entities';
-import { Heap } from '../../../lib/ECS/heap';
-import { Entity } from '../../../lib/ECS/types';
-import Enumerable from '../../../lib/linq';
-import { ReliefMeshesMatrixComponent } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
-import { SurfaceMeshesMatrixComponent } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
-import { PositionConstructor } from '../../Components/Position';
-import { SpotLightMeshComponent } from '../../Components/Renders/LightComponent';
-import { MeshComponent } from '../../Components/Renders/MeshComponent';
-import { MeshGroupComponent } from '../../Components/Renders/MeshGroupComponent';
-import { CENTER_CARD_POSITION, HALF_RENDER_CARD_SIZE } from '../../CONST';
-import { isCardEntity } from '../../Entities/Card';
-import { isGlobalLightEntity } from '../../Entities/GlobalLight';
-import { abs } from '../../utils/math';
-import { mulVector, sumVector } from '../../utils/shape';
+} from '../../../lib/ECS/Entity';
+import { filterEntities, getEntities } from '../../../lib/ECS/Heap';
+import { ReliefMeshesMatrixID } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
+import { SurfaceMeshesMatrixID } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
+import {
+    PositionComponent,
+    PositionComponentID,
+} from '../../Components/Position';
+import { SpotLightMeshComponentID } from '../../Components/Renders/LightComponent';
+import {
+    MeshComponent,
+    MeshComponentID,
+} from '../../Components/Renders/MeshComponent';
+import {
+    MeshGroupComponent,
+    MeshGroupComponentID,
+} from '../../Components/Renders/MeshGroupComponent';
+import { CardEntityID } from '../../Entities/Card';
+import { GlobalLightEntityID } from '../../Entities/GlobalLight';
+import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 export function meshesSystem(
+    heap: GameHeap,
     ticker: TasksScheduler,
     scene: Scene,
-    heap: Heap,
 ): void {
-    const globalLightEntity = [...heap.getEntities(isGlobalLightEntity)][0];
-    const spotLight = getComponent(globalLightEntity, SpotLightMeshComponent);
-    const cardEntity = [...heap.getEntities(isCardEntity)][0];
-    const cardPosition = getComponent(cardEntity, PositionConstructor);
-    const surfaceMeshes = getComponent(
-        cardEntity,
-        SurfaceMeshesMatrixComponent,
+    const globalLightEntity = getEntities(heap, GlobalLightEntityID)[0];
+    const spotLight = getComponentBody(
+        globalLightEntity,
+        SpotLightMeshComponentID,
     );
-    const reliefMeshes = getComponent(cardEntity, ReliefMeshesMatrixComponent);
+
+    const cardEntity = getEntities(heap, CardEntityID)[0];
+    const cardPosition = getComponentBody(cardEntity, PositionComponentID);
+
+    const surfaceMeshes = getComponentBody(cardEntity, SurfaceMeshesMatrixID);
+    const reliefMeshes = getComponentBody(cardEntity, ReliefMeshesMatrixID);
 
     const staticMeshes = [
         spotLight.object,
@@ -49,42 +57,69 @@ export function meshesSystem(
         scene.clear();
         scene.add(...staticMeshes);
 
-        const entities = heap.getEntities(
-            (e): e is Entity<MeshComponent | MeshGroupComponent> =>
-                hasComponent(e, MeshComponent) ||
-                hasComponent(e, MeshGroupComponent),
+        const meshEntities = filterEntities(
+            heap,
+            (
+                e,
+            ): e is
+                | Entity<any, MeshComponent>
+                | Entity<any, MeshGroupComponent> =>
+                hasComponent(e, MeshComponentID) ||
+                hasComponent(e, MeshGroupComponentID),
         );
 
-        Enumerable.from(entities).forEach((entity) => {
-            const position = getComponent(entity, PositionConstructor);
-            const meshes = getComponents(
-                entity,
-                (component): component is MeshComponent | MeshGroupComponent =>
-                    component instanceof MeshComponent ||
-                    component instanceof MeshGroupComponent,
-            );
+        const positionedEntities = filterEntities(
+            heap,
+            (
+                e,
+            ): e is Entity<any, PositionComponent> &
+                Entity<any, MeshComponent | MeshGroupComponent> =>
+                hasComponent(e, PositionComponentID) &&
+                (hasComponent(e, MeshComponentID) ||
+                    hasComponent(e, MeshGroupComponentID)),
+        );
 
-            const diff =
-                position &&
-                sumVector(
-                    position,
-                    mulVector(CENTER_CARD_POSITION, -1),
-                    cardPosition,
-                );
-            const visible =
-                position &&
-                !(
-                    abs(diff.x) > HALF_RENDER_CARD_SIZE + 5 ||
-                    abs(diff.y) > HALF_RENDER_CARD_SIZE + 5
-                );
+        meshEntities.forEach((entity) => {
+            if (hasComponent(entity, MeshComponentID)) {
+                const mesh = getComponent(entity, MeshComponentID);
+                scene.add(mesh.object);
+            }
 
-            Enumerable.from(meshes).forEach((mesh) => {
-                mesh && scene.add(mesh.object);
+            const group = getComponentBody(entity, MeshGroupComponentID);
 
-                if (visible !== undefined) {
-                    mesh.object.visible = visible;
-                }
-            });
+            mesh && scene.add(mesh.object);
         });
+
+        // meshEntities.forEach((entity) => {
+        //     const position = getComponentBody(entity, PositionComponentID);
+        //     const meshes = filterComponents(
+        //         entity,
+        //         (component): component is MeshComponent | MeshGroupComponent =>
+        //             component instanceof MeshComponent ||
+        //             component instanceof MeshGroupComponent,
+        //     );
+        //
+        //     const diff =
+        //         position &&
+        //         sumVector(
+        //             position,
+        //             mulVector(CENTER_CARD_POSITION, -1),
+        //             cardPosition,
+        //         );
+        //     const visible =
+        //         position &&
+        //         !(
+        //             abs(diff.x) > HALF_RENDER_CARD_SIZE + 5 ||
+        //             abs(diff.y) > HALF_RENDER_CARD_SIZE + 5
+        //         );
+        //
+        //     meshes.forEach((mesh) => {
+        //         mesh && scene.add(mesh.object);
+        //
+        //         if (visible !== undefined) {
+        //             mesh.object.visible = visible;
+        //         }
+        //     });
+        // });
     }
 }

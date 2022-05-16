@@ -1,37 +1,33 @@
-import { Atlas, AtlasFrame } from '../../lib/Atlas';
-import { createComponentConstructor } from '../../lib/ECS/components';
+import { Atlas } from '../../lib/Atlas';
+import { createComponent } from '../../lib/ECS/Component';
 import { floor } from '../utils/math';
-import { AnimationComponent, AnimationConstructor } from './AnimationComponent';
+import { createAnimationComponent } from './AnimationComponent';
 
-export type AtlasAnimationComponent = AnimationComponent & {
+export const AtlasAnimationComponentID = 'ATLAS_ANIMATION' as const;
+export type AtlasAnimationComponent = ReturnType<
+    typeof createAtlasAnimationComponent
+>;
+export const createAtlasAnimationComponent = (props: {
+    duration?: number;
+    time?: number;
     atlas: Atlas;
-    atlasFrame: AtlasFrame;
-};
-
-export const AtlasAnimationConstructor = createComponentConstructor(
-    'AtlasAnimationComponent',
-    (props: {
-        duration?: number;
-        time?: number;
-        atlas: Atlas;
-    }): AtlasAnimationComponent => {
-        return {
-            ...AnimationConstructor(props),
+}) =>
+    createComponent(
+        AtlasAnimationComponentID,
+        createAnimationComponent(props),
+        {
             atlas: props.atlas,
             atlasFrame: props.atlas.list[0],
-        };
-    },
-);
+        },
+    );
 
 export function updateAtlasAnimation(
-    component: AtlasAnimationComponent,
+    { body }: AtlasAnimationComponent,
     delta: number,
 ): void {
-    component.time += delta;
+    body.time += delta;
 
-    const index =
-        floor(component.time / component.duration) %
-        component.atlas.list.length;
+    const index = floor(body.time / body.duration) % body.atlas.list.length;
 
-    component.atlasFrame = component.atlas.list[index];
+    body.atlasFrame = body.atlas.list[index];
 }

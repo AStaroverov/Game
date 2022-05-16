@@ -5,13 +5,9 @@ import { getComponent } from '../../../lib/ECS/entities';
 import { Heap } from '../../../lib/ECS/heap';
 import { getMatrixCell, getMatrixSlice } from '../../Components/Matrix/Matrix';
 import { SurfaceMeshesMatrixComponent } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
-import {
-    tilesFillEmpty,
-    tilesInit,
-    TilesMatrixConstructor,
-} from '../../Components/Matrix/TilesMatrix';
+import { TilesMatrixConstructor } from '../../Components/Matrix/TilesMatrix';
 import { PositionConstructor } from '../../Components/Position';
-import { CARD_SIZE, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
+import { RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { isCardEntity } from '../../Entities/Card';
 import { isPlayerEntity } from '../../Entities/Player';
 import { floor, round, ufloor } from '../../utils/math';
@@ -34,12 +30,6 @@ export function cardSurfaceSystem(
     const cardPosition = getComponent(cardEntity, PositionConstructor);
     const cardTiles = getComponent(cardEntity, TilesMatrixConstructor);
     const cardMeshes = getComponent(cardEntity, SurfaceMeshesMatrixComponent);
-
-    const sx = Math.floor(CARD_SIZE / 2);
-    const sy = Math.floor(CARD_SIZE / 2);
-
-    tilesInit(cardTiles, sx, sy);
-    tilesFillEmpty(cardTiles);
 
     ticker.addFrameInterval(updateSurface, 1);
 

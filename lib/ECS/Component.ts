@@ -1,10 +1,11 @@
 import {
-    $inheritedTag,
-    $tag,
+    $component,
+    $inherited,
     ExtractBody,
     ExtractTags,
     Struct,
 } from './Struct';
+import { ExtractTag } from './types';
 
 export type Component<
     Tag extends string = string,
@@ -73,48 +74,49 @@ function createComponent<Tag extends string = string>(
     ...components: any[]
 ) {
     const inheritedTags = components.reduce((acc, component) => {
-        Object.assign(acc, { [component[$tag]]: true });
-
-        if ($inheritedTag in component) {
-            Object.assign(acc, component[$inheritedTag]);
+        if ($component in component) {
+            acc[component[$component]] = true;
+            Object.assign(acc, component[$inherited]);
         }
 
         return acc;
     }, {});
-    const body = Object.assign({}, ...components.map((c) => c.body));
-    debugger;
+    const body = Object.assign(
+        {},
+        ...components.map((c) => (c[$component] ? c.body : c)),
+    );
 
     return {
         body,
-        [$tag]: tag,
-        [$inheritedTag]: inheritedTags,
+        [$component]: tag,
+        [$inherited]: inheritedTags,
     };
 }
 
 export { createComponent };
 
-export function isComponent<T extends string, S extends Struct<T, object, any>>(
+export function isComponent<S extends Struct, T extends ExtractTag<S>>(
+    s: S,
     tag: T,
-    s: S,
 ): s is S {
-    return s[$tag] === tag;
+    return s[$component] === tag;
 }
 
-export function getComponent<S extends Struct>(tag: ExtractTags<S>, s: S): S {
-    return s;
-}
+// export function getComponent<S extends Struct>(tag: ExtractTags<S>, s: S): S {
+//     return s;
+// }
 
-export function getComponentBody<S extends Struct>(
-    tag: ExtractTags<S>,
-    s: S,
-): S['body'] {
-    return s.body;
-}
-
-export function hasInheritedComponent<
-    T extends string,
-    S extends Struct<any, object, T>,
->(tag: T, s: S): s is S {
-    debugger;
-    return (s[$inheritedTag] as any)[tag] === true;
-}
+// export function getComponentBody<S extends Struct>(
+//     tag: ExtractTags<S>,
+//     s: S,
+// ): S['body'] {
+//     return s.body;
+// }
+//
+// export function hasInheritedComponent<
+//     T extends string,
+//     S extends Struct<any, object, T>,
+// >(tag: T, s: S): s is S {
+//     debugger;
+//     return (s[$inheritedTag] as any)[tag] === true;
+// }

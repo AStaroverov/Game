@@ -1,8 +1,5 @@
-import { createComponentConstructor } from '../../lib/ECS/components';
+import { createComponent } from '../../lib/ECS/Component';
 
-export const GameTimeConstructor = createComponentConstructor(
-    'GameTimeConstructor',
-    (time = 1) => {
-        return { time };
-    },
-);
+export const GameTimeComponentID = 'GAME_TIME' as const;
+export const createGameTimeComponent = (time = 1) =>
+    createComponent(GameTimeComponentID, { time });

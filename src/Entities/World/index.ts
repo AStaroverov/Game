@@ -1,12 +1,6 @@
-import { Entity } from '../../../lib/ECS/entities';
-import { GameTimeComponent } from '../../Components/GameTime';
+import { createEntity } from '../../../lib/ECS/Entity';
+import { createGameTimeComponent } from '../../Components/GameTime';
 
-export class WorldEntity extends Entity {
-    constructor() {
-        super([new GameTimeComponent()]);
-    }
-}
-
-export const isWorldEntity = (
-    entity: WorldEntity | unknown,
-): entity is WorldEntity => entity instanceof WorldEntity;
+export const WorldEntityID = 'WORLD_ENTITY' as const;
+export const createWorldEntity = () =>
+    createEntity(WorldEntityID, [createGameTimeComponent()]);

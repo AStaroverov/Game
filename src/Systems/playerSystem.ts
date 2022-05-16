@@ -1,8 +1,9 @@
-import { getComponent } from '../../lib/ECS/entities';
-import { Heap } from '../../lib/ECS/heap';
-import { PositionConstructor } from '../Components/Position';
+import { getComponentBody } from '../../lib/ECS/Entity';
+import { getEntities } from '../../lib/ECS/Heap';
+import { PositionComponentID } from '../Components/Position';
 import { CENTER_CARD_POSITION } from '../CONST';
-import { isPlayerEntity } from '../Entities/Player';
+import { PlayerEntityID } from '../Entities/Player';
+import { GameHeap } from '../heap';
 import { mapVector, setVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
@@ -11,9 +12,9 @@ export const PLAYER_START_POSITION = mapVector(
     (v) => v + 0.5,
 );
 
-export function playerSystem(heap: Heap, ticker: TasksScheduler): void {
-    const playerEntity = [...heap.getEntities(isPlayerEntity)][0];
-    const playerPosition = getComponent(playerEntity, PositionConstructor);
+export function playerSystem(heap: GameHeap, ticker: TasksScheduler): void {
+    const playerEntity = getEntities(heap, PlayerEntityID)[0];
+    const playerPosition = getComponentBody(playerEntity, PositionComponentID);
 
     setVector(playerPosition, PLAYER_START_POSITION);
 }

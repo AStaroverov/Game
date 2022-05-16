@@ -1,24 +1,30 @@
-import { getComponent } from '../../lib/ECS/entities';
-import { getEntities, Heap } from '../../lib/ECS/heap';
+import { getComponentBody } from '../../lib/ECS/Entity';
+import { getEntities } from '../../lib/ECS/Heap';
 import {
     tilesFillEmpty,
-    TilesMatrixConstructor,
+    tilesInit,
+    TilesMatrixID,
     tilesMove,
 } from '../Components/Matrix/TilesMatrix';
-import { PositionConstructor } from '../Components/Position';
+import { PositionComponentID } from '../Components/Position';
 import { CENTER_CARD_POSITION } from '../CONST';
-import { isCardEntity } from '../Entities/Card';
+import { CardEntityID } from '../Entities/Card';
+import { PlayerEntityID } from '../Entities/Player';
+import { GameHeap } from '../heap';
 import { ufloor } from '../utils/math';
 import { mapVector, mulVector, setVector, sumVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
-export function cardSystem(heap: Heap, ticker: TasksScheduler): void {
-    const playerEntity = getEntities(heap, PlaC);
-    const playerPosition = getComponent(playerEntity, PositionConstructor);
+export function cardSystem(heap: GameHeap, ticker: TasksScheduler): void {
+    const playerEntity = getEntities(heap, PlayerEntityID)[0];
+    const playerPosition = getComponentBody(playerEntity, PositionComponentID);
 
-    const cardEntity = [...heap.getEntities(isCardEntity)][0];
-    const cardTiles = getComponent(cardEntity, TilesMatrixConstructor);
-    const position = getComponent(cardEntity, PositionConstructor);
+    const cardEntity = getEntities(heap, CardEntityID)[0];
+    const cardTiles = getComponentBody(cardEntity, TilesMatrixID);
+    const position = getComponentBody(cardEntity, PositionComponentID);
+
+    tilesInit(cardTiles, CENTER_CARD_POSITION.x, CENTER_CARD_POSITION.y);
+    tilesFillEmpty(cardTiles);
 
     ticker.addFrameInterval(moveCard, 1);
 

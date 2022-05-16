@@ -1,15 +1,12 @@
-import {
-    ComponentType,
-    createComponentConstructor,
-} from '../../lib/ECS/components';
+import { createComponent } from '../../lib/ECS/Component';
 
-export type VelocityComponent = ComponentType<typeof VelocityConstructor>;
+export const VelocityComponentID = 'VELOCITY' as const;
 
-export const VelocityConstructor = createComponentConstructor(
-    'VelocityConstructor',
-    (v = 0) => ({ v }),
-);
+export type VelocityComponent = ReturnType<typeof createVelocityComponent>;
 
-export function setVelocity(component: VelocityComponent, v: number): void {
-    component.v = v;
+export const createVelocityComponent = (v = 0) =>
+    createComponent(VelocityComponentID, { v });
+
+export function setVelocity(body: VelocityComponent['body'], v: number): void {
+    body.v = v;
 }

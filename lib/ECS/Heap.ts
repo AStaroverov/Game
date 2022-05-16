@@ -1,9 +1,12 @@
 import {
-    $tag as $entity,
+    $entity as $entity,
     Entity,
     ExtractComponents,
+    ExtractComponentsByInheritedTag,
+    ExtractComponentsByShallowTag,
     ExtractComponentsByTag,
 } from './Entity';
+import { ExtractInheritedTags, ExtractTags } from './Struct';
 import { ExtractTag } from './types';
 
 const EMPTY_ARRAY: any[] = [];
@@ -21,18 +24,34 @@ export type ExtractEntitiesByTag<E, T extends string> = E extends Entity<T>
 export type ExtractEntitiesByComponent<
     E extends Entity,
     C extends ExtractComponents<E>,
-    D extends Entity<any, C> = Entity<any, C>,
-> = D extends E ? D : never;
+> = Extract<Entity<any, C>, E>;
 
 export type ExtractEntitiesByComponentTag<
     E extends Entity,
+    T extends ExtractTags<ExtractComponents<E>>,
+    C extends ExtractComponents<E> = ExtractComponents<E>,
+    DC extends ExtractComponentsByTag<C, T> = ExtractComponentsByTag<C, T>,
+> = DC extends never ? never : Extract<Entity<any, DC>, E>;
+
+export type ExtractEntitiesByComponentShallowTag<
+    E extends Entity,
     T extends ExtractTag<ExtractComponents<E>>,
     C extends ExtractComponents<E> = ExtractComponents<E>,
-    D extends Entity<any, ExtractComponentsByTag<C, T>> = Entity<
-        any,
-        ExtractComponentsByTag<C, T>
-    >,
-> = D extends E ? D : never;
+    DC extends ExtractComponentsByShallowTag<
+        C,
+        T
+    > = ExtractComponentsByShallowTag<C, T>,
+> = DC extends never ? never : Extract<Entity<any, DC>, E>;
+
+export type ExtractEntitiesByComponentInheritedTag<
+    E extends Entity,
+    T extends ExtractInheritedTags<ExtractComponents<E>>,
+    C extends ExtractComponents<E> = ExtractComponents<E>,
+    DC extends ExtractComponentsByInheritedTag<
+        C,
+        T
+    > = ExtractComponentsByInheritedTag<C, T>,
+> = DC extends never ? never : Extract<Entity<any, DC>, E>;
 
 export function createHeap<
     EC extends (...args: any[]) => Entity = (...args: any[]) => Entity,
@@ -73,10 +92,9 @@ export function getEntities<
     return (heap.entities[tag] ?? EMPTY_ARRAY) as ExtractEntitiesByTag<E, T>[];
 }
 
-export function filterEntities<
-    H extends Heap,
-    E extends ExtractEntity<H>,
-    R extends E,
->(heap: H, fn: (e: E) => e is R): R[] {
+export function filterEntities<E extends Entity, R extends E>(
+    heap: Heap,
+    fn: (e: E) => e is R,
+): R[] {
     return (Object.values(heap.entities).flat() as E[]).filter(fn) as R[];
 }

@@ -1,8 +1,5 @@
-import { createComponentConstructor } from '../../lib/ECS/components';
+import { createComponent } from '../../lib/ECS/Component';
 
-export const HealConstructor = createComponentConstructor(
-    'HealConstructor',
-    (max = 1, v: number = max) => {
-        return { v, max };
-    },
-);
+export const HealComponentID = 'HEAL' as const;
+export const createHealComponent = (max = 1, v: number = max) =>
+    createComponent(HealComponentID, { v, max });

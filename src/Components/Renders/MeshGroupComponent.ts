@@ -1,9 +1,8 @@
 import { Group } from 'three';
 
-export class MeshGroupComponent {
-    object: Group;
+import { createComponent } from '../../../lib/ECS/Component';
 
-    constructor() {
-        this.object = new Group();
-    }
-}
+export const MeshGroupComponentID = 'MESH_GROUP' as const;
+export type MeshGroupComponent = ReturnType<typeof createMeshGroupComponent>;
+export const createMeshGroupComponent = () =>
+    createComponent(MeshGroupComponentID, { object: new Group() });

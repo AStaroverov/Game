@@ -1,13 +1,17 @@
 import { ExtractTag } from './types';
 
-export const $tag = '__COMPONENT__';
-export const $inheritedTag = '__INHERITED__';
+export const $component = '__COMPONENT__';
+export const $inherited = '__INHERITED__';
 
 export type Struct<
     Tag extends string = string,
     Body extends object = object,
-    InheritedTag extends never | string = never | string,
-> = { [$tag]: Tag; [$inheritedTag]: InheritedTag; body: Body };
+    InheritedTag extends never | string = any,
+> = {
+    [$component]: Tag;
+    [$inherited]: InheritedTag;
+    body: Body;
+};
 
 export type ExtractInheritedTags<C> = C extends Struct<
     string,

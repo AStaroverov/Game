@@ -1,75 +1,88 @@
-import { createComponent, isComponent } from './Component';
-import {
-    createEntity,
-    // ExtractComponentsByTag,
-    getComponent,
-    hasComponent,
-    hasInheritedComponent,
-    hasShallowComponent,
-} from './Entity';
-import {
-    createHeap,
-    ExtractEntitiesByComponent,
-    ExtractEntitiesByComponentInheritedTag,
-    ExtractEntitiesByComponentShallowTag,
-    ExtractEntitiesByComponentTag,
-    // ExtractEntitiesByComponentTag,
-    filterEntities,
-    getEntities,
-    registerEntity,
-} from './Heap';
-
-const Component_0_ID = 'Component_0' as const;
-const Component_0 = () => createComponent(Component_0_ID, { a: 1 });
+const Component_0_ID = 'Component_0_ID' as const;
+const Component_0 = () => ({ Component_0_ID, a: 1 });
 type TComponent_0 = ReturnType<typeof Component_0>;
 const component_0 = Component_0();
 
-const Component_1_ID = 'Component_1' as const;
-const Component_1 = () => createComponent(Component_1_ID, { b: 1 });
+const Component_1_ID = 'Component_1_ID' as const;
+const Component_1 = () => ({ Component_1_ID, b: 1 });
 type TComponent_1 = ReturnType<typeof Component_1>;
 const component_1 = Component_1();
 
-const Component_2_ID = 'Component_2' as const;
-const Component_2 = <T>(t: T) => createComponent(Component_2_ID, { t });
+const Component_2_ID = 'Component_2_ID' as const;
+const Component_2 = <T>(t: T) => ({ Component_2_ID, t });
 type TComponent_2 = ReturnType<typeof Component_2>;
-const component_2 = Component_2(123);
+const component_2 = Component_2('asd');
 
-const Component_ALL_ID = 'Component_ALL' as const;
-const Component_ALL = () =>
-    createComponent(
-        Component_ALL_ID,
-        { c: 1 },
-        component_0,
-        component_1,
-        Component_2('h1'),
-    );
+const Component_ALL_ID = 'Component_ALL_ID' as const;
+const Component_ALL = () => ({
+    Component_ALL_ID,
+    c: 1,
+    ...component_0,
+    ...Component_1(),
+    ...Component_2('test'),
+});
 type TComponent_ALL = ReturnType<typeof Component_ALL>;
 const componentALL = Component_ALL();
 
-isComponent(Component_0_ID, component_0);
-isComponent(Component_1_ID, component_0); // Error
+export function isComponent<C extends object, ID extends keyof C>(
+    c: C,
+    id: ID,
+): c is C {
+    // return c[id] === tag;
+    return true;
+}
 
-isComponent(Component_0_ID, component_1); // Error
-isComponent(Component_1_ID, component_1);
+isComponent(component_0, Component_0_ID);
+isComponent(component_0, Component_1_ID); // Error
 
-isComponent(Component_ALL_ID, componentALL);
+isComponent(component_1, Component_0_ID); // Error
+isComponent(component_1, Component_1_ID);
 
-const Entity_0_ID = 'Entity_0' as const;
-const Entity_0 = () =>
-    createEntity(Entity_0_ID, [Component_0(), Component_1()]);
+isComponent(componentALL, Component_0_ID);
+isComponent(componentALL, Component_1_ID);
+isComponent(componentALL, Component_ALL_ID);
+
+type Entity<C extends object = object> = {
+    components: C[];
+};
+
+const Entity_0_ID = 'Entity_0_ID' as const;
+const Entity_0 = () => ({
+    Entity_0_ID,
+    components: [Component_0(), Component_1()],
+});
 const entity_0 = Entity_0();
 
-const Entity_1_ID = 'Entity_1' as const;
-const Entity_1 = () =>
-    createEntity(Entity_1_ID, [Component_1(), Component_2('2')]);
+const Entity_1_ID = 'Entity_1_ID' as const;
+const Entity_1 = () => ({
+    Entity_1_ID,
+    components: [Component_1(), Component_2('2')],
+});
 const entity_1 = Entity_1();
 
-const Entity_2_ID = 'Entity_2' as const;
-const Entity_2 = () =>
-    createEntity(Entity_2_ID, [Component_2(2), Component_ALL()]);
+const Entity_2_ID = 'Entity_2_ID' as const;
+const Entity_2 = () => ({
+    Entity_2_ID,
+    components: [Component_2(2), Component_ALL()],
+});
 const entity_2 = Entity_2();
 
-hasComponent(entity_0, Component_0_ID);
+type ExtractComponents<E extends Entity> = E extends Entity<infer C>
+    ? C
+    : never;
+
+const t = { Component_0_ID };
+type A1 = ExtractComponents<typeof entity_2>;
+type K1 = A1 extends typeof t ? true : false;
+
+function hasComponent<E extends Entity, ID extends object>(
+    entity: E,
+    id: ID,
+): entity is E {
+    return entity.components.findIndex((e) => id in e) !== -1;
+}
+
+hasComponent(entity_0, { Component_0_ID });
 hasComponent(entity_0, Component_1_ID);
 hasComponent(entity_0, Component_2_ID); // Error
 hasComponent(entity_0, Component_ALL_ID); // Error

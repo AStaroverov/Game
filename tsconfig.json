@@ -1,5 +1,5 @@
 {
-    "include": ["global.d.ts", "src/**/*"],
+    "include": ["global.d.ts", "src/index.ts"],
     "exclude": ["node_modules", "lib"],
 
     "compilerOptions": {
