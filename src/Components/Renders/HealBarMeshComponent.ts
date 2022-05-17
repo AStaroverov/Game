@@ -1,10 +1,16 @@
 import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
 
+import { createComponent, getStruct } from '../../../lib/ECS/Component';
 import { HEAL_BAR_Z } from '../../CONST';
-import { MeshGroupComponent } from './MeshGroupComponent';
+import { createMeshGroupComponent } from './MeshGroupComponent';
 
-export class HealBarMeshComponent extends MeshGroupComponent {
-    healMesh = new Mesh(
+export const HealBarMeshComponentID = 'HEAL_BAR_MESH' as const;
+export type HealBarMeshComponent = ReturnType<
+    typeof createHealBarMeshComponent
+>;
+export const createHealBarMeshComponent = () => {
+    const groupComponent = createMeshGroupComponent();
+    const healMesh = new Mesh(
         new PlaneGeometry(60, 6),
         new MeshLambertMaterial({
             transparent: true,
@@ -12,7 +18,7 @@ export class HealBarMeshComponent extends MeshGroupComponent {
             opacity: 0.7,
         }),
     );
-    backgroundMesh = new Mesh<PlaneGeometry, MeshLambertMaterial>(
+    const backgroundMesh = new Mesh<PlaneGeometry, MeshLambertMaterial>(
         new PlaneGeometry(64, 10),
         new MeshLambertMaterial({
             transparent: true,
@@ -21,13 +27,14 @@ export class HealBarMeshComponent extends MeshGroupComponent {
         }),
     );
 
-    constructor() {
-        super();
+    healMesh.position.z = 2;
+    backgroundMesh.position.z = 1;
 
-        this.object.position.z = HEAL_BAR_Z;
-        this.healMesh.position.z = 2;
-        this.backgroundMesh.position.z = 1;
+    getStruct(groupComponent).group.position.z = HEAL_BAR_Z;
+    getStruct(groupComponent).group.add(backgroundMesh, healMesh);
 
-        this.object.add(this.backgroundMesh, this.healMesh);
-    }
-}
+    return createComponent(HealBarMeshComponentID, groupComponent, {
+        healMesh,
+        backgroundMesh,
+    });
+};

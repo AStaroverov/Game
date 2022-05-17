@@ -1,37 +1,55 @@
-import { getComponent, hasComponent } from '../../../lib/ECS/entities';
-import { Heap } from '../../../lib/ECS/heap';
-import { Entity } from '../../../lib/ECS/types';
+import { ExtractStruct } from '../../../lib/ECS/Component';
+import {
+    Entity,
+    getComponentStruct,
+    hasComponent,
+} from '../../../lib/ECS/Entity';
+import { filterEntities } from '../../../lib/ECS/Heap';
 import Enumerable from '../../../lib/linq';
-import { DirectionComponent } from '../../Components/DirectionComponent';
-import { MeshComponent } from '../../Components/Renders/MeshComponent';
+import {
+    DirectionComponent,
+    DirectionComponentID,
+} from '../../Components/DirectionComponent';
+import {
+    MeshComponent,
+    MeshComponentID,
+} from '../../Components/Renders/MeshComponent';
+import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
-export function rotateRenderSystem(heap: Heap, ticker: TasksScheduler): void {
+export function rotateRenderSystem(
+    heap: GameHeap,
+    ticker: TasksScheduler,
+): void {
     ticker.addFrameInterval(tick, 1);
 
     function tick() {
-        const entities = heap.getEntities(
-            (e): e is Entity<MeshComponent & DirectionComponent> => {
+        const entities = filterEntities(
+            heap,
+            (e): e is Entity<any, MeshComponent | DirectionComponent> => {
                 return (
-                    hasComponent(e, MeshComponent) &&
-                    hasComponent(e, DirectionComponent)
+                    hasComponent(e, MeshComponentID) &&
+                    hasComponent(e, DirectionComponentID)
                 );
             },
         );
         Enumerable.from(entities).forEach((entity) => {
-            const mesh = getComponent(entity, MeshComponent);
-            const dir = getComponent(entity, DirectionComponent);
+            const mesh = getComponentStruct(entity, MeshComponentID);
+            const dir = getComponentStruct(entity, DirectionComponentID);
 
             rotate(mesh, dir);
         });
     }
 }
 
-function rotate(mesh: MeshComponent, direction: DirectionComponent) {
+function rotate(
+    mesh: ExtractStruct<MeshComponent>,
+    direction: ExtractStruct<DirectionComponent>,
+) {
     if (direction.x > 0) {
-        mesh.object.scale.x = 1;
+        mesh.mesh.scale.x = 1;
     }
     if (direction.x < 0) {
-        mesh.object.scale.x = -1;
+        mesh.mesh.scale.x = -1;
     }
 }

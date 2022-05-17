@@ -1,21 +1,18 @@
-import { hasComponent } from '../../lib/ECS/entities';
-import { Entity } from '../../lib/ECS/types';
+import { createComponent, ExtractStruct } from '../../lib/ECS/Component';
+import { newVector } from '../utils/shape';
 
-export class DirectionComponent {
-    constructor(public x: number = 0, public y: number = 0) {}
-}
+export const DirectionComponentID = 'DIRECTION' as const;
+
+export type DirectionComponent = ReturnType<typeof createDirectionComponent>;
+
+export const createDirectionComponent = (x = 0, y = 0) =>
+    createComponent(DirectionComponentID, newVector(x, y));
 
 export function setDirection(
-    component: DirectionComponent,
+    struct: ExtractStruct<DirectionComponent>,
     x: number,
     y: number,
 ): void {
-    component.x = x;
-    component.y = y;
-}
-
-export function hasDirectionComponent(
-    entity: Entity,
-): entity is Entity<DirectionComponent> {
-    return hasComponent(entity, DirectionComponent);
+    struct.x = x;
+    struct.y = y;
 }

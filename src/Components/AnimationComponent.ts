@@ -1,10 +1,12 @@
-export type AnimationProps = { duration?: number; time?: number };
+import { createComponent } from '../../lib/ECS/Component';
 
-export class AnimationComponent {
-    time = 0;
-    duration = 0;
-    constructor(props: AnimationProps) {
-        this.time = props.time ?? 0;
-        this.duration = props.duration ?? 0;
-    }
-}
+export const AnimationComponentID = 'ANIMATION' as const;
+export type AnimationComponent = ReturnType<typeof createAnimationComponent>;
+export const createAnimationComponent = (props: {
+    duration?: number;
+    time?: number;
+}) =>
+    createComponent(AnimationComponentID, {
+        time: props.time ?? 0,
+        duration: props.duration ?? 0,
+    });

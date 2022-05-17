@@ -1,32 +1,42 @@
-import { getComponent, hasComponent } from '../../lib/ECS/entities';
-import { Heap } from '../../lib/ECS/heap';
-import { Entity } from '../../lib/ECS/types';
-import Enumerable from '../../lib/linq';
-import { DirectionComponent } from '../Components/DirectionComponent';
-import { PositionComponent } from '../Components/PositionComponent';
-import { VelocityComponent } from '../Components/VelocityComponent';
+import {
+    getComponentStruct,
+    hasComponent,
+    SomeEntity,
+} from '../../lib/ECS/Entity';
+import { filterEntities } from '../../lib/ECS/Heap';
+import {
+    DirectionComponent,
+    DirectionComponentID,
+} from '../Components/DirectionComponent';
+import { PositionComponent, PositionComponentID } from '../Components/Position';
+import { VelocityComponent, VelocityComponentID } from '../Components/Velocity';
+import { GameHeap } from '../heap';
 import { mulVector, setVector, sumVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
-export function positionBodySystem(heap: Heap, ticker: TasksScheduler): void {
+export function positionBodySystem(
+    heap: GameHeap,
+    ticker: TasksScheduler,
+): void {
     ticker.addFrameInterval(tick, 1);
 
     function tick() {
-        const bodies = heap.getEntities(
+        const entities = filterEntities(
+            heap,
             (
                 e,
-            ): e is Entity<
-                PositionComponent | DirectionComponent | VelocityComponent
+            ): e is SomeEntity<
+                VelocityComponent | DirectionComponent | PositionComponent
             > =>
-                hasComponent(e, PositionComponent) &&
-                hasComponent(e, DirectionComponent) &&
-                hasComponent(e, VelocityComponent),
+                hasComponent(e, PositionComponentID) &&
+                hasComponent(e, DirectionComponentID) &&
+                hasComponent(e, VelocityComponentID),
         );
 
-        Enumerable.from(bodies).forEach((body) => {
-            const position = getComponent(body, PositionComponent);
-            const direction = getComponent(body, DirectionComponent);
-            const velocity = getComponent(body, VelocityComponent);
+        entities.forEach((entity) => {
+            const position = getComponentStruct(entity, PositionComponentID);
+            const direction = getComponentStruct(entity, DirectionComponentID);
+            const velocity = getComponentStruct(entity, VelocityComponentID);
 
             setVector(
                 position,

@@ -1,6 +1,9 @@
-import { Heap } from '../../../lib/ECS/heap';
+import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
-export function playerRenderSystem(heap: Heap, ticker: TasksScheduler): void {
+export function playerRenderSystem(
+    heap: GameHeap,
+    ticker: TasksScheduler,
+): void {
     //
 }

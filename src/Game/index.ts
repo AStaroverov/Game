@@ -1,9 +1,10 @@
-import { createHeap, registerEntity } from '../../lib/ECS/heap';
+import { registerEntity } from '../../lib/ECS/Heap';
 import { CARD_SIZE, RENDER_CARD_SIZE } from '../CONST';
-import { CardEntity } from '../Entities/Card';
-import { GlobalLightEntity } from '../Entities/GlobalLight';
-import { PlayerEntity } from '../Entities/Player';
-import { WorldEntity } from '../Entities/World';
+import { createCardEntity } from '../Entities/Card';
+import { createGlobalLightEntity } from '../Entities/GlobalLight';
+import { createPlayerEntity } from '../Entities/Player';
+import { createWorldEntity } from '../Entities/World';
+import { createGameHeap } from '../heap';
 import { Renderer } from '../Renderer';
 import { cardSystem } from '../Systems/cardSystem';
 import { colliderSystem } from '../Systems/colliderSystem';
@@ -27,18 +28,18 @@ import { newSize } from '../utils/shape';
 import { tasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function game(): void {
-    const heap = createHeap();
+    const heap = createGameHeap();
     const ticker = tasksScheduler;
     const renderer = new Renderer(ticker);
 
     // Entities
-    const light = new GlobalLightEntity();
-    const world = new WorldEntity();
-    const card = new CardEntity({
+    const light = createGlobalLightEntity();
+    const world = createWorldEntity();
+    const card = createCardEntity({
         tileSize: newSize(CARD_SIZE),
         meshSize: newSize(RENDER_CARD_SIZE),
     });
-    const player = new PlayerEntity();
+    const player = createPlayerEntity();
 
     registerEntity(heap, light);
     registerEntity(heap, world);
@@ -60,11 +61,11 @@ export function game(): void {
     enemySpawnSystem(heap, ticker);
 
     // Render Systems
-    meshesSystem(ticker, renderer.scene, heap);
+    meshesSystem(heap, ticker, renderer.scene);
     globalLightRenderSystem(heap, ticker);
 
-    cardSurfaceSystem(ticker, renderer.scene, heap);
-    cardReliefSystem(ticker, renderer.scene, heap);
+    cardSurfaceSystem(heap, ticker);
+    cardReliefSystem(heap, ticker);
 
     positionRenderSystem(heap, ticker);
     rotateRenderSystem(heap, ticker);

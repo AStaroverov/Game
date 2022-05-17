@@ -1,22 +1,24 @@
 import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
 
+import { createComponent, ReturnStruct } from '../../../lib/ECS/Component';
 import { TILE_SIZE } from '../../CONST';
 import { Size } from '../../utils/shape';
-import { MatrixComponent } from './MatrixComponent';
+import { createMatrixComponent } from './Matrix';
 
-export class SurfaceMeshesMatrixComponent extends MatrixComponent<
-    Mesh<PlaneGeometry, MeshLambertMaterial>
-> {
-    constructor({ w, h }: Size) {
-        super({
-            w,
-            h,
+export const SurfaceMeshesMatrixID = 'SURFACE_MESHES_MATRIX' as const;
+export type SurfaceMeshesMatrix = ReturnStruct<
+    typeof createSurfaceMeshesMatrix
+>;
+export const createSurfaceMeshesMatrix = (props: Size) =>
+    createComponent(
+        SurfaceMeshesMatrixID,
+        createMatrixComponent({
+            ...props,
             seed: () => {
                 return new Mesh(
                     new PlaneGeometry(TILE_SIZE, TILE_SIZE),
                     new MeshLambertMaterial(),
                 );
             },
-        });
-    }
-}
+        }),
+    );

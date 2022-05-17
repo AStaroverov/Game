@@ -1,11 +1,13 @@
 import { Light, SpotLight } from 'three';
 
-export class LightMeshComponent<L extends Light> {
-    object: L;
+import { createComponent } from '../../../lib/ECS/Component';
 
-    constructor(object: L) {
-        this.object = object;
-    }
-}
+export const LightMeshComponentID = 'LIGHT_MESH' as const;
+export const createLightMeshComponent = <L extends Light>(object: L) =>
+    createComponent(LightMeshComponentID, {
+        object,
+    });
 
-export class SpotLightMeshComponent extends LightMeshComponent<SpotLight> {}
+export const SpotLightMeshComponentID = 'SPOT_LIGHT_MESH' as const;
+export const createSpotLightMeshComponent = <L extends SpotLight>(object: L) =>
+    createComponent(SpotLightMeshComponentID, createLightMeshComponent(object));

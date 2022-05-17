@@ -1,23 +1,20 @@
 import memoize from 'memoizee';
 import { BiAStarFinder, DiagonalMovement, Grid } from 'pathfinding';
 
-import { getComponent } from '../../lib/ECS/entities';
-import { Heap } from '../../lib/ECS/heap';
-import Enumerable from '../../lib/linq';
-import { DirectionComponent } from '../Components/DirectionComponent';
+import { getComponentStruct } from '../../lib/ECS/Entity';
+import { getEntities } from '../../lib/ECS/Heap';
+import { DirectionComponentID } from '../Components/DirectionComponent';
 import {
     Tile,
-    TilesMatrixComponent,
+    TilesMatrixID,
     TileType,
-} from '../Components/Matrix/TilesMatrixComponent';
-import { PositionComponent } from '../Components/PositionComponent';
-import {
-    setVelocity,
-    VelocityComponent,
-} from '../Components/VelocityComponent';
-import { isCardEntity } from '../Entities/Card';
-import { EnemyEntity, isEnemyEntity } from '../Entities/Enemy';
-import { isPlayerEntity } from '../Entities/Player';
+} from '../Components/Matrix/TilesMatrix';
+import { PositionComponentID } from '../Components/Position';
+import { setVelocity, VelocityComponentID } from '../Components/Velocity';
+import { CardEntityID } from '../Entities/Card';
+import { EnemyEntity, EnemyEntityID } from '../Entities/Enemy';
+import { PlayerEntityID } from '../Entities/Player';
+import { GameHeap } from '../heap';
 import { floor, ufloor } from '../utils/math';
 import { Matrix } from '../utils/Matrix';
 import {
@@ -33,13 +30,16 @@ import {
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 import { isInsideCard } from '../utils/tiles';
 
-export function enemySystem(heap: Heap, ticker: TasksScheduler): void {
-    const card = [...heap.getEntities(isCardEntity)][0];
-    const cardTiles = getComponent(card, TilesMatrixComponent);
-    const cardPosition = getComponent(card, PositionComponent);
+export function enemySystem(heap: GameHeap, ticker: TasksScheduler): void {
+    const cardEntity = getEntities(heap, CardEntityID)[0];
+    const cardTiles = getComponentStruct(cardEntity, TilesMatrixID);
+    const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
 
-    const player = [...heap.getEntities(isPlayerEntity)][0];
-    const playerPosition = getComponent(player, PositionComponent);
+    const playerEntity = getEntities(heap, PlayerEntityID)[0];
+    const playerPosition = getComponentStruct(
+        playerEntity,
+        PositionComponentID,
+    );
 
     const pathFinder = new BiAStarFinder({
         diagonalMovement: DiagonalMovement.OnlyWhenNoObstacles,
@@ -48,15 +48,13 @@ export function enemySystem(heap: Heap, ticker: TasksScheduler): void {
     ticker.addFrameInterval(tick, 1);
 
     function tick() {
-        Enumerable.from(heap.getEntities(isEnemyEntity)).forEach(
-            setEnemyDirection,
-        );
+        getEntities(heap, EnemyEntityID).forEach(setEnemyDirection);
     }
 
     function setEnemyDirection(enemy: EnemyEntity) {
-        const position = getComponent(enemy, PositionComponent);
-        const direction = getComponent(enemy, DirectionComponent);
-        const velocity = getComponent(enemy, VelocityComponent);
+        const position = getComponentStruct(enemy, PositionComponentID);
+        const direction = getComponentStruct(enemy, DirectionComponentID);
+        const velocity = getComponentStruct(enemy, VelocityComponentID);
 
         const cardTilePosition = mapVector(cardPosition, ufloor);
         const enemyTilePosition = sumVector(
@@ -112,10 +110,10 @@ export function enemySystem(heap: Heap, ticker: TasksScheduler): void {
     );
 
     const getMatrix = memoize(
-        (_: PositionComponent) => matrixToNestedArray(cardTiles.matrix),
+        (_: Vector) => matrixToNestedArray(cardTiles.matrix),
         {
             max: 100,
-            normalizer: ([p]: [PositionComponent]) => stringVector(p),
+            normalizer: ([p]: [Vector]) => stringVector(p),
         },
     );
 }

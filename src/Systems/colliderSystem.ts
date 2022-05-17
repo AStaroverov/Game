@@ -1,15 +1,18 @@
-import { getComponent, hasComponent } from '../../lib/ECS/entities';
-import { Heap } from '../../lib/ECS/heap';
-import { Entity } from '../../lib/ECS/types';
-import Enumerable from '../../lib/linq';
-import { DirectionComponent } from '../Components/DirectionComponent';
 import {
-    TilesMatrixComponent,
-    TileType,
-} from '../Components/Matrix/TilesMatrixComponent';
-import { PositionComponent } from '../Components/PositionComponent';
-import { VelocityComponent } from '../Components/VelocityComponent';
-import { isCardEntity } from '../Entities/Card';
+    getComponentStruct,
+    hasComponent,
+    SomeEntity,
+} from '../../lib/ECS/Entity';
+import { filterEntities, getEntities } from '../../lib/ECS/Heap';
+import {
+    DirectionComponent,
+    DirectionComponentID,
+} from '../Components/DirectionComponent';
+import { TilesMatrixID, TileType } from '../Components/Matrix/TilesMatrix';
+import { PositionComponent, PositionComponentID } from '../Components/Position';
+import { VelocityComponent, VelocityComponentID } from '../Components/Velocity';
+import { CardEntityID } from '../Entities/Card';
+import { GameHeap } from '../heap';
 import { floor, ufloor } from '../utils/math';
 import {
     isEqualVectors,
@@ -19,29 +22,30 @@ import {
 } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
-export function colliderSystem(heap: Heap, ticker: TasksScheduler): void {
-    const cardEntity = [...heap.getEntities(isCardEntity)][0];
-    const cardPosition = getComponent(cardEntity, PositionComponent);
-    const tiles = getComponent(cardEntity, TilesMatrixComponent);
+export function colliderSystem(heap: GameHeap, ticker: TasksScheduler): void {
+    const cardEntity = getEntities(heap, CardEntityID)[0];
+    const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
+    const tiles = getComponentStruct(cardEntity, TilesMatrixID);
 
     ticker.addFrameInterval(tick, 1);
 
     function tick() {
-        const bodies = heap.getEntities(
+        const entities = filterEntities(
+            heap,
             (
                 e,
-            ): e is Entity<
-                PositionComponent & DirectionComponent & VelocityComponent
+            ): e is SomeEntity<
+                PositionComponent | DirectionComponent | VelocityComponent
             > =>
-                hasComponent(e, PositionComponent) &&
-                hasComponent(e, DirectionComponent) &&
-                hasComponent(e, VelocityComponent),
+                hasComponent(e, PositionComponentID) &&
+                hasComponent(e, DirectionComponentID) &&
+                hasComponent(e, VelocityComponentID),
         );
 
-        Enumerable.from(bodies).forEach((body) => {
-            const direction = getComponent(body, DirectionComponent);
-            const position = getComponent(body, PositionComponent);
-            const velocity = getComponent(body, VelocityComponent);
+        entities.forEach((entity) => {
+            const direction = getComponentStruct(entity, DirectionComponentID);
+            const velocity = getComponentStruct(entity, VelocityComponentID);
+            const position = getComponentStruct(entity, PositionComponentID);
 
             if (velocity.v === 0) return;
 

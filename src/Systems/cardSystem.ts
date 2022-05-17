@@ -1,25 +1,33 @@
-import { getComponent } from '../../lib/ECS/entities';
-import { Heap } from '../../lib/ECS/heap';
+import { getComponentStruct } from '../../lib/ECS/Entity';
+import { getEntities } from '../../lib/ECS/Heap';
 import {
     tilesFillEmpty,
-    TilesMatrixComponent,
+    tilesInit,
+    TilesMatrixID,
     tilesMove,
-} from '../Components/Matrix/TilesMatrixComponent';
-import { PositionComponent } from '../Components/PositionComponent';
+} from '../Components/Matrix/TilesMatrix';
+import { PositionComponentID } from '../Components/Position';
 import { CENTER_CARD_POSITION } from '../CONST';
-import { isCardEntity } from '../Entities/Card';
-import { isPlayerEntity } from '../Entities/Player';
+import { CardEntityID } from '../Entities/Card';
+import { PlayerEntityID } from '../Entities/Player';
+import { GameHeap } from '../heap';
 import { ufloor } from '../utils/math';
 import { mapVector, mulVector, setVector, sumVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
-export function cardSystem(heap: Heap, ticker: TasksScheduler): void {
-    const playerEntity = [...heap.getEntities(isPlayerEntity)][0];
-    const playerPosition = getComponent(playerEntity, PositionComponent);
+export function cardSystem(heap: GameHeap, ticker: TasksScheduler): void {
+    const playerEntity = getEntities(heap, PlayerEntityID)[0];
+    const playerPosition = getComponentStruct(
+        playerEntity,
+        PositionComponentID,
+    );
 
-    const cardEntity = [...heap.getEntities(isCardEntity)][0];
-    const cardTiles = getComponent(cardEntity, TilesMatrixComponent);
-    const position = getComponent(cardEntity, PositionComponent);
+    const cardEntity = getEntities(heap, CardEntityID)[0];
+    const cardTiles = getComponentStruct(cardEntity, TilesMatrixID);
+    const position = getComponentStruct(cardEntity, PositionComponentID);
+
+    tilesInit(cardTiles, CENTER_CARD_POSITION.x, CENTER_CARD_POSITION.y);
+    tilesFillEmpty(cardTiles);
 
     ticker.addFrameInterval(moveCard, 1);
 

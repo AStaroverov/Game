@@ -1,32 +1,48 @@
-import { getComponent, hasComponent } from '../../../lib/ECS/entities';
-import { Heap } from '../../../lib/ECS/heap';
-import { Entity } from '../../../lib/ECS/types';
-import Enumerable from '../../../lib/linq';
-import { PositionComponent } from '../../Components/PositionComponent';
-import { MeshComponent } from '../../Components/Renders/MeshComponent';
+import { ExtractStruct } from '../../../lib/ECS/Component';
+import {
+    Entity,
+    getComponentStruct,
+    hasComponent,
+} from '../../../lib/ECS/Entity';
+import { filterEntities, getEntities } from '../../../lib/ECS/Heap';
+import {
+    PositionComponent,
+    PositionComponentID,
+} from '../../Components/Position';
+import {
+    MeshComponent,
+    MeshComponentID,
+} from '../../Components/Renders/MeshComponent';
 import { TILE_SIZE } from '../../CONST';
-import { isCardEntity } from '../../Entities/Card';
+import { CardEntityID } from '../../Entities/Card';
+import { GameHeap } from '../../heap';
 import { worldYToPositionZ } from '../../utils/positionZ';
 import { Vector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 import { worldToRenderPosition } from '../../utils/worldToRenderPosition';
 
-export function positionRenderSystem(heap: Heap, ticker: TasksScheduler): void {
-    const cardEntity = [...heap.getEntities(isCardEntity)][0];
-    const cardPosition = getComponent(cardEntity, PositionComponent);
+export function positionRenderSystem(
+    heap: GameHeap,
+    ticker: TasksScheduler,
+): void {
+    const cardEntity = getEntities(heap, CardEntityID)[0];
+    const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
 
     ticker.addFrameInterval(tick, 1);
 
     function tick() {
-        const entities = heap.getEntities(
-            (e): e is Entity<MeshComponent | PositionComponent> =>
-                hasComponent(e, MeshComponent) &&
-                hasComponent(e, PositionComponent),
+        const entities = filterEntities(
+            heap,
+            (
+                entity,
+            ): entity is Entity<any, MeshComponent | PositionComponent> =>
+                hasComponent(entity, MeshComponentID) &&
+                hasComponent(entity, PositionComponentID),
         );
 
-        Enumerable.from(entities).forEach((entity) => {
-            const mesh = getComponent(entity, MeshComponent);
-            const position = getComponent(entity, PositionComponent);
+        entities.forEach((entity) => {
+            const mesh = getComponentStruct(entity, MeshComponentID);
+            const position = getComponentStruct(entity, PositionComponentID);
 
             setPositionMesh(
                 mesh,
@@ -36,8 +52,11 @@ export function positionRenderSystem(heap: Heap, ticker: TasksScheduler): void {
     }
 }
 
-function setPositionMesh({ object }: MeshComponent, position: Vector): void {
-    object.position.x = (position.x - 0.5) * TILE_SIZE;
-    object.position.y = (position.y - 0.5) * TILE_SIZE;
-    object.position.z = worldYToPositionZ(object.position.y);
+function setPositionMesh(
+    { mesh }: ExtractStruct<MeshComponent>,
+    position: Vector,
+): void {
+    mesh.position.x = (position.x - 0.5) * TILE_SIZE;
+    mesh.position.y = (position.y - 0.5) * TILE_SIZE;
+    mesh.position.z = worldYToPositionZ(mesh.position.y);
 }

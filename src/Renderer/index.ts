@@ -1,7 +1,7 @@
 import { OrthographicCamera, Scene, WebGLRenderer } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-import { RENDER_CARD_SIZE, TILE_SIZE } from '../CONST';
+import { CENTER_RENDER_POSITION, TILE_SIZE } from '../CONST';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 const min = Math.min(window.innerWidth, window.innerHeight) * 1.4;
@@ -40,8 +40,8 @@ export class Renderer {
         this.renderer.setSize(width, height);
         this.renderer.setPixelRatio(window.devicePixelRatio ?? 1);
         this.camera.position.z = 1000;
-        this.scene.position.x -= (TILE_SIZE * RENDER_CARD_SIZE) / 2;
-        this.scene.position.y -= (TILE_SIZE * RENDER_CARD_SIZE) / 2;
+        this.scene.position.x -= TILE_SIZE * CENTER_RENDER_POSITION.x;
+        this.scene.position.y -= TILE_SIZE * CENTER_RENDER_POSITION.y;
 
         ticker.addFrameInterval(this.render, 1, this);
     }

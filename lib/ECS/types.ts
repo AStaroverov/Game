@@ -1,10 +1,8 @@
-export interface Constructor<T = object> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    new (...args: any[]): T;
-    prototype: T;
-}
-export type Component<C extends object = object> = C;
+import { Component } from './Component';
+import { Entity } from './Entity';
 
-export type Entity<C extends Component = Component> = {
-    components: Map<Constructor<C>, C>;
-};
+export type ExtractTag<T> = T extends Component<infer Tag>
+    ? Tag
+    : T extends Entity<infer Tag>
+    ? Tag
+    : never;

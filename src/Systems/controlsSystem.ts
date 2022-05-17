@@ -1,22 +1,23 @@
 import { filter, fromEvent, map, tap } from 'rxjs';
 
-import { getComponent } from '../../lib/ECS/entities';
-import { Heap } from '../../lib/ECS/heap';
-import {
-    DirectionComponent,
-    setDirection,
-} from '../Components/DirectionComponent';
-import {
-    setVelocity,
-    VelocityComponent,
-} from '../Components/VelocityComponent';
-import { isPlayerEntity } from '../Entities/Player';
-import { Vector } from '../utils/shape';
+import { getComponentStruct } from '../../lib/ECS/Entity';
+import { getEntities } from '../../lib/ECS/Heap';
+import { DirectionComponentID } from '../Components/DirectionComponent';
+import { setVelocity, VelocityComponentID } from '../Components/Velocity';
+import { PlayerEntityID } from '../Entities/Player';
+import { GameHeap } from '../heap';
+import { newVector, setVector, Vector } from '../utils/shape';
 
-export function controlsSystem(heap: Heap): void {
-    const playerEntity = [...heap.getEntities(isPlayerEntity)][0];
-    const playerDirection = getComponent(playerEntity, DirectionComponent);
-    const playerVelocity = getComponent(playerEntity, VelocityComponent);
+export function controlsSystem(heap: GameHeap): void {
+    const playerEntity = getEntities(heap, PlayerEntityID)[0];
+    const playerVelocity = getComponentStruct(
+        playerEntity,
+        VelocityComponentID,
+    );
+    const playerDirection = getComponentStruct(
+        playerEntity,
+        DirectionComponentID,
+    );
 
     const pressed = new Set();
 
@@ -28,10 +29,12 @@ export function controlsSystem(heap: Heap): void {
             map(arrowDownToVector),
         )
         .subscribe((vector) => {
-            setDirection(
+            setVector(
                 playerDirection,
-                vector.x ?? playerDirection.x,
-                vector.y ?? playerDirection.y,
+                newVector(
+                    vector.x ?? playerDirection.x,
+                    vector.y ?? playerDirection.y,
+                ),
             );
 
             setVelocity(playerVelocity, 0.08);

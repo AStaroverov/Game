@@ -3,16 +3,17 @@ import { MeshLambertMaterial, NearestFilter, PlaneGeometry } from 'three';
 import dataAtlasPlayer from '../../../assets/atlases/player_idle.json';
 import imageAtlasPlayer from '../../../assets/atlases/player_idle.png';
 import { Atlas } from '../../../lib/Atlas';
-import { createEntity } from '../../../lib/ECS/entities';
-import { AtlasAnimationComponent } from '../../Components/AtlasAnimationComponent';
-import { DirectionComponent } from '../../Components/DirectionComponent';
-import { HealComponent } from '../../Components/HealComponent';
-import { PositionComponent } from '../../Components/PositionComponent';
-import { HealBarMeshComponent } from '../../Components/Renders/HealBarMeshComponent';
-import { MeshComponent } from '../../Components/Renders/MeshComponent';
-import { VelocityComponent } from '../../Components/VelocityComponent';
-import { VisualSizeComponent } from '../../Components/VisualSizeComponent';
+import { createEntity } from '../../../lib/ECS/Entity';
+import { createAtlasAnimationComponent } from '../../Components/AtlasAnimation';
+import { createDirectionComponent } from '../../Components/DirectionComponent';
+import { createHealComponent } from '../../Components/Heal';
+import { createPositionComponent } from '../../Components/Position';
+import { createHealBarMeshComponent } from '../../Components/Renders/HealBarMeshComponent';
+import { createMeshComponent } from '../../Components/Renders/MeshComponent';
+import { createVelocityComponent } from '../../Components/Velocity';
+import { createVisualSizeComponent } from '../../Components/VisualSize';
 import { TILE_SIZE } from '../../CONST';
+import { newSize } from '../../utils/shape';
 
 export const atlasPlayer = new Atlas(imageAtlasPlayer, dataAtlasPlayer);
 
@@ -20,29 +21,26 @@ atlasPlayer.list.forEach((frame) => {
     frame.texture.magFilter = NearestFilter;
 });
 
-export class PlayerEntity extends createEntity(() => [
-    new VisualSizeComponent(TILE_SIZE, TILE_SIZE),
-    new PositionComponent(),
-    new DirectionComponent(),
-    new VelocityComponent(),
-    new MeshComponent({
-        geometry: new PlaneGeometry(atlasPlayer.w * 3, atlasPlayer.h * 3),
-        material: new MeshLambertMaterial({
-            transparent: true,
-            alphaTest: 0.5,
+export const PlayerEntityID = 'PLAYER_ENTITY' as const;
+export type PlayerEntity = ReturnType<typeof createPlayerEntity>;
+export const createPlayerEntity = () =>
+    createEntity(PlayerEntityID, [
+        createVisualSizeComponent(newSize(TILE_SIZE)),
+        createPositionComponent(),
+        createDirectionComponent(),
+        createVelocityComponent(),
+        createMeshComponent({
+            geometry: new PlaneGeometry(atlasPlayer.w * 3, atlasPlayer.h * 3),
+            material: new MeshLambertMaterial({
+                transparent: true,
+                alphaTest: 0.5,
+            }),
         }),
-    }),
-    new AtlasAnimationComponent({
-        time: 0,
-        duration: 100,
-        atlas: atlasPlayer,
-    }),
-    new HealComponent(100),
-    new HealBarMeshComponent(),
-]) {}
-
-export function isPlayerEntity<T = PlayerEntity>(
-    entity: PlayerEntity | unknown,
-): entity is PlayerEntity {
-    return entity instanceof PlayerEntity;
-}
+        createAtlasAnimationComponent({
+            time: 0,
+            duration: 100,
+            atlas: atlasPlayer,
+        }),
+        createHealComponent(100),
+        createHealBarMeshComponent(),
+    ]);

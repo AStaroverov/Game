@@ -1,13 +1,12 @@
 import { uniq } from 'lodash';
 import { pipe } from 'lodash/fp';
 
-import { hasComponent } from '../../../lib/ECS/entities';
-import { Entity } from '../../../lib/ECS/types';
+import { createComponent, ReturnStruct } from '../../../lib/ECS/Component';
 import Enumerable from '../../../lib/linq';
 import { Matrix } from '../../utils/Matrix';
 import { Item, radialForEach } from '../../utils/Matrix/utils';
 import { Size, Vector } from '../../utils/shape';
-import { MatrixComponent } from './MatrixComponent';
+import { createMatrixComponent } from './Matrix';
 
 export enum TileType {
     empty = 'empty',
@@ -23,27 +22,19 @@ const GET_EMPTY_TILE = (): Tile => ({
     type: TileType.empty,
 });
 
-export class TilesMatrixComponent extends MatrixComponent<Tile> {
-    constructor(props: Size) {
-        super({ ...props, seed: GET_EMPTY_TILE });
-    }
-}
+export const TilesMatrixID = 'TILES_MATRIX' as const;
+export type TilesMatrix = ReturnStruct<typeof createTilesMatrixComponent>;
+export const createTilesMatrixComponent = (props: Size) =>
+    createComponent(
+        TilesMatrixID,
+        createMatrixComponent({ ...props, seed: GET_EMPTY_TILE }),
+    );
 
-export function hasTilesComponent(
-    entity: Entity,
-): entity is Entity<TilesMatrixComponent> {
-    return hasComponent(entity, TilesMatrixComponent);
-}
-
-export function tilesInit(
-    { matrix }: TilesMatrixComponent,
-    x: number,
-    y: number,
-): void {
+export function tilesInit({ matrix }: TilesMatrix, x: number, y: number): void {
     matrix.set(x, y, { type: TileType.passable });
 }
 
-export function tilesMove({ matrix }: TilesMatrixComponent, v: Vector): void {
+export function tilesMove({ matrix }: TilesMatrix, v: Vector): void {
     const { w, h } = matrix;
     const tmp = new Matrix<Tile>(w, h, GET_EMPTY_TILE);
 
@@ -57,7 +48,7 @@ export function tilesMove({ matrix }: TilesMatrixComponent, v: Vector): void {
     matrix.setSource(tmp.buffer.slice());
 }
 
-export function tilesFillEmpty({ matrix }: TilesMatrixComponent): void {
+export function tilesFillEmpty({ matrix }: TilesMatrix): void {
     Enumerable.from(
         radialForEach(
             matrix,

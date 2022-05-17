@@ -1,40 +1,60 @@
 import { Scene } from 'three';
 
 import {
-    getComponent,
-    getComponents,
-    hasComponent,
-} from '../../../lib/ECS/entities';
-import { Heap } from '../../../lib/ECS/heap';
-import { Entity } from '../../../lib/ECS/types';
-import Enumerable from '../../../lib/linq';
-import { ReliefMeshesMatrixComponent } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
-import { SurfaceMeshesMatrixComponent } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
-import { PositionComponent } from '../../Components/PositionComponent';
-import { SpotLightMeshComponent } from '../../Components/Renders/LightComponent';
-import { MeshComponent } from '../../Components/Renders/MeshComponent';
-import { MeshGroupComponent } from '../../Components/Renders/MeshGroupComponent';
+    getStruct,
+    isInheritedComponent,
+    NullableComponent,
+    SomeComponent,
+} from '../../../lib/ECS/Component';
+import {
+    filterComponents,
+    getComponentStruct,
+    hasInheritedComponent,
+    SomeEntity,
+    tryGetComponentStruct,
+} from '../../../lib/ECS/Entity';
+import { filterEntities, getEntities } from '../../../lib/ECS/Heap';
+import { ReliefMeshesMatrixID } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
+import { SurfaceMeshesMatrixID } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
+import {
+    PositionComponent,
+    PositionComponentID,
+} from '../../Components/Position';
+import { SpotLightMeshComponentID } from '../../Components/Renders/LightComponent';
+import {
+    MeshComponent,
+    MeshComponentID,
+    MeshStruct,
+} from '../../Components/Renders/MeshComponent';
+import {
+    MeshGroupComponent,
+    MeshGroupComponentID,
+    MeshGroupStruct,
+} from '../../Components/Renders/MeshGroupComponent';
 import { CENTER_CARD_POSITION, HALF_RENDER_CARD_SIZE } from '../../CONST';
-import { isCardEntity } from '../../Entities/Card';
-import { isGlobalLightEntity } from '../../Entities/GlobalLight';
+import { CardEntityID } from '../../Entities/Card';
+import { GlobalLightEntityID } from '../../Entities/GlobalLight';
+import { GameHeap } from '../../heap';
 import { abs } from '../../utils/math';
 import { mulVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 export function meshesSystem(
+    heap: GameHeap,
     ticker: TasksScheduler,
     scene: Scene,
-    heap: Heap,
 ): void {
-    const globalLightEntity = [...heap.getEntities(isGlobalLightEntity)][0];
-    const spotLight = getComponent(globalLightEntity, SpotLightMeshComponent);
-    const cardEntity = [...heap.getEntities(isCardEntity)][0];
-    const cardPosition = getComponent(cardEntity, PositionComponent);
-    const surfaceMeshes = getComponent(
-        cardEntity,
-        SurfaceMeshesMatrixComponent,
+    const globalLightEntity = getEntities(heap, GlobalLightEntityID)[0];
+    const spotLight = getComponentStruct(
+        globalLightEntity,
+        SpotLightMeshComponentID,
     );
-    const reliefMeshes = getComponent(cardEntity, ReliefMeshesMatrixComponent);
+
+    const cardEntity = getEntities(heap, CardEntityID)[0];
+    const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
+
+    const surfaceMeshes = getComponentStruct(cardEntity, SurfaceMeshesMatrixID);
+    const reliefMeshes = getComponentStruct(cardEntity, ReliefMeshesMatrixID);
 
     const staticMeshes = [
         spotLight.object,
@@ -49,19 +69,30 @@ export function meshesSystem(
         scene.clear();
         scene.add(...staticMeshes);
 
-        const entities = heap.getEntities(
-            (e): e is Entity<MeshComponent | MeshGroupComponent> =>
-                hasComponent(e, MeshComponent) ||
-                hasComponent(e, MeshGroupComponent),
+        const meshEntities = filterEntities(
+            heap,
+            (
+                e,
+            ): e is SomeEntity<
+                | NullableComponent<SomeComponent<MeshStruct>>
+                | NullableComponent<SomeComponent<MeshGroupStruct>>
+            > =>
+                hasInheritedComponent(e, MeshComponentID) ||
+                hasInheritedComponent(e, MeshGroupComponentID),
         );
 
-        Enumerable.from(entities).forEach((entity) => {
-            const position = getComponent(entity, PositionComponent);
-            const meshes = getComponents(
+        meshEntities.forEach((entity) => {
+            const mesh = filterComponents(entity, (c): c is MeshComponent =>
+                isInheritedComponent(c, MeshComponentID),
+            );
+            const group = filterComponents(
                 entity,
-                (component): component is MeshComponent | MeshGroupComponent =>
-                    component instanceof MeshComponent ||
-                    component instanceof MeshGroupComponent,
+                (c): c is MeshGroupComponent =>
+                    isInheritedComponent(c, MeshGroupComponentID),
+            );
+            const position = tryGetComponentStruct<PositionComponent>(
+                entity,
+                PositionComponentID,
             );
 
             const diff =
@@ -71,20 +102,25 @@ export function meshesSystem(
                     mulVector(CENTER_CARD_POSITION, -1),
                     cardPosition,
                 );
-            const visible =
-                position &&
+            const isVisible =
+                diff &&
                 !(
                     abs(diff.x) > HALF_RENDER_CARD_SIZE + 5 ||
                     abs(diff.y) > HALF_RENDER_CARD_SIZE + 5
                 );
 
-            Enumerable.from(meshes).forEach((mesh) => {
-                mesh && scene.add(mesh.object);
+            [...mesh, ...group]
+                .map(getStruct)
+                .map((struct) =>
+                    'mesh' in struct ? struct.mesh : struct.group,
+                )
+                .forEach((object) => {
+                    scene.add(object);
 
-                if (visible !== undefined) {
-                    mesh.object.visible = visible;
-                }
-            });
+                    if (isVisible !== undefined) {
+                        object.visible = isVisible;
+                    }
+                });
         });
     }
 }
