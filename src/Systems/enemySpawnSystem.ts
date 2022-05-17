@@ -1,9 +1,9 @@
-import { getComponentBody } from '../../lib/ECS/Entity';
+import { getComponentStruct } from '../../lib/ECS/Entity';
 import {
     getEntities,
     registerEntity,
     unregisterEntity,
-} from '../../lib/ECS/heap';
+} from '../../lib/ECS/Heap';
 import Enumerable from '../../lib/linq';
 import {
     Tile,
@@ -27,8 +27,8 @@ import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function enemySpawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const cardEntity = getEntities(heap, CardEntityID)[0];
-    const cardTiles = getComponentBody(cardEntity, TilesMatrixID);
-    const cardPosition = getComponentBody(cardEntity, PositionComponentID);
+    const cardTiles = getComponentStruct(cardEntity, TilesMatrixID);
+    const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
 
     ticker.addTimeInterval(tick, 1000);
 
@@ -43,7 +43,7 @@ export function enemySpawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
     function clear(enemies: EnemyEntity[]) {
         enemies.forEach((enemy) => {
-            const position = getComponentBody(enemy, PositionComponentID);
+            const position = getComponentStruct(enemy, PositionComponentID);
             const diff = sumVector(
                 position,
                 mulVector(CENTER_CARD_POSITION, -1),
@@ -77,7 +77,7 @@ export function enemySpawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
             });
 
         if (suitableItem) {
-            const position = getComponentBody(enemy, PositionComponentID);
+            const position = getComponentStruct(enemy, PositionComponentID);
             const seedPosition = sumVector(
                 suitableItem,
                 mulVector(cardPosition, -1),

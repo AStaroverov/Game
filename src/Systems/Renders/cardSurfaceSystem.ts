@@ -1,15 +1,16 @@
-import { Color, Scene, TextureLoader } from 'three';
+import { Color, TextureLoader } from 'three';
 
 import imageGrass from '../../../assets/sprites/tilesets/grass.png';
-import { getComponent } from '../../../lib/ECS/entities';
-import { Heap } from '../../../lib/ECS/heap';
+import { getComponentStruct } from '../../../lib/ECS/Entity';
+import { getEntities } from '../../../lib/ECS/Heap';
 import { getMatrixCell, getMatrixSlice } from '../../Components/Matrix/Matrix';
-import { SurfaceMeshesMatrixComponent } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
-import { TilesMatrixConstructor } from '../../Components/Matrix/TilesMatrix';
-import { PositionConstructor } from '../../Components/Position';
+import { SurfaceMeshesMatrixID } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
+import { TilesMatrixID } from '../../Components/Matrix/TilesMatrix';
+import { PositionComponentID } from '../../Components/Position';
 import { RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
-import { isCardEntity } from '../../Entities/Card';
-import { isPlayerEntity } from '../../Entities/Player';
+import { CardEntityID } from '../../Entities/Card';
+import { PlayerEntityID } from '../../Entities/Player';
+import { GameHeap } from '../../heap';
 import { floor, round, ufloor } from '../../utils/math';
 import { getRandomArbitrary } from '../../utils/random';
 import { mapVector, newVector, sumVector } from '../../utils/shape';
@@ -19,17 +20,19 @@ const RENDER_RADIUS = Math.floor(RENDER_CARD_SIZE / 2);
 const TEXTURE_GRASS = new TextureLoader().load(imageGrass);
 
 export function cardSurfaceSystem(
+    heap: GameHeap,
     ticker: TasksScheduler,
-    scene: Scene,
-    heap: Heap,
 ): void {
-    const playerEntity = [...heap.getEntities(isPlayerEntity)][0];
-    const cardEntity = [...heap.getEntities(isCardEntity)][0];
+    const playerEntity = getEntities(heap, PlayerEntityID)[0];
+    const cardEntity = getEntities(heap, CardEntityID)[0];
 
-    const playerPosition = getComponent(playerEntity, PositionConstructor);
-    const cardPosition = getComponent(cardEntity, PositionConstructor);
-    const cardTiles = getComponent(cardEntity, TilesMatrixConstructor);
-    const cardMeshes = getComponent(cardEntity, SurfaceMeshesMatrixComponent);
+    const playerPosition = getComponentStruct(
+        playerEntity,
+        PositionComponentID,
+    );
+    const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
+    const cardTiles = getComponentStruct(cardEntity, TilesMatrixID);
+    const cardMeshes = getComponentStruct(cardEntity, SurfaceMeshesMatrixID);
 
     ticker.addFrameInterval(updateSurface, 1);
 

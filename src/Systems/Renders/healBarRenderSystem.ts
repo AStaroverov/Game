@@ -1,37 +1,58 @@
-import { getComponent, hasComponent } from '../../../lib/ECS/entities';
-import { Heap } from '../../../lib/ECS/heap';
-import { Entity } from '../../../lib/ECS/types';
+import {
+    getComponentStruct,
+    hasComponent,
+    SomeEntity,
+} from '../../../lib/ECS/Entity';
+import { filterEntities, getEntities } from '../../../lib/ECS/Heap';
 import Enumerable from '../../../lib/linq';
-import { PositionConstructor } from '../../Components/Position';
-import { HealBarMeshComponent } from '../../Components/Renders/HealBarMeshComponent';
-import { VisualSizeConstructor } from '../../Components/VisualSizeComponent';
+import {
+    PositionComponent,
+    PositionComponentID,
+} from '../../Components/Position';
+import {
+    HealBarMeshComponent,
+    HealBarMeshComponentID,
+} from '../../Components/Renders/HealBarMeshComponent';
+import {
+    VisualSizeComponent,
+    VisualSizeComponentID,
+} from '../../Components/VisualSize';
 import { TILE_SIZE } from '../../CONST';
-import { isCardEntity } from '../../Entities/Card';
+import { CardEntityID } from '../../Entities/Card';
+import { GameHeap } from '../../heap';
 import { mulVector, newVector, setVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 import { worldToRenderPosition } from '../../utils/worldToRenderPosition';
 
-export function healBarRenderSystem(heap: Heap, ticker: TasksScheduler): void {
-    const cardEntity = [...heap.getEntities(isCardEntity)][0];
-    const cardPosition = getComponent(cardEntity, PositionConstructor);
+export function healBarRenderSystem(
+    heap: GameHeap,
+    ticker: TasksScheduler,
+): void {
+    const cardEntity = getEntities(heap, CardEntityID)[0];
+    const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
 
     ticker.addFrameInterval(tick, 1);
 
     function tick() {
-        const entities = heap.getEntities(
-            (e): e is Entity<HealBarMeshComponent | PositionConstructor> =>
-                hasComponent(e, HealBarMeshComponent) &&
-                hasComponent(e, PositionConstructor) &&
-                hasComponent(e, VisualSizeConstructor),
+        const entities = filterEntities(
+            heap,
+            (
+                e,
+            ): e is SomeEntity<
+                HealBarMeshComponent | PositionComponent | VisualSizeComponent
+            > =>
+                hasComponent(e, HealBarMeshComponentID) &&
+                hasComponent(e, PositionComponentID) &&
+                hasComponent(e, VisualSizeComponentID),
         );
 
         Enumerable.from(entities).forEach((entity) => {
-            const size = getComponent(entity, VisualSizeConstructor);
-            const position = getComponent(entity, PositionConstructor);
-            const healBar = getComponent(entity, HealBarMeshComponent);
+            const size = getComponentStruct(entity, VisualSizeComponentID);
+            const position = getComponentStruct(entity, PositionComponentID);
+            const healBar = getComponentStruct(entity, HealBarMeshComponentID);
 
             setVector(
-                healBar.object.position,
+                healBar.group.position,
                 sumVector(
                     mulVector(
                         sumVector(

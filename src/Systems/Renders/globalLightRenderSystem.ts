@@ -1,23 +1,24 @@
-import { getComponent } from '../../../lib/ECS/entities';
-import { Heap } from '../../../lib/ECS/heap';
-import { GameTimeConstructor } from '../../Components/GameTime';
-import { SpotLightMeshComponent } from '../../Components/Renders/LightComponent';
-import { isGlobalLightEntity } from '../../Entities/GlobalLight';
-import { isWorldEntity } from '../../Entities/World';
+import { getComponentStruct } from '../../../lib/ECS/Entity';
+import { getEntities } from '../../../lib/ECS/Heap';
+import { GameTimeComponentID } from '../../Components/GameTime';
+import { SpotLightMeshComponentID } from '../../Components/Renders/LightComponent';
+import { GlobalLightEntityID } from '../../Entities/GlobalLight';
+import { WorldEntityID } from '../../Entities/World';
+import { GameHeap } from '../../heap';
 import { cos } from '../../utils/math';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 const ONE_DAY = 5 * 60 * 1000; // 5 min
 
 export function globalLightRenderSystem(
-    heap: Heap,
+    heap: GameHeap,
     ticker: TasksScheduler,
 ): void {
-    const globalLight = [...heap.getEntities(isGlobalLightEntity)][0];
-    const spotLight = getComponent(globalLight, SpotLightMeshComponent);
+    const globalLight = getEntities(heap, GlobalLightEntityID)[0];
+    const spotLight = getComponentStruct(globalLight, SpotLightMeshComponentID);
 
-    const world = [...heap.getEntities(isWorldEntity)][0];
-    const gameTime = getComponent(world, GameTimeConstructor);
+    const world = getEntities(heap, WorldEntityID)[0];
+    const gameTime = getComponentStruct(world, GameTimeComponentID);
 
     update();
     ticker.addTimeInterval(update, 1_000);

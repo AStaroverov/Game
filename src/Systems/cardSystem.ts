@@ -1,4 +1,4 @@
-import { getComponentBody } from '../../lib/ECS/Entity';
+import { getComponentStruct } from '../../lib/ECS/Entity';
 import { getEntities } from '../../lib/ECS/Heap';
 import {
     tilesFillEmpty,
@@ -17,11 +17,14 @@ import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function cardSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
-    const playerPosition = getComponentBody(playerEntity, PositionComponentID);
+    const playerPosition = getComponentStruct(
+        playerEntity,
+        PositionComponentID,
+    );
 
     const cardEntity = getEntities(heap, CardEntityID)[0];
-    const cardTiles = getComponentBody(cardEntity, TilesMatrixID);
-    const position = getComponentBody(cardEntity, PositionComponentID);
+    const cardTiles = getComponentStruct(cardEntity, TilesMatrixID);
+    const position = getComponentStruct(cardEntity, PositionComponentID);
 
     tilesInit(cardTiles, CENTER_CARD_POSITION.x, CENTER_CARD_POSITION.y);
     tilesFillEmpty(cardTiles);

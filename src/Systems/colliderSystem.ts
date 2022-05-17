@@ -1,13 +1,16 @@
-import { getComponentBody, hasComponent } from '../../lib/ECS/Entity';
 import {
-    ExtractEntitiesByComponentShallowTag,
-    filterEntities,
-    getEntities,
-} from '../../lib/ECS/Heap';
-import { DirectionComponentID } from '../Components/DirectionComponent';
+    getComponentStruct,
+    hasComponent,
+    SomeEntity,
+} from '../../lib/ECS/Entity';
+import { filterEntities, getEntities } from '../../lib/ECS/Heap';
+import {
+    DirectionComponent,
+    DirectionComponentID,
+} from '../Components/DirectionComponent';
 import { TilesMatrixID, TileType } from '../Components/Matrix/TilesMatrix';
-import { PositionComponentID } from '../Components/Position';
-import { VelocityComponentID } from '../Components/Velocity';
+import { PositionComponent, PositionComponentID } from '../Components/Position';
+import { VelocityComponent, VelocityComponentID } from '../Components/Velocity';
 import { CardEntityID } from '../Entities/Card';
 import { GameHeap } from '../heap';
 import { floor, ufloor } from '../utils/math';
@@ -21,8 +24,8 @@ import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function colliderSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const cardEntity = getEntities(heap, CardEntityID)[0];
-    const cardPosition = getComponentBody(cardEntity, PositionComponentID);
-    const tiles = getComponentBody(cardEntity, TilesMatrixID);
+    const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
+    const tiles = getComponentStruct(cardEntity, TilesMatrixID);
 
     ticker.addFrameInterval(tick, 1);
 
@@ -31,11 +34,8 @@ export function colliderSystem(heap: GameHeap, ticker: TasksScheduler): void {
             heap,
             (
                 e,
-            ): e is ExtractEntitiesByComponentShallowTag<
-                typeof e,
-                | typeof PositionComponentID
-                | typeof DirectionComponentID
-                | typeof VelocityComponentID
+            ): e is SomeEntity<
+                PositionComponent | DirectionComponent | VelocityComponent
             > =>
                 hasComponent(e, PositionComponentID) &&
                 hasComponent(e, DirectionComponentID) &&
@@ -43,9 +43,9 @@ export function colliderSystem(heap: GameHeap, ticker: TasksScheduler): void {
         );
 
         entities.forEach((entity) => {
-            const direction = getComponentBody(entity, DirectionComponentID);
-            const velocity = getComponentBody(entity, VelocityComponentID);
-            const position = getComponentBody(entity, PositionComponentID);
+            const direction = getComponentStruct(entity, DirectionComponentID);
+            const velocity = getComponentStruct(entity, VelocityComponentID);
+            const position = getComponentStruct(entity, PositionComponentID);
 
             if (velocity.v === 0) return;
 

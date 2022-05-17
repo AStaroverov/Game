@@ -1,4 +1,4 @@
-import { createComponent } from '../../lib/ECS/Component';
+import { createComponent, ExtractStruct } from '../../lib/ECS/Component';
 import { newVector } from '../utils/shape';
 
 export const DirectionComponentID = 'DIRECTION' as const;
@@ -9,10 +9,10 @@ export const createDirectionComponent = (x = 0, y = 0) =>
     createComponent(DirectionComponentID, newVector(x, y));
 
 export function setDirection(
-    { body }: DirectionComponent,
+    struct: ExtractStruct<DirectionComponent>,
     x: number,
     y: number,
 ): void {
-    body.x = x;
-    body.y = y;
+    struct.x = x;
+    struct.y = y;
 }

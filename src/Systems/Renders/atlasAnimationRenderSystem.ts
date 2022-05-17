@@ -1,30 +1,42 @@
-import { getComponent, hasComponent } from '../../../lib/ECS/entities';
-import { Heap } from '../../../lib/ECS/heap';
-import { Entity } from '../../../lib/ECS/types';
-import Enumerable from '../../../lib/linq';
+import { ExtractStruct } from '../../../lib/ECS/Component';
 import {
-    AtlasAnimationConstructor,
+    getComponentStruct,
+    hasComponent,
+    SomeEntity,
+} from '../../../lib/ECS/Entity';
+import { filterEntities } from '../../../lib/ECS/Heap';
+import {
+    AtlasAnimationComponent,
+    AtlasAnimationComponentID,
     updateAtlasAnimation,
 } from '../../Components/AtlasAnimation';
-import { MeshComponent } from '../../Components/Renders/MeshComponent';
+import {
+    MeshComponent,
+    MeshComponentID,
+} from '../../Components/Renders/MeshComponent';
+import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 export function atlasAnimationRenderSystem(
-    heap: Heap,
+    heap: GameHeap,
     ticker: TasksScheduler,
 ): void {
     ticker.addFrameInterval(tick, 1);
 
     function tick(delta: number) {
-        const entities = heap.getEntities(
-            (e): e is Entity<MeshComponent | AtlasAnimationConstructor> =>
-                hasComponent(e, MeshComponent) &&
-                hasComponent(e, AtlasAnimationConstructor),
+        const entities = filterEntities(
+            heap,
+            (e): e is SomeEntity<MeshComponent | AtlasAnimationComponent> =>
+                hasComponent(e, MeshComponentID) &&
+                hasComponent(e, AtlasAnimationComponentID),
         );
 
-        Enumerable.from(entities).forEach((entity) => {
-            const mesh = getComponent(entity, MeshComponent);
-            const animation = getComponent(entity, AtlasAnimationConstructor);
+        entities.forEach((entity) => {
+            const mesh = getComponentStruct(entity, MeshComponentID);
+            const animation = getComponentStruct(
+                entity,
+                AtlasAnimationComponentID,
+            );
 
             animate(delta, mesh, animation);
         });
@@ -33,13 +45,13 @@ export function atlasAnimationRenderSystem(
 
 function animate(
     delta: number,
-    component: MeshComponent,
-    animation: AtlasAnimationConstructor,
+    component: ExtractStruct<MeshComponent>,
+    animation: ExtractStruct<AtlasAnimationComponent>,
 ): void {
     updateAtlasAnimation(animation, delta);
 
-    if (component.object.material.map !== animation.atlasFrame.texture) {
-        component.object.material.map = animation.atlasFrame.texture;
-        component.object.material.needsUpdate = true;
+    if (component.mesh.material.map !== animation.atlasFrame.texture) {
+        component.mesh.material.map = animation.atlasFrame.texture;
+        component.mesh.material.needsUpdate = true;
     }
 }

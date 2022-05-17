@@ -1,6 +1,7 @@
+import { ExtractStruct } from '../../../lib/ECS/Component';
 import {
     Entity,
-    getComponentBody,
+    getComponentStruct,
     hasComponent,
 } from '../../../lib/ECS/Entity';
 import { filterEntities, getEntities } from '../../../lib/ECS/Heap';
@@ -25,7 +26,7 @@ export function positionRenderSystem(
     ticker: TasksScheduler,
 ): void {
     const cardEntity = getEntities(heap, CardEntityID)[0];
-    const cardPosition = getComponentBody(cardEntity, PositionComponentID);
+    const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
 
     ticker.addFrameInterval(tick, 1);
 
@@ -40,8 +41,8 @@ export function positionRenderSystem(
         );
 
         entities.forEach((entity) => {
-            const mesh = getComponentBody(entity, MeshComponentID);
-            const position = getComponentBody(entity, PositionComponentID);
+            const mesh = getComponentStruct(entity, MeshComponentID);
+            const position = getComponentStruct(entity, PositionComponentID);
 
             setPositionMesh(
                 mesh,
@@ -52,10 +53,10 @@ export function positionRenderSystem(
 }
 
 function setPositionMesh(
-    { object }: MeshComponent['body'],
+    { mesh }: ExtractStruct<MeshComponent>,
     position: Vector,
 ): void {
-    object.position.x = (position.x - 0.5) * TILE_SIZE;
-    object.position.y = (position.y - 0.5) * TILE_SIZE;
-    object.position.z = worldYToPositionZ(object.position.y);
+    mesh.position.x = (position.x - 0.5) * TILE_SIZE;
+    mesh.position.y = (position.y - 0.5) * TILE_SIZE;
+    mesh.position.z = worldYToPositionZ(mesh.position.y);
 }

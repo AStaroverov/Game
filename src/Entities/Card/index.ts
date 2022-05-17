@@ -6,7 +6,7 @@ import { Atlas } from '../../../lib/Atlas';
 import { createEntity } from '../../../lib/ECS/Entity';
 import { createReliefMeshesMatrix } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
 import { createSurfaceMeshesMatrix } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
-import { createTilesMatrix } from '../../Components/Matrix/TilesMatrix';
+import { createTilesMatrixComponent } from '../../Components/Matrix/TilesMatrix';
 import { createPositionComponent } from '../../Components/Position';
 import { Size } from '../../utils/shape';
 
@@ -21,7 +21,7 @@ export type CardEntity = ReturnType<typeof createCardEntity>;
 export const createCardEntity = (props: { tileSize: Size; meshSize: Size }) =>
     createEntity(CardEntityID, [
         createPositionComponent(),
-        createTilesMatrix(props.tileSize),
+        createTilesMatrixComponent(props.tileSize),
         createSurfaceMeshesMatrix(props.meshSize),
         createReliefMeshesMatrix(props.meshSize),
     ]);

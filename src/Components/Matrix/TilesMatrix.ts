@@ -1,7 +1,7 @@
 import { uniq } from 'lodash';
 import { pipe } from 'lodash/fp';
 
-import { createComponent } from '../../../lib/ECS/Component';
+import { createComponent, ReturnStruct } from '../../../lib/ECS/Component';
 import Enumerable from '../../../lib/linq';
 import { Matrix } from '../../utils/Matrix';
 import { Item, radialForEach } from '../../utils/Matrix/utils';
@@ -23,22 +23,18 @@ const GET_EMPTY_TILE = (): Tile => ({
 });
 
 export const TilesMatrixID = 'TILES_MATRIX' as const;
-export type TilesMatrix = ReturnType<typeof createTilesMatrix>;
-export const createTilesMatrix = (props: Size) =>
+export type TilesMatrix = ReturnStruct<typeof createTilesMatrixComponent>;
+export const createTilesMatrixComponent = (props: Size) =>
     createComponent(
         TilesMatrixID,
         createMatrixComponent({ ...props, seed: GET_EMPTY_TILE }),
     );
 
-export function tilesInit(
-    { matrix }: TilesMatrix['body'],
-    x: number,
-    y: number,
-): void {
+export function tilesInit({ matrix }: TilesMatrix, x: number, y: number): void {
     matrix.set(x, y, { type: TileType.passable });
 }
 
-export function tilesMove({ matrix }: TilesMatrix['body'], v: Vector): void {
+export function tilesMove({ matrix }: TilesMatrix, v: Vector): void {
     const { w, h } = matrix;
     const tmp = new Matrix<Tile>(w, h, GET_EMPTY_TILE);
 
@@ -52,7 +48,7 @@ export function tilesMove({ matrix }: TilesMatrix['body'], v: Vector): void {
     matrix.setSource(tmp.buffer.slice());
 }
 
-export function tilesFillEmpty({ matrix }: TilesMatrix['body']): void {
+export function tilesFillEmpty({ matrix }: TilesMatrix): void {
     Enumerable.from(
         radialForEach(
             matrix,

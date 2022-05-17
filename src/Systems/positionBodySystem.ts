@@ -1,11 +1,15 @@
-import { getComponentBody, hasComponent } from '../../lib/ECS/Entity';
 import {
-    ExtractEntitiesByComponentShallowTag,
-    filterEntities,
-} from '../../lib/ECS/Heap';
-import { DirectionComponentID } from '../Components/DirectionComponent';
-import { PositionComponentID } from '../Components/Position';
-import { VelocityComponentID } from '../Components/Velocity';
+    getComponentStruct,
+    hasComponent,
+    SomeEntity,
+} from '../../lib/ECS/Entity';
+import { filterEntities } from '../../lib/ECS/Heap';
+import {
+    DirectionComponent,
+    DirectionComponentID,
+} from '../Components/DirectionComponent';
+import { PositionComponent, PositionComponentID } from '../Components/Position';
+import { VelocityComponent, VelocityComponentID } from '../Components/Velocity';
 import { GameHeap } from '../heap';
 import { mulVector, setVector, sumVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
@@ -21,11 +25,8 @@ export function positionBodySystem(
             heap,
             (
                 e,
-            ): e is ExtractEntitiesByComponentShallowTag<
-                typeof e,
-                | typeof VelocityComponentID
-                | typeof DirectionComponentID
-                | typeof PositionComponentID
+            ): e is SomeEntity<
+                VelocityComponent | DirectionComponent | PositionComponent
             > =>
                 hasComponent(e, PositionComponentID) &&
                 hasComponent(e, DirectionComponentID) &&
@@ -33,9 +34,9 @@ export function positionBodySystem(
         );
 
         entities.forEach((entity) => {
-            const position = getComponentBody(entity, PositionComponentID);
-            const direction = getComponentBody(entity, DirectionComponentID);
-            const velocity = getComponentBody(entity, VelocityComponentID);
+            const position = getComponentStruct(entity, PositionComponentID);
+            const direction = getComponentStruct(entity, DirectionComponentID);
+            const velocity = getComponentStruct(entity, VelocityComponentID);
 
             setVector(
                 position,

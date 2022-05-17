@@ -1,5 +1,5 @@
 import { Atlas } from '../../lib/Atlas';
-import { createComponent } from '../../lib/ECS/Component';
+import { createComponent, ExtractStruct } from '../../lib/ECS/Component';
 import { floor } from '../utils/math';
 import { createAnimationComponent } from './AnimationComponent';
 
@@ -22,12 +22,13 @@ export const createAtlasAnimationComponent = (props: {
     );
 
 export function updateAtlasAnimation(
-    { body }: AtlasAnimationComponent,
+    struct: ExtractStruct<AtlasAnimationComponent>,
     delta: number,
 ): void {
-    body.time += delta;
+    struct.time += delta;
 
-    const index = floor(body.time / body.duration) % body.atlas.list.length;
+    const index =
+        floor(struct.time / struct.duration) % struct.atlas.list.length;
 
-    body.atlasFrame = body.atlas.list[index];
+    struct.atlasFrame = struct.atlas.list[index];
 }

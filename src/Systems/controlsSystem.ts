@@ -1,6 +1,6 @@
 import { filter, fromEvent, map, tap } from 'rxjs';
 
-import { getComponentBody } from '../../lib/ECS/Entity';
+import { getComponentStruct } from '../../lib/ECS/Entity';
 import { getEntities } from '../../lib/ECS/Heap';
 import { DirectionComponentID } from '../Components/DirectionComponent';
 import { setVelocity, VelocityComponentID } from '../Components/Velocity';
@@ -10,8 +10,11 @@ import { newVector, setVector, Vector } from '../utils/shape';
 
 export function controlsSystem(heap: GameHeap): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
-    const playerVelocity = getComponentBody(playerEntity, VelocityComponentID);
-    const playerDirection = getComponentBody(
+    const playerVelocity = getComponentStruct(
+        playerEntity,
+        VelocityComponentID,
+    );
+    const playerDirection = getComponentStruct(
         playerEntity,
         DirectionComponentID,
     );

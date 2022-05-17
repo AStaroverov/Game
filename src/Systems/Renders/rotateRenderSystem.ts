@@ -1,6 +1,7 @@
+import { ExtractStruct } from '../../../lib/ECS/Component';
 import {
     Entity,
-    getComponentBody,
+    getComponentStruct,
     hasComponent,
 } from '../../../lib/ECS/Entity';
 import { filterEntities } from '../../../lib/ECS/Heap';
@@ -33,8 +34,8 @@ export function rotateRenderSystem(
             },
         );
         Enumerable.from(entities).forEach((entity) => {
-            const mesh = getComponentBody(entity, MeshComponentID);
-            const dir = getComponentBody(entity, DirectionComponentID);
+            const mesh = getComponentStruct(entity, MeshComponentID);
+            const dir = getComponentStruct(entity, DirectionComponentID);
 
             rotate(mesh, dir);
         });
@@ -42,13 +43,13 @@ export function rotateRenderSystem(
 }
 
 function rotate(
-    mesh: MeshComponent['body'],
-    direction: DirectionComponent['body'],
+    mesh: ExtractStruct<MeshComponent>,
+    direction: ExtractStruct<DirectionComponent>,
 ) {
     if (direction.x > 0) {
-        mesh.object.scale.x = 1;
+        mesh.mesh.scale.x = 1;
     }
     if (direction.x < 0) {
-        mesh.object.scale.x = -1;
+        mesh.mesh.scale.x = -1;
     }
 }

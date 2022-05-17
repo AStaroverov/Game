@@ -8,6 +8,7 @@ import { newVector, sumVector } from '../../utils/shape';
 const LIGHT_POSITION = sumVector(CENTER_RENDER_POSITION, newVector(-0.5, -0.5));
 
 export const GlobalLightEntityID = 'GLOBAL_LIGHT_ENTITY' as const;
+export type GlobalLightEntity = ReturnType<typeof createGlobalLightEntity>;
 export const createGlobalLightEntity = () => {
     const light = new SpotLight(0xffffff);
 

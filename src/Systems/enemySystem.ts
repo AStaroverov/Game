@@ -1,8 +1,8 @@
 import memoize from 'memoizee';
 import { BiAStarFinder, DiagonalMovement, Grid } from 'pathfinding';
 
-import { getComponentBody } from '../../lib/ECS/Entity';
-import { getEntities } from '../../lib/ECS/heap';
+import { getComponentStruct } from '../../lib/ECS/Entity';
+import { getEntities } from '../../lib/ECS/Heap';
 import { DirectionComponentID } from '../Components/DirectionComponent';
 import {
     Tile,
@@ -32,11 +32,14 @@ import { isInsideCard } from '../utils/tiles';
 
 export function enemySystem(heap: GameHeap, ticker: TasksScheduler): void {
     const cardEntity = getEntities(heap, CardEntityID)[0];
-    const cardTiles = getComponentBody(cardEntity, TilesMatrixID);
-    const cardPosition = getComponentBody(cardEntity, PositionComponentID);
+    const cardTiles = getComponentStruct(cardEntity, TilesMatrixID);
+    const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
 
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
-    const playerPosition = getComponentBody(playerEntity, PositionComponentID);
+    const playerPosition = getComponentStruct(
+        playerEntity,
+        PositionComponentID,
+    );
 
     const pathFinder = new BiAStarFinder({
         diagonalMovement: DiagonalMovement.OnlyWhenNoObstacles,
@@ -49,9 +52,9 @@ export function enemySystem(heap: GameHeap, ticker: TasksScheduler): void {
     }
 
     function setEnemyDirection(enemy: EnemyEntity) {
-        const position = getComponentBody(enemy, PositionComponentID);
-        const direction = getComponentBody(enemy, DirectionComponentID);
-        const velocity = getComponentBody(enemy, VelocityComponentID);
+        const position = getComponentStruct(enemy, PositionComponentID);
+        const direction = getComponentStruct(enemy, DirectionComponentID);
+        const velocity = getComponentStruct(enemy, VelocityComponentID);
 
         const cardTilePosition = mapVector(cardPosition, ufloor);
         const enemyTilePosition = sumVector(

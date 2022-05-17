@@ -1,44 +1,39 @@
 import { Component, createComponent } from '../../../lib/ECS/Component';
-import { Like } from '../../../lib/ECS/types';
 import { Matrix, MatrixSeed } from '../../utils/Matrix';
 import { newSize, Size } from '../../utils/shape';
 
 export const MatrixComponentID = 'MATRIX' as const;
-export type MatrixComponent<T = unknown> = Component<
-    typeof MatrixComponentID,
-    {
-        seed: MatrixSeed<T>;
-        matrix: Matrix<T>;
-    }
->;
+export type MatrixStruct<T = unknown> = {
+    seed: MatrixSeed<T>;
+    matrix: Matrix<T>;
+};
 
 export const createMatrixComponent = <T>(
     props: Size & { seed: MatrixSeed<T> },
-): MatrixComponent<T> =>
+): Component<typeof MatrixComponentID, MatrixStruct<T>> =>
     createComponent(MatrixComponentID, {
         seed: props.seed,
         matrix: new Matrix<T>(props.w, props.h, props.seed),
     });
 
-export type ExtractMatrixType<M> = M extends Like<MatrixComponent<infer T>>
-    ? T
-    : never;
+export type ExtractMatrixType<M> = M extends MatrixStruct<infer T> ? T : never;
 
-export function getMatrixSize({ matrix }: MatrixComponent['body']): Size {
+export function getMatrixSize({ matrix }: MatrixStruct): Size {
     return newSize(matrix.w, matrix.h);
 }
 
-export function getMatrixCell<
-    C extends Like<MatrixComponent>,
-    T = ExtractMatrixType<C>,
->({ matrix }: C['body'], x: number, y: number): undefined | T {
+export function getMatrixCell<C extends MatrixStruct, T = ExtractMatrixType<C>>(
+    { matrix }: C,
+    x: number,
+    y: number,
+): undefined | T {
     return matrix.get(x, y) as undefined | T;
 }
 
 export function getMatrixSlice<
-    C extends Like<MatrixComponent>,
+    C extends MatrixStruct,
     T = ExtractMatrixType<C>,
->(comp: C['body'], x: number, y: number, r: number): Matrix<undefined | T> {
+>(comp: C, x: number, y: number, r: number): Matrix<undefined | T> {
     const slice = new Matrix<undefined | T>(
         r * 2 + 1,
         r * 2 + 1,
