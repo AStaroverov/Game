@@ -47,7 +47,7 @@ export class Atlas<
         >;
 
         new ImageLoader().load(url, (image) =>
-            updateFramesImage(image, this.list),
+            updateFramesImage(this.list, image),
         );
     }
 }
@@ -82,7 +82,7 @@ function createFramesMap(
     }, {} as Record<string, AtlasFrame>);
 }
 
-function updateFramesImage(image: HTMLImageElement, frames: AtlasFrame[]) {
+function updateFramesImage(frames: AtlasFrame[], image: HTMLImageElement) {
     frames.forEach((f) => {
         f.texture.image = image;
         f.texture.needsUpdate = true;

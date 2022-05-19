@@ -6,11 +6,12 @@ import { getMatrixCell, getMatrixSlice } from '../../Components/Matrix/Matrix';
 import { ReliefMeshesMatrixID } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
 import { TilesMatrixID, TileType } from '../../Components/Matrix/TilesMatrix';
 import { PositionComponentID } from '../../Components/Position';
-import { RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
+import { $object, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { atlasTrees, CardEntityID } from '../../Entities/Card';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
 import { floor, round, ufloor } from '../../utils/math';
+import { Matrix } from '../../utils/Matrix';
 import { tileYToPositionZ } from '../../utils/positionZ';
 import { getRandomSign } from '../../utils/random';
 import { mapVector, newVector, sumVector } from '../../utils/shape';
@@ -59,9 +60,11 @@ export function cardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
         );
         const uflooredPosition = mapVector(cardPosition, ufloor);
 
-        getMatrixSlice(cardTiles, abs.x, abs.y, RENDER_RADIUS).forEach(
+        Matrix.forEach(
+            getMatrixSlice(cardTiles, abs.x, abs.y, RENDER_RADIUS),
             (tile, x, y) => {
-                const mesh = getMatrixCell(meshes, x, y);
+                const cell = getMatrixCell(meshes, x, y);
+                const mesh = cell?.[$object];
 
                 if (mesh === undefined) {
                     return;

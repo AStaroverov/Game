@@ -10,10 +10,12 @@ import {
     AtlasAnimationComponentID,
     updateAtlasAnimation,
 } from '../../Components/AtlasAnimation';
+import { atlases } from '../../Components/AtlasAnimation/atlases';
 import {
     MeshComponent,
     MeshComponentID,
 } from '../../Components/Renders/MeshComponent';
+import { $object } from '../../CONST';
 import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
@@ -50,8 +52,12 @@ function animate(
 ): void {
     updateAtlasAnimation(animation, delta);
 
-    if (component.mesh.material.map !== animation.atlasFrame.texture) {
-        component.mesh.material.map = animation.atlasFrame.texture;
-        component.mesh.material.needsUpdate = true;
+    const mesh = component[$object];
+    const atlas = atlases[animation.atlasName];
+    const texture = atlas.list[animation.atlasFrame].texture;
+
+    if (mesh && mesh.material.map !== texture) {
+        mesh.material.map = texture;
+        mesh.material.needsUpdate = true;
     }
 }

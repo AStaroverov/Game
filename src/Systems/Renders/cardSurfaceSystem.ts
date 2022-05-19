@@ -7,11 +7,12 @@ import { getMatrixCell, getMatrixSlice } from '../../Components/Matrix/Matrix';
 import { SurfaceMeshesMatrixID } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
 import { TilesMatrixID } from '../../Components/Matrix/TilesMatrix';
 import { PositionComponentID } from '../../Components/Position';
-import { RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
+import { $object, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
 import { floor, round, ufloor } from '../../utils/math';
+import { Matrix } from '../../utils/Matrix';
 import { getRandomArbitrary } from '../../utils/random';
 import { mapVector, newVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
@@ -55,9 +56,11 @@ export function cardSurfaceSystem(
         );
         const uflooredPosition = mapVector(cardPosition, ufloor);
 
-        getMatrixSlice(cardTiles, abs.x, abs.y, RENDER_RADIUS).forEach(
+        Matrix.forEach(
+            getMatrixSlice(cardTiles, abs.x, abs.y, RENDER_RADIUS),
             (tile, x, y) => {
-                const mesh = getMatrixCell(cardMeshes, x, y);
+                const cell = getMatrixCell(cardMeshes, x, y);
+                const mesh = cell?.[$object];
 
                 if (tile && mesh) {
                     mesh.visible = true;

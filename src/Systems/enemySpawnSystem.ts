@@ -1,9 +1,5 @@
 import { getComponentStruct } from '../../lib/ECS/Entity';
-import {
-    getEntities,
-    registerEntity,
-    unregisterEntity,
-} from '../../lib/ECS/Heap';
+import { addEntity, deleteEntity, getEntities } from '../../lib/ECS/Heap';
 import Enumerable from '../../lib/linq';
 import {
     Tile,
@@ -51,7 +47,7 @@ export function enemySpawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
             );
 
             if (abs(diff.x) > HALF_CARD_SIZE || abs(diff.y) > HALF_CARD_SIZE) {
-                unregisterEntity(heap, enemy);
+                deleteEntity(heap, enemy);
             }
         });
     }
@@ -85,7 +81,7 @@ export function enemySpawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
             setVector(position, seedPosition);
 
-            registerEntity(heap, enemy);
+            addEntity(heap, enemy);
         } else {
             debugger;
         }

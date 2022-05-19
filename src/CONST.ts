@@ -1,4 +1,6 @@
-import { newVector } from './utils/shape';
+import { mapVector, newVector } from './utils/shape';
+
+export const GAME_VERSION = 0;
 
 export const TILE_SIZE = 64;
 
@@ -16,4 +18,11 @@ export const CENTER_RENDER_POSITION = newVector(
     Math.floor(HALF_RENDER_CARD_SIZE),
 );
 
+export const PLAYER_START_POSITION = mapVector(
+    CENTER_CARD_POSITION,
+    (v) => v + 0.5,
+);
+
 export const HEAL_BAR_Z = 100;
+
+export const $object = Symbol('OBJECT');

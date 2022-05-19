@@ -2,7 +2,6 @@ import { getComponentStruct } from '../../lib/ECS/Entity';
 import { getEntities } from '../../lib/ECS/Heap';
 import {
     tilesFillEmpty,
-    tilesInit,
     TilesMatrixID,
     tilesMove,
 } from '../Components/Matrix/TilesMatrix';
@@ -16,18 +15,15 @@ import { mapVector, mulVector, setVector, sumVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function cardSystem(heap: GameHeap, ticker: TasksScheduler): void {
+    const cardEntity = getEntities(heap, CardEntityID)[0];
+    const cardTiles = getComponentStruct(cardEntity, TilesMatrixID);
+    const position = getComponentStruct(cardEntity, PositionComponentID);
+
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
     const playerPosition = getComponentStruct(
         playerEntity,
         PositionComponentID,
     );
-
-    const cardEntity = getEntities(heap, CardEntityID)[0];
-    const cardTiles = getComponentStruct(cardEntity, TilesMatrixID);
-    const position = getComponentStruct(cardEntity, PositionComponentID);
-
-    tilesInit(cardTiles, CENTER_CARD_POSITION.x, CENTER_CARD_POSITION.y);
-    tilesFillEmpty(cardTiles);
 
     ticker.addFrameInterval(moveCard, 1);
 

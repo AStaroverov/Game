@@ -14,13 +14,13 @@ export type ExtractEntitiesByTag<
     T extends ExtractTag<E>,
 > = Extract<E, { [$entity]: T }>;
 
-export function createHeap<H extends Heap = Heap>(): H {
-    const entities = {};
+export function createHeap<H extends Heap = Heap>(seed: object = {}): H {
+    const entities = seed;
 
     return { entities } as H;
 }
 
-export function registerEntity<H extends Heap, E extends Entity>(
+export function addEntity<H extends Heap, E extends Entity>(
     heap: H,
     entity: E,
 ): void {
@@ -31,7 +31,7 @@ export function registerEntity<H extends Heap, E extends Entity>(
     heap.entities[entity[$entity]].push(entity);
 }
 
-export function unregisterEntity<H extends Heap, E extends Entity>(
+export function deleteEntity<H extends Heap, E extends Entity>(
     heap: H,
     entity: E,
 ): void {
@@ -41,6 +41,10 @@ export function unregisterEntity<H extends Heap, E extends Entity>(
     if (index !== -1) {
         arr.slice(index, 1);
     }
+}
+
+export function getSnapshot(heap: Heap): object {
+    return heap.entities;
 }
 
 export function getEntities<

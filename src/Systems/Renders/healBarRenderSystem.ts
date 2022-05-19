@@ -4,7 +4,6 @@ import {
     SomeEntity,
 } from '../../../lib/ECS/Entity';
 import { filterEntities, getEntities } from '../../../lib/ECS/Heap';
-import Enumerable from '../../../lib/linq';
 import {
     PositionComponent,
     PositionComponentID,
@@ -17,7 +16,7 @@ import {
     VisualSizeComponent,
     VisualSizeComponentID,
 } from '../../Components/VisualSize';
-import { TILE_SIZE } from '../../CONST';
+import { $object, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
 import { mulVector, newVector, setVector, sumVector } from '../../utils/shape';
@@ -46,24 +45,25 @@ export function healBarRenderSystem(
                 hasComponent(e, VisualSizeComponentID),
         );
 
-        Enumerable.from(entities).forEach((entity) => {
+        entities.forEach((entity) => {
             const size = getComponentStruct(entity, VisualSizeComponentID);
             const position = getComponentStruct(entity, PositionComponentID);
             const healBar = getComponentStruct(entity, HealBarMeshComponentID);
 
-            setVector(
-                healBar.group.position,
-                sumVector(
-                    mulVector(
-                        sumVector(
-                            worldToRenderPosition(position, cardPosition),
-                            newVector(-0.5, -0.5),
+            healBar[$object] &&
+                setVector(
+                    healBar[$object]!.position,
+                    sumVector(
+                        mulVector(
+                            sumVector(
+                                worldToRenderPosition(position, cardPosition),
+                                newVector(-0.5, -0.5),
+                            ),
+                            TILE_SIZE,
                         ),
-                        TILE_SIZE,
+                        newVector(0, size.h / 2 + 10),
                     ),
-                    newVector(0, size.h / 2 + 10),
-                ),
-            );
+                );
         });
     }
 }

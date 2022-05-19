@@ -16,7 +16,7 @@ atlasTrees.list.forEach((frame) => {
     frame.texture.magFilter = NearestFilter;
 });
 
-export const CardEntityID = 'CardEntity' as const;
+export const CardEntityID = 'CARD_ENTITY' as const;
 export type CardEntity = ReturnType<typeof createCardEntity>;
 export const createCardEntity = (props: { tileSize: Size; meshSize: Size }) =>
     createEntity(CardEntityID, [

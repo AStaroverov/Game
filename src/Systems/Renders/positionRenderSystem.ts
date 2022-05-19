@@ -13,7 +13,7 @@ import {
     MeshComponent,
     MeshComponentID,
 } from '../../Components/Renders/MeshComponent';
-import { TILE_SIZE } from '../../CONST';
+import { $object, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
 import { worldYToPositionZ } from '../../utils/positionZ';
@@ -53,10 +53,14 @@ export function positionRenderSystem(
 }
 
 function setPositionMesh(
-    { mesh }: ExtractStruct<MeshComponent>,
+    struct: ExtractStruct<MeshComponent>,
     position: Vector,
 ): void {
-    mesh.position.x = (position.x - 0.5) * TILE_SIZE;
-    mesh.position.y = (position.y - 0.5) * TILE_SIZE;
-    mesh.position.z = worldYToPositionZ(mesh.position.y);
+    const mesh = struct[$object];
+
+    if (mesh !== undefined) {
+        mesh.position.x = (position.x - 0.5) * TILE_SIZE;
+        mesh.position.y = (position.y - 0.5) * TILE_SIZE;
+        mesh.position.z = worldYToPositionZ(mesh.position.y);
+    }
 }

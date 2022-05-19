@@ -14,6 +14,7 @@ import { VelocityComponent, VelocityComponentID } from '../Components/Velocity';
 import { CardEntityID } from '../Entities/Card';
 import { GameHeap } from '../heap';
 import { floor, ufloor } from '../utils/math';
+import { Matrix } from '../utils/Matrix';
 import {
     isEqualVectors,
     mapVector,
@@ -55,7 +56,7 @@ export function colliderSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
             if (!isEqualVectors(current, next)) {
                 const coord = sumVector(next, mapVector(cardPosition, ufloor));
-                const tile = tiles.matrix.get(coord.x, coord.y);
+                const tile = Matrix.get(tiles.matrix, coord.x, coord.y);
 
                 if (tile && tile.type !== TileType.passable) {
                     velocity.v = 0;

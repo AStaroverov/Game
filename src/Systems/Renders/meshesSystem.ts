@@ -31,11 +31,16 @@ import {
     MeshGroupComponentID,
     MeshGroupStruct,
 } from '../../Components/Renders/MeshGroupComponent';
-import { CENTER_CARD_POSITION, HALF_RENDER_CARD_SIZE } from '../../CONST';
+import {
+    $object,
+    CENTER_CARD_POSITION,
+    HALF_RENDER_CARD_SIZE,
+} from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GlobalLightEntityID } from '../../Entities/GlobalLight';
 import { GameHeap } from '../../heap';
 import { abs } from '../../utils/math';
+import { Matrix } from '../../utils/Matrix';
 import { mulVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
@@ -56,19 +61,17 @@ export function meshesSystem(
     const surfaceMeshes = getComponentStruct(cardEntity, SurfaceMeshesMatrixID);
     const reliefMeshes = getComponentStruct(cardEntity, ReliefMeshesMatrixID);
 
-    const staticMeshes = [
-        spotLight.object,
-        spotLight.object.target,
-        ...surfaceMeshes.matrix.toArray(),
-        ...reliefMeshes.matrix.toArray(),
-    ];
-
     ticker.addFrameInterval(tick, 1);
 
     function tick() {
-        scene.clear();
-        scene.add(...staticMeshes);
-
+        const staticMeshes = [
+            spotLight[$object],
+            spotLight[$object]?.target,
+            ...Matrix.toArray(surfaceMeshes.matrix).map((v) => v[$object]),
+            ...Matrix.toArray(reliefMeshes.matrix).map((v) => v[$object]),
+        ].filter(
+            <T>(object: undefined | T): object is T => object !== undefined,
+        );
         const meshEntities = filterEntities(
             heap,
             (
@@ -80,6 +83,12 @@ export function meshesSystem(
                 hasInheritedComponent(e, MeshComponentID) ||
                 hasInheritedComponent(e, MeshGroupComponentID),
         );
+
+        scene.clear();
+
+        if (staticMeshes.length > 0) {
+            scene.add(...staticMeshes);
+        }
 
         meshEntities.forEach((entity) => {
             const mesh = filterComponents(entity, (c): c is MeshComponent =>
@@ -109,18 +118,17 @@ export function meshesSystem(
                     abs(diff.y) > HALF_RENDER_CARD_SIZE + 5
                 );
 
-            [...mesh, ...group]
-                .map(getStruct)
-                .map((struct) =>
-                    'mesh' in struct ? struct.mesh : struct.group,
-                )
-                .forEach((object) => {
+            [...mesh, ...group].map(getStruct).forEach((withObject) => {
+                const object = withObject[$object];
+
+                if (object) {
                     scene.add(object);
 
                     if (isVisible !== undefined) {
                         object.visible = isVisible;
                     }
-                });
+                }
+            });
         });
     }
 }
