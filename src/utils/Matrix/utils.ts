@@ -1,13 +1,13 @@
 import { Point } from '../shape';
-import { Matrix } from './index';
+import { Matrix, TMatrix } from './index';
 
 export type Item<T> = Point & {
     value: T;
-    matrix: Matrix<T>;
+    matrix: TMatrix<T>;
 };
 
 export function* radialForEach<T>(
-    matrix: Matrix<T>,
+    matrix: TMatrix<T>,
     sx: number,
     sy: number,
     radius?: number,
@@ -59,7 +59,7 @@ export function* radialForEach<T>(
     }
 
     function getItem(dx: number, dy: number) {
-        const value = matrix.get(sx + dx, sy + dy);
+        const value = Matrix.get(matrix, sx + dx, sy + dy);
         return value ? { value, x: sx + dx, y: sy + dy, matrix } : undefined;
     }
 }

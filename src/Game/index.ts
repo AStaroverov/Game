@@ -1,5 +1,5 @@
-import { registerEntity } from '../../lib/ECS/Heap';
-import { CARD_SIZE, RENDER_CARD_SIZE } from '../CONST';
+import { addEntity } from '../../lib/ECS/Heap';
+import { CARD_SIZE, GAME_VERSION, RENDER_CARD_SIZE } from '../CONST';
 import { createCardEntity } from '../Entities/Card';
 import { createGlobalLightEntity } from '../Entities/GlobalLight';
 import { createPlayerEntity } from '../Entities/Player';
@@ -12,6 +12,11 @@ import { controlsSystem } from '../Systems/controlsSystem';
 import { enemySpawnSystem } from '../Systems/enemySpawnSystem';
 import { enemySystem } from '../Systems/enemySystem';
 import { gameTimeSystem } from '../Systems/gameTimeSystem';
+import { initCardSystem } from '../Systems/Init/initCardSystem';
+import { initLightSystem } from '../Systems/Init/initLightSystem';
+import { initMatrixMeshesSystem } from '../Systems/Init/initMatrixMeshesSystem';
+import { initMeshesSystem } from '../Systems/Init/initMeshesSystem';
+import { initPlayerSystem } from '../Systems/Init/initPlayerSystem';
 import { playerSystem } from '../Systems/playerSystem';
 import { positionBodySystem } from '../Systems/positionBodySystem';
 import { atlasAnimationRenderSystem } from '../Systems/Renders/atlasAnimationRenderSystem';
@@ -24,27 +29,43 @@ import { meshesSystem } from '../Systems/Renders/meshesSystem';
 import { playerRenderSystem } from '../Systems/Renders/playerRenderSystem';
 import { positionRenderSystem } from '../Systems/Renders/positionRenderSystem';
 import { rotateRenderSystem } from '../Systems/Renders/rotateRenderSystem';
+import { saveSystem } from '../Systems/Utils/saveSystem';
 import { newSize } from '../utils/shape';
 import { tasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function game(): void {
-    const heap = createGameHeap();
+    const saveString = localStorage.getItem(`SAVE_${GAME_VERSION}`);
+    const saveObject = saveString ? JSON.parse(saveString) : undefined;
+
+    const heap = createGameHeap(saveObject);
     const ticker = tasksScheduler;
     const renderer = new Renderer(ticker);
 
     // Entities
-    const light = createGlobalLightEntity();
-    const world = createWorldEntity();
-    const card = createCardEntity({
-        tileSize: newSize(CARD_SIZE),
-        meshSize: newSize(RENDER_CARD_SIZE),
-    });
-    const player = createPlayerEntity();
+    if (saveObject === undefined) {
+        const light = createGlobalLightEntity();
+        const world = createWorldEntity();
+        const card = createCardEntity({
+            tileSize: newSize(CARD_SIZE),
+            meshSize: newSize(RENDER_CARD_SIZE),
+        });
+        const player = createPlayerEntity();
 
-    registerEntity(heap, light);
-    registerEntity(heap, world);
-    registerEntity(heap, card);
-    registerEntity(heap, player);
+        addEntity(heap, light);
+        addEntity(heap, world);
+        addEntity(heap, card);
+        addEntity(heap, player);
+    }
+
+    // Utils
+    saveSystem(heap);
+
+    // Init Systems
+    initLightSystem(heap);
+    initCardSystem(heap);
+    initPlayerSystem(heap);
+    initMeshesSystem(heap, ticker);
+    initMatrixMeshesSystem(heap);
 
     // Systems
     controlsSystem(heap);

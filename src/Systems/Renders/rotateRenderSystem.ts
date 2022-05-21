@@ -5,7 +5,6 @@ import {
     hasComponent,
 } from '../../../lib/ECS/Entity';
 import { filterEntities } from '../../../lib/ECS/Heap';
-import Enumerable from '../../../lib/linq';
 import {
     DirectionComponent,
     DirectionComponentID,
@@ -14,6 +13,7 @@ import {
     MeshComponent,
     MeshComponentID,
 } from '../../Components/Renders/MeshComponent';
+import { $object } from '../../CONST';
 import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
@@ -33,7 +33,7 @@ export function rotateRenderSystem(
                 );
             },
         );
-        Enumerable.from(entities).forEach((entity) => {
+        entities.forEach((entity) => {
             const mesh = getComponentStruct(entity, MeshComponentID);
             const dir = getComponentStruct(entity, DirectionComponentID);
 
@@ -46,10 +46,12 @@ function rotate(
     mesh: ExtractStruct<MeshComponent>,
     direction: ExtractStruct<DirectionComponent>,
 ) {
+    if (mesh[$object] === undefined) return;
+
     if (direction.x > 0) {
-        mesh.mesh.scale.x = 1;
+        mesh[$object]!.scale.x = 1;
     }
     if (direction.x < 0) {
-        mesh.mesh.scale.x = -1;
+        mesh[$object]!.scale.x = -1;
     }
 }

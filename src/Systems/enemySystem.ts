@@ -16,7 +16,7 @@ import { EnemyEntity, EnemyEntityID } from '../Entities/Enemy';
 import { PlayerEntityID } from '../Entities/Player';
 import { GameHeap } from '../heap';
 import { floor, ufloor } from '../utils/math';
-import { Matrix } from '../utils/Matrix';
+import { Matrix, TMatrix } from '../utils/Matrix';
 import {
     isEqualVectors,
     mapVector,
@@ -118,12 +118,12 @@ export function enemySystem(heap: GameHeap, ticker: TasksScheduler): void {
     );
 }
 
-function matrixToNestedArray<T extends Tile>(matrix: Matrix<T>): number[][] {
+function matrixToNestedArray<T extends Tile>(matrix: TMatrix<T>): number[][] {
     const m = new Array(matrix.h)
         .fill(null)
         .map(() => new Array(matrix.w).fill(null));
 
-    matrix.forEach((v, x, y) => {
+    Matrix.forEach(matrix, (v, x, y) => {
         m[y][x] = v.type === TileType.passable ? 0 : 1;
     });
 

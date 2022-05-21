@@ -8,4 +8,6 @@ import { WorldEntity } from './Entities/World';
 export type GameHeap = Heap<
     GlobalLightEntity | WorldEntity | CardEntity | PlayerEntity | EnemyEntity
 >;
-export const createGameHeap = (): GameHeap => createHeap();
+export const createGameHeap = (seed: object = {}): GameHeap => {
+    return createHeap(seed);
+};

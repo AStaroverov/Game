@@ -30,22 +30,26 @@ export const createTilesMatrixComponent = (props: Size) =>
         createMatrixComponent({ ...props, seed: GET_EMPTY_TILE }),
     );
 
-export function tilesInit({ matrix }: TilesMatrix, x: number, y: number): void {
-    matrix.set(x, y, { type: TileType.passable });
+export function tilesInit(struct: TilesMatrix, x: number, y: number): void {
+    if (Matrix.get(struct.matrix, x, y).type === TileType.empty) {
+        Matrix.set(struct.matrix, x, y, { type: TileType.passable });
+    }
+
+    tilesFillEmpty(struct);
 }
 
 export function tilesMove({ matrix }: TilesMatrix, v: Vector): void {
     const { w, h } = matrix;
-    const tmp = new Matrix<Tile>(w, h, GET_EMPTY_TILE);
+    const tmp = Matrix.create<Tile>(w, h, GET_EMPTY_TILE);
 
     for (let i = 0; i < w; i++) {
         for (let j = 0; j < h; j++) {
-            const prevTile = matrix.get(i + v.x, j + v.y);
-            prevTile && tmp.set(i, j, prevTile);
+            const prevTile = Matrix.get(matrix, i + v.x, j + v.y);
+            prevTile && Matrix.set(tmp, i, j, prevTile);
         }
     }
 
-    matrix.setSource(tmp.buffer.slice());
+    Matrix.setSource(matrix, tmp.buffer.slice());
 }
 
 export function tilesFillEmpty({ matrix }: TilesMatrix): void {
@@ -124,9 +128,11 @@ function sumProbabilities<T extends ProbabilityRecord>(a: T, b: T): T {
 
 const getFromProbabilities =
     (rand: () => number) =>
-    <T extends ProbabilityRecord>(probs: T): keyof T => {
+    <T extends ProbabilityRecord>(probabilities: T): keyof T => {
         const num = rand();
-        const entries = Object.entries(probs).sort(([, a], [, b]) => a - b);
+        const entries = Object.entries(probabilities).sort(
+            ([, a], [, b]) => a - b,
+        );
         const index = entries
             .map(([, v]) => v)
             .map((v, i, arr) => v + (arr[i - 1] ?? 0))

@@ -1,23 +1,23 @@
-import { Atlas } from '../../lib/Atlas';
-import { createComponent, ExtractStruct } from '../../lib/ECS/Component';
-import { floor } from '../utils/math';
-import { createAnimationComponent } from './AnimationComponent';
+import { createComponent, ExtractStruct } from '../../../lib/ECS/Component';
+import { floor } from '../../utils/math';
+import { createAnimationComponent } from '../AnimationComponent';
+import { atlases, AtlasName } from './atlases';
 
 export const AtlasAnimationComponentID = 'ATLAS_ANIMATION' as const;
 export type AtlasAnimationComponent = ReturnType<
     typeof createAtlasAnimationComponent
 >;
 export const createAtlasAnimationComponent = (props: {
-    duration?: number;
     time?: number;
-    atlas: Atlas;
+    duration?: number;
+    atlasName: AtlasName;
 }) =>
     createComponent(
         AtlasAnimationComponentID,
         createAnimationComponent(props),
         {
-            atlas: props.atlas,
-            atlasFrame: props.atlas.list[0],
+            atlasName: props.atlasName,
+            atlasFrame: 0,
         },
     );
 
@@ -26,9 +26,7 @@ export function updateAtlasAnimation(
     delta: number,
 ): void {
     struct.time += delta;
-
-    const index =
-        floor(struct.time / struct.duration) % struct.atlas.list.length;
-
-    struct.atlasFrame = struct.atlas.list[index];
+    struct.atlasFrame =
+        floor(struct.time / struct.duration) %
+        atlases[struct.atlasName].list.length;
 }
