@@ -1,3 +1,5 @@
+import { sqrt } from './math';
+
 export type Size = { w: number; h: number };
 export const newSize = (w: number, h?: number): Size => ({ w, h: h ?? w });
 
@@ -29,6 +31,8 @@ export const mulVector = (v: Vector, k: number): Vector =>
     newVector(v.x * k, v.y * k);
 
 export const negateVector = (v: Vector): Vector => mulVector(v, -1);
+
+export const widthVector = (a: Vector): number => sqrt(a.x ** 2 + a.y ** 2);
 
 export const isEqualVectors = (a: Vector, b: Vector): boolean =>
     a.x === b.x && a.y === b.y;

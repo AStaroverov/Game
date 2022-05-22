@@ -4,8 +4,8 @@ import { atlases, AtlasName } from '../../Components/AtlasAnimation/atlases';
 import { createDirectionComponent } from '../../Components/DirectionComponent';
 import { createHealComponent } from '../../Components/Heal';
 import { createPositionComponent } from '../../Components/Position';
+import { createBaseMeshComponent } from '../../Components/Renders/BaseMeshComponent';
 import { createHealBarMeshComponent } from '../../Components/Renders/HealBarMeshComponent';
-import { createMeshComponent } from '../../Components/Renders/MeshComponent';
 import { createVelocityComponent } from '../../Components/Velocity';
 import { createVisualSizeComponent } from '../../Components/VisualSize';
 import { PLAYER_START_POSITION, TILE_SIZE } from '../../CONST';
@@ -21,7 +21,7 @@ export const createPlayerEntity = () => {
         createPositionComponent(PLAYER_START_POSITION),
         createDirectionComponent(),
         createVelocityComponent(),
-        createMeshComponent({
+        createBaseMeshComponent({
             w: playerAtlas.w * 3,
             h: playerAtlas.h * 3,
             alphaTest: 0.5,

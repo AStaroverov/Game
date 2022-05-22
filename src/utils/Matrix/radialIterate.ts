@@ -6,7 +6,7 @@ export type Item<T> = Point & {
     matrix: TMatrix<T>;
 };
 
-export function* radialForEach<T>(
+export function* radialIterate<T>(
     matrix: TMatrix<T>,
     sx: number,
     sy: number,

@@ -10,9 +10,9 @@ import {
     DirectionComponentID,
 } from '../../Components/DirectionComponent';
 import {
-    MeshComponent,
-    MeshComponentID,
-} from '../../Components/Renders/MeshComponent';
+    BaseMeshComponent,
+    BaseMeshComponentID,
+} from '../../Components/Renders/BaseMeshComponent';
 import { $object } from '../../CONST';
 import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
@@ -26,15 +26,15 @@ export function rotateRenderSystem(
     function tick() {
         const entities = filterEntities(
             heap,
-            (e): e is Entity<any, MeshComponent | DirectionComponent> => {
+            (e): e is Entity<any, BaseMeshComponent | DirectionComponent> => {
                 return (
-                    hasComponent(e, MeshComponentID) &&
+                    hasComponent(e, BaseMeshComponentID) &&
                     hasComponent(e, DirectionComponentID)
                 );
             },
         );
         entities.forEach((entity) => {
-            const mesh = getComponentStruct(entity, MeshComponentID);
+            const mesh = getComponentStruct(entity, BaseMeshComponentID);
             const dir = getComponentStruct(entity, DirectionComponentID);
 
             rotate(mesh, dir);
@@ -43,7 +43,7 @@ export function rotateRenderSystem(
 }
 
 function rotate(
-    mesh: ExtractStruct<MeshComponent>,
+    mesh: ExtractStruct<BaseMeshComponent>,
     direction: ExtractStruct<DirectionComponent>,
 ) {
     if (mesh[$object] === undefined) return;

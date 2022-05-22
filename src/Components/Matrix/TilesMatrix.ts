@@ -4,7 +4,7 @@ import { pipe } from 'lodash/fp';
 import { createComponent, ReturnStruct } from '../../../lib/ECS/Component';
 import Enumerable from '../../../lib/linq';
 import { Matrix } from '../../utils/Matrix';
-import { Item, radialForEach } from '../../utils/Matrix/utils';
+import { Item, radialIterate } from '../../utils/Matrix/radialIterate';
 import { Size, Vector } from '../../utils/shape';
 import { createMatrixComponent } from './Matrix';
 
@@ -54,7 +54,7 @@ export function tilesMove({ matrix }: TilesMatrix, v: Vector): void {
 
 export function tilesFillEmpty({ matrix }: TilesMatrix): void {
     Enumerable.from(
-        radialForEach(
+        radialIterate(
             matrix,
             Math.floor(matrix.h / 2),
             Math.floor(matrix.w / 2),
@@ -66,7 +66,7 @@ export function tilesFillEmpty({ matrix }: TilesMatrix): void {
         )
         .forEach(({ value, x, y }) => {
             const summedProbabilities = Enumerable.from(
-                radialForEach(matrix, x, y, 1),
+                radialIterate(matrix, x, y, 1),
             )
                 .skip(1)
                 .where((item): item is Item<Tile> => item !== undefined)

@@ -1,43 +1,54 @@
 import { ExtractTag } from './types';
 
-export const $component = '__COMPONENT__' as const;
 export const $struct = '__STRUCT__' as const;
+export const $component = '__COMPONENT__' as const;
 export const $inherited = '__INHERITED__' as const;
 
-export type ComponentTag<Tag extends string = string> = {
+export type ComponentTag<Tag extends unknown | string = string> = {
     [$component]: Tag;
 };
 
-export type ComponentStruct<Struct extends void | object = void | object> = {
+export type ComponentStruct<Struct extends object = object> = {
     [$struct]: Struct;
 };
 
+export type ComponentInherited<Inherited extends unknown | string = never> = {
+    [$inherited]: Inherited;
+};
+
 export type Component<
-    Tag extends string = string,
-    Struct extends void | object = void | object,
-> = ComponentTag<Tag> & ComponentStruct<Struct>;
+    Tag extends unknown | string = string,
+    Struct extends object = object,
+    Inherited extends unknown | string = never,
+> = ComponentTag<Tag> & ComponentStruct<Struct> & ComponentInherited<Inherited>;
 
-export type SomeComponent<Body extends object = object> = ComponentTag<'*'> &
-    ComponentStruct<Body>;
+export type AnyComponent = Component<any, any, any>;
 
-export type NullableComponent<C extends Component = Component> = ComponentTag<
-    ExtractTag<C>
-> &
-    ComponentStruct<void | ExtractStruct<C>>;
+export type InheritedComponent<C extends Component<any, any, any>> =
+    ComponentTag<unknown> &
+        ComponentInherited<ExtractTag<C>> &
+        ComponentStruct<ExtractStruct<C>>;
 
-export type ExtractStruct<C> = C extends Component<any, infer Body>
+export type ExtractTags<C> = ExtractTag<C> | ExtractInherited<C>;
+
+export type ExtractInherited<C> = C extends ComponentInherited<infer Inherited>
+    ? Inherited
+    : never;
+
+export type ExtractStruct<C> = C extends ComponentStruct<infer Body>
     ? Body
     : C extends object
     ? C
     : never;
 
-export type ReturnStruct<F extends (...args: any[]) => Component> =
-    ReturnType<F>[typeof $struct];
+export type ReturnStruct<
+    F extends (...args: any[]) => Component<any, any, any>,
+> = ExtractStruct<ReturnType<F>>;
 
 function createComponent<Tag extends string, B1 extends object>(
     tag: Tag,
     b1: B1,
-): Component<Tag, ExtractStruct<B1>>;
+): Component<Tag, ExtractStruct<B1>, ExtractTags<B1>>;
 function createComponent<
     Tag extends string,
     B1 extends object,
@@ -46,7 +57,11 @@ function createComponent<
     tag: Tag,
     b1: B1,
     b2: B2,
-): Component<Tag, ExtractStruct<B1> & ExtractStruct<B2>>;
+): Component<
+    Tag,
+    ExtractStruct<B1> & ExtractStruct<B2>,
+    ExtractTags<B1> | ExtractTags<B2>
+>;
 function createComponent<
     Tag extends string,
     B1 extends object,
@@ -57,7 +72,11 @@ function createComponent<
     b1: B1,
     b2: B2,
     b3: B3,
-): Component<Tag, ExtractStruct<B1> & ExtractStruct<B2> & ExtractStruct<B3>>;
+): Component<
+    Tag,
+    ExtractStruct<B1> & ExtractStruct<B2> & ExtractStruct<B3>,
+    ExtractTags<B1> | ExtractTags<B2> | ExtractTags<B3>
+>;
 function createComponent<
     Tag extends string,
     B1 extends object,
@@ -75,7 +94,8 @@ function createComponent<
     ExtractStruct<B1> &
         ExtractStruct<B2> &
         ExtractStruct<B3> &
-        ExtractStruct<B4>
+        ExtractStruct<B4>,
+    ExtractTags<B1> | ExtractTags<B2> | ExtractTags<B3> | ExtractTags<B4>
 >;
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 function createComponent<Tag extends string = string>(
@@ -104,23 +124,22 @@ function createComponent<Tag extends string = string>(
 
 export { createComponent };
 
-export function isComponent<S extends Component, T extends ExtractTag<S>>(
-    s: S,
-    tag: T,
-): s is S {
-    return (s as any)[$component] === tag;
+export function isComponent<C extends Component<any, any, any>>(
+    c: C,
+    tag: ExtractTag<C>,
+): c is C {
+    return c[$component] === tag;
 }
 
-export function isInheritedComponent<S extends Component, T extends string>(
-    s: S,
-    tag: T,
-): s is S {
-    return (
-        s[$component] === tag ||
-        tag in ((s as any)[$inherited] as Record<string, Component>)
-    );
+export function isInheritedComponent<
+    C extends Component<any, any, any>,
+    T extends string,
+>(c: C, tag: T): c is C {
+    return c[$component] === tag || tag in c[$inherited];
 }
 
-export function getStruct<S extends Component>(s: S): ExtractStruct<S> {
-    return s[$struct] as ExtractStruct<S>;
+export function getStruct<C extends Component<any, any, any>>(
+    s: C,
+): ExtractStruct<C> {
+    return s[$struct] as ExtractStruct<C>;
 }

@@ -12,9 +12,9 @@ import {
 } from '../../Components/AtlasAnimation';
 import { atlases } from '../../Components/AtlasAnimation/atlases';
 import {
-    MeshComponent,
-    MeshComponentID,
-} from '../../Components/Renders/MeshComponent';
+    BaseMeshComponent,
+    BaseMeshComponentID,
+} from '../../Components/Renders/BaseMeshComponent';
 import { $object } from '../../CONST';
 import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
@@ -28,13 +28,13 @@ export function atlasAnimationRenderSystem(
     function tick(delta: number) {
         const entities = filterEntities(
             heap,
-            (e): e is SomeEntity<MeshComponent | AtlasAnimationComponent> =>
-                hasComponent(e, MeshComponentID) &&
+            (e): e is SomeEntity<BaseMeshComponent | AtlasAnimationComponent> =>
+                hasComponent(e, BaseMeshComponentID) &&
                 hasComponent(e, AtlasAnimationComponentID),
         );
 
         entities.forEach((entity) => {
-            const mesh = getComponentStruct(entity, MeshComponentID);
+            const mesh = getComponentStruct(entity, BaseMeshComponentID);
             const animation = getComponentStruct(
                 entity,
                 AtlasAnimationComponentID,
@@ -47,7 +47,7 @@ export function atlasAnimationRenderSystem(
 
 function animate(
     delta: number,
-    component: ExtractStruct<MeshComponent>,
+    component: ExtractStruct<BaseMeshComponent>,
     animation: ExtractStruct<AtlasAnimationComponent>,
 ): void {
     updateAtlasAnimation(animation, delta);
