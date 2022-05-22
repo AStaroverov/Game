@@ -25,11 +25,11 @@ export function globalLightRenderSystem(
     ticker.addTimeInterval(update, 1_000);
 
     function update() {
-        if (spotLight[$object]) {
-            spotLight[$object]!.angle =
-                0.6 + (1 + cos(gameTime.time / ONE_DAY)) / 2;
-            spotLight[$object]!.intensity =
-                1 + (1 + cos(gameTime.time / ONE_DAY)) / 2;
+        const light = spotLight[$object];
+
+        if (light) {
+            light.angle = 0.6 + (1 + cos(gameTime.time / ONE_DAY)) / 2;
+            light.intensity = 1 + (1 + cos(gameTime.time / ONE_DAY)) / 2;
         }
     }
 }

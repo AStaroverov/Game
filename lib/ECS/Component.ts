@@ -104,11 +104,11 @@ function createComponent<Tag extends string = string>(
 
 export { createComponent };
 
-export function isComponent<S extends Component, T extends ExtractTag<S>>(
-    s: S,
-    tag: T,
-): s is S {
-    return (s as any)[$component] === tag;
+export function isComponent<C extends Component>(
+    c: C,
+    tag: ExtractTag<C>,
+): c is C {
+    return c[$component] === tag;
 }
 
 export function isInheritedComponent<S extends Component, T extends string>(

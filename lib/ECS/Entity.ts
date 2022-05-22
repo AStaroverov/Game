@@ -17,7 +17,7 @@ export type EntityComponents<Comp extends Component = Component> = {
     components: Record<ExtractTag<Comp>, Comp>;
 };
 
-export type SomeEntity<Comp extends Component = Component> = Entity<'*', Comp>;
+export type SomeEntity<Comp extends Component = Component> = Entity<any, Comp>;
 
 export type Entity<
     Tag extends string = string,
@@ -55,21 +55,24 @@ export function isEntity<E extends Entity, T extends ExtractTag<E>>(
 }
 
 export function hasComponent<
-    C extends ExtractComponents<E>,
     E extends Entity,
+    C extends ExtractComponents<E>,
     T extends ExtractTag<C>,
->(e: E, tag: T): boolean {
+>(
+    e: E,
+    tag: T,
+): e is Extract<E, EntityComponents<ExtractComponentsByTag<C, T>>> {
     return tag in e.components;
 }
 
-export function hasInheritedComponent<E extends Entity, T extends string>(
-    { components }: E,
-    tag: T,
-): boolean {
-    if (tag in components) return true;
+export function hasInheritedComponent<
+    C extends Component,
+    T extends string = string,
+>(e: Entity, tag: T): e is SomeEntity<C> {
+    if (tag in e.components) return true;
 
-    for (const t in components) {
-        if (tag in (components[t] as any)[$inherited]) {
+    for (const t in e.components) {
+        if (tag in (e.components[t] as any)[$inherited]) {
             return true;
         }
     }
@@ -82,6 +85,36 @@ export function getComponent<
     T extends ExtractTag<ExtractComponents<E>>,
 >(e: E, tag: T): ExtractComponentsByTag<ExtractComponents<E>, T> {
     return e.components[tag] as ExtractComponentsByTag<ExtractComponents<E>, T>;
+}
+
+export function getInheritedComponents<C extends Component>(
+    e: Entity,
+    tag: ExtractTag<C>,
+): C[] {
+    const components: C[] = [];
+
+    for (const t in e.components) {
+        if (tag in (e.components[t] as any)[$inherited]) {
+            components.push(e.components[t] as C);
+        }
+    }
+
+    return components;
+}
+
+export function getInheritedComponentStructs<C extends Component>(
+    e: Entity,
+    tag: ExtractTag<C>,
+): ExtractStruct<C>[] {
+    const components: C[] = [];
+
+    for (const t in e.components) {
+        if (tag in (e.components[t] as any)[$inherited]) {
+            components.push(e.components[t] as C);
+        }
+    }
+
+    return components.map(getStruct);
 }
 
 export function getComponentStruct<
