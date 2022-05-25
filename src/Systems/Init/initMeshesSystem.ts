@@ -1,54 +1,86 @@
-import { getComponentStruct } from '../../../lib/ECS/Entity';
-import { getEntities } from '../../../lib/ECS/Heap';
 import {
+    AnyComponent,
+    getStruct,
+    InheritedComponent,
+    isComponent,
+    isInheritedComponent,
+} from '../../../lib/ECS/Component';
+import {
+    filterComponents,
+    hasInheritedComponent,
+    SomeEntity,
+} from '../../../lib/ECS/Entity';
+import { filterEntities } from '../../../lib/ECS/Heap';
+import {
+    HealBarMeshComponent,
     HealBarMeshComponentID,
     initHealBarStruct,
 } from '../../Components/Renders/HealBarMeshComponent';
 import {
     initMeshStruct,
+    MeshComponent,
     MeshComponentID,
 } from '../../Components/Renders/MeshComponent';
+import {
+    MeshGroupComponent,
+    MeshGroupComponentID,
+} from '../../Components/Renders/MeshGroupComponent';
 import { $object } from '../../CONST';
-import { EnemyEntity, EnemyEntityID } from '../../Entities/Enemy';
-import { PlayerEntity, PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 export function initMeshesSystem(heap: GameHeap, ticker: TasksScheduler) {
-    const players = getEntities(heap, PlayerEntityID);
-
-    initMeshes(players[0]);
-
     ticker.addFrameInterval(update, 10);
 
     function update() {
-        getEntities(heap, EnemyEntityID).forEach((enemy) => {
-            const mesh = getComponentStruct(enemy, MeshComponentID);
-            const healBarMesh = getComponentStruct(
-                enemy,
-                HealBarMeshComponentID,
-            );
-
-            if (mesh[$object] === undefined) {
-                initMeshStruct(mesh);
+        filterEntities(
+            heap,
+            (
+                e,
+            ): e is
+                | SomeEntity<InheritedComponent<MeshComponent>>
+                | SomeEntity<InheritedComponent<MeshGroupComponent>> => {
+                return (
+                    hasInheritedComponent(e, MeshComponentID) ||
+                    hasInheritedComponent(e, MeshGroupComponentID)
+                );
+            },
+        ).forEach((entity) => {
+            if (hasInheritedComponent(entity, MeshComponentID)) {
+                initInheritedMeshes(entity);
             }
 
-            if (healBarMesh[$object] === undefined) {
-                initHealBarStruct(healBarMesh);
+            if (hasInheritedComponent(entity, MeshGroupComponentID)) {
+                initInheritedGroups(entity);
             }
         });
     }
+}
 
-    function initMeshes(body: EnemyEntity | PlayerEntity) {
-        const mesh = getComponentStruct(body, MeshComponentID);
-        const healBarMesh = getComponentStruct(body, HealBarMeshComponentID);
+function initInheritedMeshes(
+    entity: SomeEntity<AnyComponent | InheritedComponent<MeshComponent>>,
+) {
+    filterComponents(entity, (c): c is MeshComponent =>
+        isInheritedComponent(c, MeshComponentID),
+    )
+        .map(getStruct)
+        .forEach((mesh) => {
+            if (mesh && mesh[$object] === undefined) {
+                initMeshStruct(mesh);
+            }
+        });
+}
 
-        if (mesh[$object] === undefined) {
-            initMeshStruct(mesh);
-        }
-
-        if (healBarMesh[$object] === undefined) {
-            initHealBarStruct(healBarMesh);
-        }
-    }
+function initInheritedGroups(
+    entity: SomeEntity<AnyComponent | InheritedComponent<MeshGroupComponent>>,
+) {
+    filterComponents(entity, (c): c is HealBarMeshComponent =>
+        isComponent(c, HealBarMeshComponentID),
+    )
+        .map(getStruct)
+        .forEach((healBarMesh) => {
+            if (healBarMesh && healBarMesh[$object] === undefined) {
+                initHealBarStruct(healBarMesh);
+            }
+        });
 }

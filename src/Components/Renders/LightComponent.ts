@@ -12,6 +12,9 @@ export const createLightMeshComponent = <L extends Light>() =>
     });
 
 export const SpotLightMeshComponentID = 'SPOT_LIGHT_MESH' as const;
+export type SpotLightMeshComponent = ReturnType<
+    typeof createSpotLightMeshComponent
+>;
 export const createSpotLightMeshComponent = () =>
     createComponent(
         SpotLightMeshComponentID,
