@@ -1,5 +1,7 @@
 import {
+    AnyComponent,
     getStruct,
+    InheritedComponent,
     isComponent,
     isInheritedComponent,
 } from '../../../lib/ECS/Component';
@@ -36,31 +38,28 @@ export function initMeshesSystem(heap: GameHeap, ticker: TasksScheduler) {
             (
                 e,
             ): e is
-                | SomeEntity<MeshComponent>
-                | SomeEntity<MeshGroupComponent> => {
+                | SomeEntity<InheritedComponent<MeshComponent>>
+                | SomeEntity<InheritedComponent<MeshGroupComponent>> => {
                 return (
                     hasInheritedComponent(e, MeshComponentID) ||
                     hasInheritedComponent(e, MeshGroupComponentID)
                 );
             },
         ).forEach((entity) => {
-            if (hasInheritedComponent<MeshComponent>(entity, MeshComponentID)) {
+            if (hasInheritedComponent(entity, MeshComponentID)) {
                 initInheritedMeshes(entity);
             }
 
-            if (
-                hasInheritedComponent<MeshGroupComponent>(
-                    entity,
-                    MeshGroupComponentID,
-                )
-            ) {
+            if (hasInheritedComponent(entity, MeshGroupComponentID)) {
                 initInheritedGroups(entity);
             }
         });
     }
 }
 
-function initInheritedMeshes(entity: SomeEntity<MeshComponent>) {
+function initInheritedMeshes(
+    entity: SomeEntity<AnyComponent | InheritedComponent<MeshComponent>>,
+) {
     filterComponents(entity, (c): c is MeshComponent =>
         isInheritedComponent(c, MeshComponentID),
     )
@@ -72,7 +71,9 @@ function initInheritedMeshes(entity: SomeEntity<MeshComponent>) {
         });
 }
 
-function initInheritedGroups(entity: SomeEntity<MeshGroupComponent>) {
+function initInheritedGroups(
+    entity: SomeEntity<AnyComponent | InheritedComponent<MeshGroupComponent>>,
+) {
     filterComponents(entity, (c): c is HealBarMeshComponent =>
         isComponent(c, HealBarMeshComponentID),
     )

@@ -1,14 +1,9 @@
 import { Scene } from 'three';
 
+import { InheritedComponent } from '../../../lib/ECS/Component';
 import {
-    getStruct,
-    isInheritedComponent,
-    NullableComponent,
-    SomeComponent,
-} from '../../../lib/ECS/Component';
-import {
-    filterComponents,
     getComponentStruct,
+    getInheritedComponentStructs,
     hasInheritedComponent,
     SomeEntity,
     tryGetComponentStruct,
@@ -24,12 +19,10 @@ import { SpotLightMeshComponentID } from '../../Components/Renders/LightComponen
 import {
     MeshComponent,
     MeshComponentID,
-    MeshStruct,
 } from '../../Components/Renders/MeshComponent';
 import {
     MeshGroupComponent,
     MeshGroupComponentID,
-    MeshGroupStruct,
 } from '../../Components/Renders/MeshGroupComponent';
 import {
     $object,
@@ -72,16 +65,19 @@ export function meshesSystem(
         ].filter(
             <T>(object: undefined | T): object is T => object !== undefined,
         );
+
         const meshEntities = filterEntities(
             heap,
             (
                 e,
-            ): e is SomeEntity<
-                | NullableComponent<SomeComponent<MeshStruct>>
-                | NullableComponent<SomeComponent<MeshGroupStruct>>
-            > =>
-                hasInheritedComponent(e, MeshComponentID) ||
-                hasInheritedComponent(e, MeshGroupComponentID),
+            ): e is
+                | SomeEntity<InheritedComponent<MeshComponent>>
+                | SomeEntity<InheritedComponent<MeshGroupComponent>> => {
+                return (
+                    hasInheritedComponent(e, MeshComponentID) ||
+                    hasInheritedComponent(e, MeshGroupComponentID)
+                );
+            },
         );
 
         scene.clear();
@@ -91,13 +87,10 @@ export function meshesSystem(
         }
 
         meshEntities.forEach((entity) => {
-            const mesh = filterComponents(entity, (c): c is MeshComponent =>
-                isInheritedComponent(c, MeshComponentID),
-            );
-            const group = filterComponents(
+            const mesh = getInheritedComponentStructs(entity, MeshComponentID);
+            const group = getInheritedComponentStructs(
                 entity,
-                (c): c is MeshGroupComponent =>
-                    isInheritedComponent(c, MeshGroupComponentID),
+                MeshGroupComponentID,
             );
             const position = tryGetComponentStruct<PositionComponent>(
                 entity,
@@ -118,7 +111,7 @@ export function meshesSystem(
                     abs(diff.y) > HALF_RENDER_CARD_SIZE + 5
                 );
 
-            [...mesh, ...group].map(getStruct).forEach((withObject) => {
+            [...mesh, ...group].forEach((withObject) => {
                 const object = withObject[$object];
 
                 if (object) {
