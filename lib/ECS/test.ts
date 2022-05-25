@@ -1,16 +1,17 @@
 // import { createComponent, isComponent } from './Component';
 // import {
 //     createEntity,
-//     Entity,
 //     getComponent,
 //     hasComponent,
 //     isEntity,
+//     SomeEntity,
 // } from './Entity';
 // import {
+//     addEntity,
 //     createHeap,
 //     filterEntities,
 //     getEntities,
-//     registerEntity,
+//     Heap,
 // } from './Heap';
 //
 // const Component_0_ID = 'Component_0' as const;
@@ -81,15 +82,15 @@
 // const _g2 = getComponent(entity_2, Component_2_ID);
 // const _g3 = getComponent(entity_2, Component_ALL_ID);
 //
-// const heap = createHeap();
+// const heap = createHeap() as Heap<TEntity_0 | TEntity_1 | TEntity_2>;
 //
-// registerEntity(heap, entity_0);
-// registerEntity(heap, entity_1);
-// registerEntity(heap, entity_2);
+// addEntity(heap, entity_0);
+// addEntity(heap, entity_1);
+// addEntity(heap, entity_2);
 //
 // const _entity_0 = getEntities<TEntity_1>(heap, Entity_0_ID);
 //
-// const _entity_1 = filterEntities(heap, (e): e is Entity<string, TComponent_1> =>
+// const _entity_1 = filterEntities(heap, (e): e is SomeEntity<TComponent_1> =>
 //     hasComponent(e, Component_1_ID),
 // );
 //

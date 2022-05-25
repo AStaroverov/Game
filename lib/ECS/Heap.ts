@@ -1,4 +1,4 @@
-import { $entity as $entity, Entity } from './Entity';
+import { $entity as $entity, Entity, EntityTag, SomeEntity } from './Entity';
 import { ExtractTag } from './types';
 
 const EMPTY_ARRAY: any[] = [];
@@ -12,7 +12,7 @@ export type ExtractEntities<H> = H extends Heap<infer E> ? E : never;
 export type ExtractEntitiesByTag<
     E extends Entity,
     T extends ExtractTag<E>,
-> = Extract<E, { [$entity]: T }>;
+> = Extract<E, EntityTag<T>>;
 
 export function createHeap<H extends Heap = Heap>(seed: object = {}): H {
     const entities = seed;
@@ -56,9 +56,9 @@ export function getEntities<
 }
 
 export function filterEntities<
-    E extends Entity,
-    H extends Heap = Heap,
-    T extends string = string,
->(heap: H, fn: (e: Entity) => e is E): E[] {
-    return (Object.values(heap.entities).flat() as Entity[]).filter(fn) as E[];
+    H extends Heap,
+    E extends ExtractEntities<H> | SomeEntity,
+    R extends E,
+>(heap: H, fn: (e: E) => e is R): R[] {
+    return (Object.values(heap.entities).flat() as E[]).filter(fn) as R[];
 }
