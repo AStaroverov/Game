@@ -1,8 +1,8 @@
 import { ExtractStruct } from '../../../lib/ECS/Component';
 import {
-    Entity,
     getComponentStruct,
     hasComponent,
+    SomeEntity,
 } from '../../../lib/ECS/Entity';
 import { filterEntities, getEntities } from '../../../lib/ECS/Heap';
 import {
@@ -33,9 +33,7 @@ export function positionRenderSystem(
     function tick() {
         const entities = filterEntities(
             heap,
-            (
-                entity,
-            ): entity is Entity<any, MeshComponent | PositionComponent> =>
+            (entity): entity is SomeEntity<MeshComponent | PositionComponent> =>
                 hasComponent(entity, MeshComponentID) &&
                 hasComponent(entity, PositionComponentID),
         );

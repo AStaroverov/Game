@@ -68,8 +68,8 @@ export function game(): void {
     UnspawnSystem(heap, ticker);
 
     // Render Systems
-    meshesSystem(heap, ticker, renderer.scene);
     globalLightRenderSystem(heap, ticker);
+    meshesSystem(heap, ticker, renderer.scene);
 
     cardSurfaceSystem(heap, ticker);
     cardReliefSystem(heap, ticker);

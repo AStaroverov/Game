@@ -49,21 +49,22 @@ export function healBarRenderSystem(
             const size = getComponentStruct(entity, VisualSizeComponentID);
             const position = getComponentStruct(entity, PositionComponentID);
             const healBar = getComponentStruct(entity, HealBarMeshComponentID);
+            const group = healBar[$object];
 
-            healBar[$object] &&
-                setVector(
-                    healBar[$object]!.position,
-                    sumVector(
-                        mulVector(
-                            sumVector(
-                                worldToRenderPosition(position, cardPosition),
-                                newVector(-0.5, -0.5),
-                            ),
-                            TILE_SIZE,
+            if (group) {
+                const nextPosition = sumVector(
+                    mulVector(
+                        sumVector(
+                            worldToRenderPosition(position, cardPosition),
+                            newVector(-0.5, -0.5),
                         ),
-                        newVector(0, size.h / 2 + 10),
+                        TILE_SIZE,
                     ),
+                    newVector(0, size.h / 2 + 10),
                 );
+
+                setVector(group.position, nextPosition);
+            }
         });
     }
 }

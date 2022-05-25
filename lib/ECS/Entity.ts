@@ -82,7 +82,7 @@ export function hasInheritedComponent<
     if (tag in e.components) return true;
 
     for (const t in e.components) {
-        if (tag in __getEntityComponent(e, tag)[$inherited]) {
+        if (tag in __getEntityComponent(e, t)[$inherited]) {
             return true;
         }
     }
@@ -107,7 +107,7 @@ export function getInheritedComponents<
     for (const t in __getEntityComponents(e)) {
         const component = __getEntityComponent(e, t) as C;
 
-        if (tag in component[$inherited]) {
+        if (component[$component] === tag || tag in component[$inherited]) {
             resultComponents.push(component);
         }
     }
@@ -156,10 +156,10 @@ export function filterComponents<
     return (Object.values(__getEntityComponents(e)) as C[]).filter(fn) as R[];
 }
 
-function __getEntityComponents(e: any): any {
+function __getEntityComponents(e: any): Record<any, Component<any, any, any>> {
     return e.components as any;
 }
 
-function __getEntityComponent(e: any, t: any): any {
+function __getEntityComponent(e: any, t: any): Component<any, any, any> {
     return __getEntityComponents(e)[t] as any;
 }

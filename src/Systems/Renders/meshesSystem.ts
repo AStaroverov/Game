@@ -66,7 +66,13 @@ export function meshesSystem(
             <T>(object: undefined | T): object is T => object !== undefined,
         );
 
-        const meshEntities = filterEntities(
+        scene.clear();
+
+        if (staticMeshes.length > 0) {
+            scene.add(...staticMeshes);
+        }
+
+        filterEntities(
             heap,
             (
                 e,
@@ -78,15 +84,7 @@ export function meshesSystem(
                     hasInheritedComponent(e, MeshGroupComponentID)
                 );
             },
-        );
-
-        scene.clear();
-
-        if (staticMeshes.length > 0) {
-            scene.add(...staticMeshes);
-        }
-
-        meshEntities.forEach((entity) => {
+        ).forEach((entity) => {
             const mesh = getInheritedComponentStructs(entity, MeshComponentID);
             const group = getInheritedComponentStructs(
                 entity,
