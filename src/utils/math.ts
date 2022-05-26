@@ -6,6 +6,7 @@ export const round = Math.round;
 export const sin = Math.sin;
 export const cos = Math.cos;
 export const trunc = Math.trunc;
+export const sqrt = Math.sqrt;
 
 export function ufloor(n: number): number {
     return sign(n) * floor(abs(n));

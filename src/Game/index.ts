@@ -1,6 +1,7 @@
 import { GAME_VERSION } from '../CONST';
 import { createGameHeap } from '../heap';
 import { Renderer } from '../Renderer';
+import { runActionSystem } from '../Systems/ActionSystem';
 import { cardSystem } from '../Systems/cardSystem';
 import { colliderSystem } from '../Systems/colliderSystem';
 import { controlsSystem } from '../Systems/controlsSystem';
@@ -53,6 +54,7 @@ export function game(): void {
 
     // Systems
     controlsSystem(heap);
+    runActionSystem(heap);
 
     gameTimeSystem(heap, ticker);
     colliderSystem(heap, ticker);
