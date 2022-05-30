@@ -10,7 +10,7 @@ import {
     SurfaceMeshesMatrix,
     SurfaceMeshesMatrixID,
 } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
-import { $object, TILE_SIZE } from '../../CONST';
+import { $ref, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
 import { Matrix } from '../../utils/Matrix';
@@ -33,7 +33,7 @@ export function initMatrixMeshesSystem(heap: GameHeap) {
 function initReliefMeshMatrix(meshesMatrix: ReliefMeshesMatrix) {
     Matrix.fill(meshesMatrix.matrix, () => {
         return {
-            [$object]: new Mesh(
+            [$ref]: new Mesh(
                 new PlaneGeometry(),
                 new MeshLambertMaterial({
                     transparent: true,
@@ -47,7 +47,7 @@ function initReliefMeshMatrix(meshesMatrix: ReliefMeshesMatrix) {
 function initSurfaceMeshMatrix(meshesMatrix: SurfaceMeshesMatrix) {
     Matrix.fill(meshesMatrix.matrix, () => {
         return {
-            [$object]: new Mesh(
+            [$ref]: new Mesh(
                 new PlaneGeometry(TILE_SIZE, TILE_SIZE),
                 new MeshLambertMaterial(),
             ),

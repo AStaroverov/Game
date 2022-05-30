@@ -18,11 +18,7 @@ import {
     MeshComponent,
     MeshComponentID,
 } from '../../Components/Renders/MeshComponent';
-import {
-    $object,
-    CENTER_CARD_POSITION,
-    HALF_RENDER_CARD_SIZE,
-} from '../../CONST';
+import { $ref, CENTER_CARD_POSITION, HALF_RENDER_CARD_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GlobalLightEntityID } from '../../Entities/GlobalLight';
 import { GameHeap } from '../../heap';
@@ -53,10 +49,10 @@ export function meshesSystem(
 
     function tick() {
         const staticMeshes = [
-            spotLight[$object],
-            spotLight[$object]?.target,
-            ...Matrix.toArray(surfaceMeshes.matrix).map((v) => v[$object]),
-            ...Matrix.toArray(reliefMeshes.matrix).map((v) => v[$object]),
+            spotLight[$ref],
+            spotLight[$ref]?.target,
+            ...Matrix.toArray(surfaceMeshes.matrix).map((v) => v[$ref]),
+            ...Matrix.toArray(reliefMeshes.matrix).map((v) => v[$ref]),
         ].filter(
             <T>(object: undefined | T): object is T => object !== undefined,
         );
@@ -95,7 +91,7 @@ export function meshesSystem(
                 );
 
             mesh.forEach((struct) => {
-                const object = struct[$object];
+                const object = struct[$ref];
 
                 if (object) {
                     scenes[struct.layer].add(object);

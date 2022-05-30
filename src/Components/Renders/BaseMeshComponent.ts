@@ -2,7 +2,7 @@ import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
 import { MeshLambertMaterialParameters } from 'three/src/materials/MeshLambertMaterial';
 
 import { createComponent, ExtractStruct } from '../../../lib/ECS/Component';
-import { $object } from '../../CONST';
+import { $ref } from '../../CONST';
 import { Layer } from '../../Renderer';
 import { Size } from '../../utils/shape';
 import { createMeshComponent } from './MeshComponent';
@@ -25,7 +25,7 @@ export const createBaseMeshComponent = (
 export function initBaseMeshStruct<M extends BaseMesh = BaseMesh>(
     struct: ExtractStruct<BaseMeshComponent>,
 ): void {
-    struct[$object] = new Mesh(
+    struct[$ref] = new Mesh(
         new PlaneGeometry(struct.w, struct.h),
         new MeshLambertMaterial({
             transparent: struct.transparent,

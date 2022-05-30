@@ -2,7 +2,7 @@ import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { getEntities } from '../../../lib/ECS/Heap';
 import { GameTimeComponentID } from '../../Components/GameTime';
 import { SpotLightMeshComponentID } from '../../Components/Renders/LightComponent';
-import { $object } from '../../CONST';
+import { $ref } from '../../CONST';
 import { GlobalLightEntityID } from '../../Entities/GlobalLight';
 import { WorldEntityID } from '../../Entities/World';
 import { GameHeap } from '../../heap';
@@ -25,7 +25,7 @@ export function globalLightRenderSystem(
     ticker.addTimeInterval(update, 1_000);
 
     function update() {
-        const light = spotLight[$object];
+        const light = spotLight[$ref];
 
         if (light) {
             light.angle = 0.6 + (1 + cos(gameTime.time / ONE_DAY)) / 2;

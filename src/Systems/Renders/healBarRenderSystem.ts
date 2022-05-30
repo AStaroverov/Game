@@ -16,7 +16,7 @@ import {
     VisualSizeComponent,
     VisualSizeComponentID,
 } from '../../Components/VisualSize';
-import { $object, TILE_SIZE } from '../../CONST';
+import { $ref, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
 import { mulVector, newVector, setVector, sumVector } from '../../utils/shape';
@@ -49,7 +49,7 @@ export function healBarRenderSystem(
             const size = getComponentStruct(entity, VisualSizeComponentID);
             const position = getComponentStruct(entity, PositionComponentID);
             const healBar = getComponentStruct(entity, HealBarMeshComponentID);
-            const group = healBar[$object];
+            const group = healBar[$ref];
 
             if (group) {
                 const nextPosition = sumVector(

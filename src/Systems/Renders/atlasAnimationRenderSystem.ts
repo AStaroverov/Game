@@ -15,7 +15,7 @@ import {
     BaseMeshComponent,
     BaseMeshComponentID,
 } from '../../Components/Renders/BaseMeshComponent';
-import { $object } from '../../CONST';
+import { $ref } from '../../CONST';
 import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
@@ -52,7 +52,7 @@ function animate(
 ): void {
     updateAtlasAnimation(animation, delta);
 
-    const mesh = component[$object];
+    const mesh = component[$ref];
     const atlas = atlases[animation.atlasName];
     const texture = atlas.list[animation.atlasFrame].texture;
 

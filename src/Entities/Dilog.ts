@@ -11,7 +11,7 @@ import {
     MeshComponent,
     MeshComponentID,
 } from '../Components/Renders/MeshComponent';
-import { $object } from '../CONST';
+import { $ref } from '../CONST';
 import { Layer } from '../Renderer';
 
 type DialogGroup = Group & {
@@ -57,12 +57,12 @@ export function initDialogEntityMesh(
     group.groupText = groupText;
     group.add(background, groupText);
 
-    struct[$object] = group;
+    struct[$ref] = group;
 }
 
 export function setDialogText(entity: DialogEntity, text: string): void {
     const struct = getComponentStruct(entity, MeshComponentID);
-    const groupText = struct[$object]?.groupText;
+    const groupText = struct[$ref]?.groupText;
 
     if (groupText === undefined) return;
 

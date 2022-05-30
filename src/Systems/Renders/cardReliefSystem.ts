@@ -6,7 +6,7 @@ import { getMatrixCell, getMatrixSlice } from '../../Components/Matrix/Matrix';
 import { ReliefMeshesMatrixID } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
 import { TilesMatrixID, TileType } from '../../Components/Matrix/TilesMatrix';
 import { PositionComponentID } from '../../Components/Position';
-import { $object, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
+import { $ref, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { atlasTrees, CardEntityID } from '../../Entities/Card';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
@@ -64,7 +64,7 @@ export function cardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
             getMatrixSlice(cardTiles, abs.x, abs.y, RENDER_RADIUS),
             (tile, x, y) => {
                 const cell = getMatrixCell(meshes, x, y);
-                const mesh = cell?.[$object];
+                const mesh = cell?.[$ref];
 
                 if (mesh === undefined) {
                     return;

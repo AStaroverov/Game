@@ -7,7 +7,7 @@ import { getMatrixCell, getMatrixSlice } from '../../Components/Matrix/Matrix';
 import { SurfaceMeshesMatrixID } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
 import { TilesMatrixID } from '../../Components/Matrix/TilesMatrix';
 import { PositionComponentID } from '../../Components/Position';
-import { $object, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
+import { $ref, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
@@ -60,7 +60,7 @@ export function cardSurfaceSystem(
             getMatrixSlice(cardTiles, abs.x, abs.y, RENDER_RADIUS),
             (tile, x, y) => {
                 const cell = getMatrixCell(cardMeshes, x, y);
-                const mesh = cell?.[$object];
+                const mesh = cell?.[$ref];
 
                 if (tile && mesh) {
                     mesh.visible = true;

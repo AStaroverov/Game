@@ -13,7 +13,7 @@ import {
     BaseMeshComponent,
     BaseMeshComponentID,
 } from '../../Components/Renders/BaseMeshComponent';
-import { $object, TILE_SIZE } from '../../CONST';
+import { $ref, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
 import { worldYToPositionZ } from '../../utils/positionZ';
@@ -56,7 +56,7 @@ function setPositionMesh(
     struct: ExtractStruct<BaseMeshComponent>,
     position: Vector,
 ): void {
-    const mesh = struct[$object];
+    const mesh = struct[$ref];
 
     if (mesh !== undefined) {
         mesh.position.x = (position.x - 0.5) * TILE_SIZE;

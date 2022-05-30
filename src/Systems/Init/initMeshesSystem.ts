@@ -25,7 +25,7 @@ import {
     MeshComponent,
     MeshComponentID,
 } from '../../Components/Renders/MeshComponent';
-import { $object } from '../../CONST';
+import { $ref } from '../../CONST';
 import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
@@ -53,7 +53,7 @@ function initBasicMesh(
     )
         .map(getStruct)
         .forEach((mesh) => {
-            if (mesh && mesh[$object] === undefined) {
+            if (mesh && mesh[$ref] === undefined) {
                 initBaseMeshStruct(mesh);
             }
         });
@@ -67,7 +67,7 @@ function initHealBarMesh(
     )
         .map(getStruct)
         .forEach((healBarMesh) => {
-            if (healBarMesh && healBarMesh[$object] === undefined) {
+            if (healBarMesh && healBarMesh[$ref] === undefined) {
                 initHealBarStruct(healBarMesh);
             }
         });

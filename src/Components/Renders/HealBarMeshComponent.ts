@@ -1,7 +1,7 @@
 import { Group, Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
 
 import { createComponent, ExtractStruct } from '../../../lib/ECS/Component';
-import { $object, HEAL_BAR_Z } from '../../CONST';
+import { $ref, HEAL_BAR_Z } from '../../CONST';
 import { Layer } from '../../Renderer';
 import { createMeshComponent } from './MeshComponent';
 
@@ -43,5 +43,5 @@ export function initHealBarStruct(
     group.position.z = HEAL_BAR_Z;
     group.add(backgroundMesh, healMesh);
 
-    struct[$object] = group;
+    struct[$ref] = group;
 }

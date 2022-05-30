@@ -13,7 +13,7 @@ import {
     BaseMeshComponent,
     BaseMeshComponentID,
 } from '../../Components/Renders/BaseMeshComponent';
-import { $object } from '../../CONST';
+import { $ref } from '../../CONST';
 import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
@@ -46,12 +46,12 @@ function rotate(
     mesh: ExtractStruct<BaseMeshComponent>,
     direction: ExtractStruct<DirectionComponent>,
 ) {
-    if (mesh[$object] === undefined) return;
+    if (mesh[$ref] === undefined) return;
 
     if (direction.x > 0) {
-        mesh[$object]!.scale.x = 1;
+        mesh[$ref]!.scale.x = 1;
     }
     if (direction.x < 0) {
-        mesh[$object]!.scale.x = -1;
+        mesh[$ref]!.scale.x = -1;
     }
 }
