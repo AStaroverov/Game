@@ -1,36 +1,17 @@
-import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
-import { MeshLambertMaterialParameters } from 'three/src/materials/MeshLambertMaterial';
+import { Object3D } from 'three/src/core/Object3D';
 
-import { createComponent, ReturnStruct } from '../../../lib/ECS/Component';
+import { createComponent, ExtractStruct } from '../../../lib/ECS/Component';
 import { $object } from '../../CONST';
-import { Size } from '../../utils/shape';
+import { Layer } from '../../Renderer';
 
 export const MeshComponentID = 'MESH' as const;
-export type MeshStruct = ReturnStruct<typeof createMeshComponent>;
 export type MeshComponent = ReturnType<typeof createMeshComponent>;
-export const createMeshComponent = (
-    props?: Partial<
-        Size & Pick<MeshLambertMaterialParameters, 'transparent' | 'alphaTest'>
-    >,
-) =>
+export const createMeshComponent = <T extends Object3D>(layer: Layer) =>
     createComponent(MeshComponentID, {
-        [$object]: undefined as
-            | undefined
-            | Mesh<PlaneGeometry, MeshLambertMaterial>,
-        ...props,
+        layer,
+        [$object]: undefined as undefined | T,
     });
 
-export function initMeshStruct<
-    M extends Mesh<PlaneGeometry, MeshLambertMaterial> = Mesh<
-        PlaneGeometry,
-        MeshLambertMaterial
-    >,
->(struct: MeshStruct): void {
-    struct[$object] = new Mesh(
-        new PlaneGeometry(struct.w, struct.h),
-        new MeshLambertMaterial({
-            transparent: struct.transparent,
-            alphaTest: struct.alphaTest,
-        }),
-    );
+export function shouldInitMesh(struct: ExtractStruct<MeshComponent>) {
+    return struct[$object] === undefined;
 }

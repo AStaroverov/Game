@@ -5,6 +5,7 @@ import { runActionSystem } from '../Systems/ActionSystem';
 import { cardSystem } from '../Systems/cardSystem';
 import { colliderSystem } from '../Systems/colliderSystem';
 import { controlsSystem } from '../Systems/controlsSystem';
+import { runDialogSystem } from '../Systems/DialogSystem';
 import { EnemySpawnSystem } from '../Systems/enemySpawnSystem';
 import { enemySystem } from '../Systems/enemySystem';
 import { gameTimeSystem } from '../Systems/gameTimeSystem';
@@ -21,6 +22,7 @@ import { positionBodySystem } from '../Systems/positionBodySystem';
 import { atlasAnimationRenderSystem } from '../Systems/Renders/atlasAnimationRenderSystem';
 import { cardReliefSystem } from '../Systems/Renders/cardReliefSystem';
 import { cardSurfaceSystem } from '../Systems/Renders/cardSurfaceSystem';
+import { runDialogRenderSystem } from '../Systems/Renders/DialogRenderSystem';
 import { enemyRenderSystem } from '../Systems/Renders/enemyRenderSystem';
 import { globalLightRenderSystem } from '../Systems/Renders/globalLightRenderSystem';
 import { healBarRenderSystem } from '../Systems/Renders/healBarRenderSystem';
@@ -71,7 +73,7 @@ export function game(): void {
 
     // Render Systems
     globalLightRenderSystem(heap, ticker);
-    meshesSystem(heap, ticker, renderer.scene);
+    meshesSystem(heap, ticker, renderer.scenes);
 
     cardSurfaceSystem(heap, ticker);
     cardReliefSystem(heap, ticker);
@@ -85,5 +87,28 @@ export function game(): void {
 
     healBarRenderSystem(heap, ticker);
 
-    document.body.append(renderer.renderer.domElement);
+    // DIALOG
+    runDialogSystem(heap, ticker);
+    runDialogRenderSystem(heap, ticker);
+
+    document.body.append(renderer.renderers['Main'].domElement);
+    document.body.append(renderer.renderers['Fixed'].domElement);
+    styleCanvases();
+}
+
+function styleCanvases() {
+    const style = document.createElement('style');
+
+    // language=CSS
+    style.textContent = `
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    `;
+
+    document.head.appendChild(style);
 }

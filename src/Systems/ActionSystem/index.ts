@@ -4,28 +4,26 @@ import {
     getComponentStruct,
     hasComponent,
     SomeEntity,
-} from '../../lib/ECS/Entity';
-import { filterEntities, getEntities } from '../../lib/ECS/Heap';
+} from '../../../lib/ECS/Entity';
+import { addEntity, filterEntities, getEntities } from '../../../lib/ECS/Heap';
 import {
     ActionableComponent,
     ActionableComponentID,
-} from '../Components/Actionable';
-import { DirectionComponentID } from '../Components/DirectionComponent';
-import { PositionComponent, PositionComponentID } from '../Components/Position';
-import { PlayerEntityID } from '../Entities/Player';
-import { GameHeap } from '../heap';
-import { negateVector, sumVector, widthVector } from '../utils/shape';
-
-export enum PlayerMainStoryAction {
-    Next = 'Next',
-}
+} from '../../Components/Actionable';
+import { DirectionComponentID } from '../../Components/DirectionComponent';
+import {
+    PositionComponent,
+    PositionComponentID,
+} from '../../Components/Position';
+import { createDialogEntity } from '../../Entities/Dilog';
+import { PlayerEntityID } from '../../Entities/Player';
+import { GameHeap } from '../../heap';
+import { negateVector, sumVector, widthVector } from '../../utils/shape';
 
 export enum CommonAction {
     Open = 'Open',
+    Dialog = 'Dialog',
 }
-
-export type QuestAction = PlayerMainStoryAction;
-export type PlayerAction = CommonAction | PlayerMainStoryAction;
 
 export function runActionSystem(heap: GameHeap): void {
     const player = getEntities(heap, PlayerEntityID)[0];
@@ -57,10 +55,18 @@ export function runActionSystem(heap: GameHeap): void {
                     sumVector(playerLookingAtPosition, negateVector(position)),
                 );
 
-                console.log('>> dist', dist);
+                if (dist > 1) return;
 
-                if (dist < 1) {
-                    console.log('>> GOGOGO');
+                const action = getComponentStruct(
+                    entity,
+                    ActionableComponentID,
+                );
+
+                if (action.type === CommonAction.Dialog) {
+                    addEntity(
+                        heap,
+                        createDialogEntity({ id: action.dialogID }),
+                    );
                 }
             });
         });

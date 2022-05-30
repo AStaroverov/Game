@@ -23,6 +23,7 @@ export const PLAYER_START_POSITION = mapVector(
     (v) => v + 0.5,
 );
 
+export const DIALOG_Z = 110;
 export const HEAL_BAR_Z = 100;
 
 export const $object = Symbol('OBJECT');

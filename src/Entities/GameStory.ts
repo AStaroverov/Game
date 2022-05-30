@@ -1,5 +1,5 @@
 import { createEntity } from '../../lib/ECS/Entity';
-import { createPlayerStoryComponent } from '../Components/MainStoryProgress';
+import { createPlayerStoryComponent } from '../Components/PlayerStoryProgress';
 
 export const GameStoryEntityID = 'GAME_STORY_ENTITY' as const;
 export type GameStoryEntity = ReturnType<typeof createGameStoryEntity>;

@@ -1,17 +1,18 @@
 import { getComponentStruct } from '../../lib/ECS/Entity';
 import { addEntity, getEntities } from '../../lib/ECS/Heap';
 import Enumerable from '../../lib/linq';
+import { DialogID } from '../Components/Dialogs/data';
 import { DirectionComponentID } from '../Components/DirectionComponent';
-import {
-    PlayerStoryComponentID,
-    PlayerStoryStep,
-} from '../Components/MainStoryProgress';
 import {
     Tile,
     TilesMatrix,
     TilesMatrixID,
     TileType,
 } from '../Components/Matrix/TilesMatrix';
+import {
+    PlayerStoryComponentID,
+    PlayerStoryStep,
+} from '../Components/PlayerStoryProgress';
 import { PositionComponentID } from '../Components/Position';
 import { TypeComponentID } from '../Components/Type';
 import {
@@ -42,7 +43,7 @@ import {
     Vector,
 } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
-import { PlayerMainStoryAction } from './ActionSystem';
+import { CommonAction } from './ActionSystem';
 
 export function NpcSpawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const cardEntity = getEntities(heap, CardEntityID)[0];
@@ -70,17 +71,21 @@ function updateFirstNPC(
     const playerStory = getComponentStruct(gameStory, PlayerStoryComponentID);
 
     const NPCes = getEntities(heap, NPCEntityID);
-    const firstNPC = NPCes.find((NPC) => {
-        const type = getComponentStruct(NPC, TypeComponentID);
-        return type.type === NPCType.First;
-    });
 
-    if (
-        firstNPC === undefined &&
-        playerStory.currentStep === PlayerStoryStep.NewGame
-    ) {
-        const npc = tryAddFirstNpc(cardTiles, cardPosition, playerDirection);
-        npc && addEntity(heap, npc);
+    if (playerStory.currentStep === PlayerStoryStep.NewGame) {
+        const firstNPC = NPCes.find((NPC) => {
+            const type = getComponentStruct(NPC, TypeComponentID);
+            return type.type === NPCType.First;
+        });
+
+        if (firstNPC === undefined) {
+            const npc = tryAddFirstNpc(
+                cardTiles,
+                cardPosition,
+                playerDirection,
+            );
+            npc && addEntity(heap, npc);
+        }
     }
 }
 
@@ -95,7 +100,10 @@ function tryAddFirstNpc(
 
     const npc = createNpcEntity({
         type: NPCType.First,
-        actionType: PlayerMainStoryAction.Next,
+        action: {
+            type: CommonAction.Dialog,
+            dialogID: DialogID.FirstMeeting,
+        },
     });
     const position = getComponentStruct(npc, PositionComponentID);
 

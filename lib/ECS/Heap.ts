@@ -35,12 +35,7 @@ export function deleteEntity<H extends Heap, E extends Entity>(
     heap: H,
     entity: E,
 ): void {
-    const arr = heap.entities[entity[$entity]];
-    const index = arr !== undefined ? arr.indexOf(entity) : -1;
-
-    if (index !== -1) {
-        arr.slice(index, 1);
-    }
+    delete heap.entities[entity[$entity]];
 }
 
 export function getSnapshot(heap: Heap): object {

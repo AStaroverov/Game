@@ -12,19 +12,19 @@ import {
 } from '../../../lib/ECS/Entity';
 import { filterEntities } from '../../../lib/ECS/Heap';
 import {
+    BaseMeshComponent,
+    BaseMeshComponentID,
+    initBaseMeshStruct,
+} from '../../Components/Renders/BaseMeshComponent';
+import {
     HealBarMeshComponent,
     HealBarMeshComponentID,
     initHealBarStruct,
 } from '../../Components/Renders/HealBarMeshComponent';
 import {
-    initMeshStruct,
     MeshComponent,
     MeshComponentID,
 } from '../../Components/Renders/MeshComponent';
-import {
-    MeshGroupComponent,
-    MeshGroupComponentID,
-} from '../../Components/Renders/MeshGroupComponent';
 import { $object } from '../../CONST';
 import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
@@ -35,44 +35,32 @@ export function initMeshesSystem(heap: GameHeap, ticker: TasksScheduler) {
     function update() {
         filterEntities(
             heap,
-            (
-                e,
-            ): e is
-                | SomeEntity<InheritedComponent<MeshComponent>>
-                | SomeEntity<InheritedComponent<MeshGroupComponent>> => {
-                return (
-                    hasInheritedComponent(e, MeshComponentID) ||
-                    hasInheritedComponent(e, MeshGroupComponentID)
-                );
+            (e): e is SomeEntity<InheritedComponent<MeshComponent>> => {
+                return hasInheritedComponent(e, MeshComponentID);
             },
         ).forEach((entity) => {
-            if (hasInheritedComponent(entity, MeshComponentID)) {
-                initInheritedMeshes(entity);
-            }
-
-            if (hasInheritedComponent(entity, MeshGroupComponentID)) {
-                initInheritedGroups(entity);
-            }
+            initBasicMesh(entity);
+            initHealBarMesh(entity);
         });
     }
 }
 
-function initInheritedMeshes(
-    entity: SomeEntity<AnyComponent | InheritedComponent<MeshComponent>>,
+function initBasicMesh(
+    entity: SomeEntity<AnyComponent | InheritedComponent<BaseMeshComponent>>,
 ) {
-    filterComponents(entity, (c): c is MeshComponent =>
-        isInheritedComponent(c, MeshComponentID),
+    filterComponents(entity, (c): c is BaseMeshComponent =>
+        isInheritedComponent(c, BaseMeshComponentID),
     )
         .map(getStruct)
         .forEach((mesh) => {
             if (mesh && mesh[$object] === undefined) {
-                initMeshStruct(mesh);
+                initBaseMeshStruct(mesh);
             }
         });
 }
 
-function initInheritedGroups(
-    entity: SomeEntity<AnyComponent | InheritedComponent<MeshGroupComponent>>,
+function initHealBarMesh(
+    entity: SomeEntity<AnyComponent | HealBarMeshComponent>,
 ) {
     filterComponents(entity, (c): c is HealBarMeshComponent =>
         isComponent(c, HealBarMeshComponentID),

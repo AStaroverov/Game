@@ -8,8 +8,8 @@ import {
 import { createDirectionComponent } from '../../Components/DirectionComponent';
 import { createHealComponent } from '../../Components/Heal';
 import { createPositionComponent } from '../../Components/Position';
+import { createBaseMeshComponent } from '../../Components/Renders/BaseMeshComponent';
 import { createHealBarMeshComponent } from '../../Components/Renders/HealBarMeshComponent';
-import { createMeshComponent } from '../../Components/Renders/MeshComponent';
 import { createVelocityComponent } from '../../Components/Velocity';
 import { createVisualSizeComponent } from '../../Components/VisualSize';
 import { TILE_SIZE } from '../../CONST';
@@ -26,7 +26,7 @@ export const createEnemyEntity = (maxHP = 1) => {
         createPositionComponent(),
         createDirectionComponent(),
         createVelocityComponent(),
-        createMeshComponent({
+        createBaseMeshComponent({
             w: enemyAtlas.w * 2.2,
             h: enemyAtlas.h * 2.2,
             transparent: true,

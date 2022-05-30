@@ -144,7 +144,8 @@ export function tryGetComponentStruct<S extends object>(
     e: Entity,
     tag: string,
 ): void | ExtractStruct<S> {
-    return getStruct(__getEntityComponent(e, tag)) as void | ExtractStruct<S>;
+    const comp = __getEntityComponent(e, tag);
+    return (comp && getStruct(comp)) as void | ExtractStruct<S>;
 }
 
 export function filterComponents<

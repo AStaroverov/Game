@@ -1,5 +1,3 @@
-import { Scene } from 'three';
-
 import { InheritedComponent } from '../../../lib/ECS/Component';
 import {
     getComponentStruct,
@@ -21,10 +19,6 @@ import {
     MeshComponentID,
 } from '../../Components/Renders/MeshComponent';
 import {
-    MeshGroupComponent,
-    MeshGroupComponentID,
-} from '../../Components/Renders/MeshGroupComponent';
-import {
     $object,
     CENTER_CARD_POSITION,
     HALF_RENDER_CARD_SIZE,
@@ -32,6 +26,7 @@ import {
 import { CardEntityID } from '../../Entities/Card';
 import { GlobalLightEntityID } from '../../Entities/GlobalLight';
 import { GameHeap } from '../../heap';
+import { Layer, Scenes } from '../../Renderer';
 import { abs } from '../../utils/math';
 import { Matrix } from '../../utils/Matrix';
 import { mulVector, sumVector } from '../../utils/shape';
@@ -40,7 +35,7 @@ import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 export function meshesSystem(
     heap: GameHeap,
     ticker: TasksScheduler,
-    scene: Scene,
+    scenes: Scenes,
 ): void {
     const globalLightEntity = getEntities(heap, GlobalLightEntityID)[0];
     const spotLight = getComponentStruct(
@@ -66,30 +61,20 @@ export function meshesSystem(
             <T>(object: undefined | T): object is T => object !== undefined,
         );
 
-        scene.clear();
+        scenes[Layer.Main].clear();
+        scenes[Layer.Fixed].clear();
 
         if (staticMeshes.length > 0) {
-            scene.add(...staticMeshes);
+            scenes[Layer.Main].add(...staticMeshes);
         }
 
         filterEntities(
             heap,
-            (
-                e,
-            ): e is
-                | SomeEntity<InheritedComponent<MeshComponent>>
-                | SomeEntity<InheritedComponent<MeshGroupComponent>> => {
-                return (
-                    hasInheritedComponent(e, MeshComponentID) ||
-                    hasInheritedComponent(e, MeshGroupComponentID)
-                );
+            (e): e is SomeEntity<InheritedComponent<MeshComponent>> => {
+                return hasInheritedComponent(e, MeshComponentID);
             },
         ).forEach((entity) => {
             const mesh = getInheritedComponentStructs(entity, MeshComponentID);
-            const group = getInheritedComponentStructs(
-                entity,
-                MeshGroupComponentID,
-            );
             const position = tryGetComponentStruct<PositionComponent>(
                 entity,
                 PositionComponentID,
@@ -109,11 +94,11 @@ export function meshesSystem(
                     abs(diff.y) > HALF_RENDER_CARD_SIZE + 5
                 );
 
-            [...mesh, ...group].forEach((withObject) => {
-                const object = withObject[$object];
+            mesh.forEach((struct) => {
+                const object = struct[$object];
 
                 if (object) {
-                    scene.add(object);
+                    scenes[struct.layer].add(object);
 
                     if (isVisible !== undefined) {
                         object.visible = isVisible;

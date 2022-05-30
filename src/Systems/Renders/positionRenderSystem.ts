@@ -10,9 +10,9 @@ import {
     PositionComponentID,
 } from '../../Components/Position';
 import {
-    MeshComponent,
-    MeshComponentID,
-} from '../../Components/Renders/MeshComponent';
+    BaseMeshComponent,
+    BaseMeshComponentID,
+} from '../../Components/Renders/BaseMeshComponent';
 import { $object, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
@@ -33,13 +33,15 @@ export function positionRenderSystem(
     function tick() {
         const entities = filterEntities(
             heap,
-            (entity): entity is SomeEntity<MeshComponent | PositionComponent> =>
-                hasComponent(entity, MeshComponentID) &&
+            (
+                entity,
+            ): entity is SomeEntity<BaseMeshComponent | PositionComponent> =>
+                hasComponent(entity, BaseMeshComponentID) &&
                 hasComponent(entity, PositionComponentID),
         );
 
         entities.forEach((entity) => {
-            const mesh = getComponentStruct(entity, MeshComponentID);
+            const mesh = getComponentStruct(entity, BaseMeshComponentID);
             const position = getComponentStruct(entity, PositionComponentID);
 
             setPositionMesh(
@@ -51,7 +53,7 @@ export function positionRenderSystem(
 }
 
 function setPositionMesh(
-    struct: ExtractStruct<MeshComponent>,
+    struct: ExtractStruct<BaseMeshComponent>,
     position: Vector,
 ): void {
     const mesh = struct[$object];
