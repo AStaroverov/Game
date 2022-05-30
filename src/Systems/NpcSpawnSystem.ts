@@ -78,7 +78,11 @@ function updateFirstNPC(
             return type.type === NPCType.First;
         });
 
-        if (firstNPC === undefined) {
+        if (
+            firstNPC === undefined &&
+            (playerDirection.x !== 0 || playerDirection.y !== 0)
+        ) {
+            console.log('>>add');
             const npc = tryAddFirstNpc(
                 cardTiles,
                 cardPosition,
@@ -124,15 +128,18 @@ function getRandomTile(
     return Enumerable.from(
         rectangleIterate(cardTiles.matrix, sx, sy, w, h),
     ).firstOrDefault(({ value, x, y }) => {
-        if (value.type !== TileType.passable) return false;
+        if (value.type !== TileType.passable) {
+            return false;
+        }
 
         const normalizedTilePosition = mapVector(
             newVector((x - sx) / w, (y - sy) / h),
             floor,
         );
 
-        if (!isEqualVectors(normalizedTilePosition, playerDirection))
+        if (!isEqualVectors(normalizedTilePosition, playerDirection)) {
             return false;
+        }
 
         return random() > 0.9;
     }, undefined);
