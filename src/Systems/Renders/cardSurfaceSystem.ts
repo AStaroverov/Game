@@ -1,11 +1,13 @@
 import { Color, TextureLoader } from 'three';
 
 import imageGrass from '../../../assets/sprites/tilesets/grass.png';
+import imagePlains from '../../../assets/sprites/tilesets/plains.png';
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { getEntities } from '../../../lib/ECS/Heap';
 import { getMatrixCell, getMatrixSlice } from '../../Components/Matrix/Matrix';
 import { SurfaceMeshesMatrixID } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
 import { TilesMatrixID } from '../../Components/Matrix/TilesMatrix';
+import { TileSubtype } from '../../Components/Matrix/TilesMatrix/def';
 import { PositionComponentID } from '../../Components/Position';
 import { $ref, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
@@ -19,6 +21,7 @@ import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 const RENDER_RADIUS = Math.floor(RENDER_CARD_SIZE / 2);
 const TEXTURE_GRASS = new TextureLoader().load(imageGrass);
+const TEXTURE_ROAD = new TextureLoader().load(imagePlains);
 
 export function cardSurfaceSystem(
     heap: GameHeap,
@@ -82,8 +85,19 @@ export function cardSurfaceSystem(
                         mesh.material.color = salt.color;
                     }
 
-                    if (mesh.material.map !== TEXTURE_GRASS) {
+                    if (
+                        tile.subtype === TileSubtype.gross &&
+                        mesh.material.map !== TEXTURE_GRASS
+                    ) {
                         mesh.material.map = TEXTURE_GRASS;
+                        mesh.material.needsUpdate = true;
+                    }
+
+                    if (
+                        tile.subtype === TileSubtype.road &&
+                        mesh.material.map !== TEXTURE_ROAD
+                    ) {
+                        mesh.material.map = TEXTURE_ROAD;
                         mesh.material.needsUpdate = true;
                     }
                 } else if (mesh) {

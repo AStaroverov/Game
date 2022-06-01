@@ -4,11 +4,8 @@ import { BiAStarFinder, DiagonalMovement, Grid } from 'pathfinding';
 import { getComponentStruct } from '../../lib/ECS/Entity';
 import { getEntities } from '../../lib/ECS/Heap';
 import { DirectionComponentID } from '../Components/DirectionComponent';
-import {
-    Tile,
-    TilesMatrixID,
-    TileType,
-} from '../Components/Matrix/TilesMatrix';
+import { TilesMatrixID } from '../Components/Matrix/TilesMatrix';
+import { Tile, TileType } from '../Components/Matrix/TilesMatrix/def';
 import { PositionComponentID } from '../Components/Position';
 import { setVelocity, VelocityComponentID } from '../Components/Velocity';
 import { CardEntityID } from '../Entities/Card';

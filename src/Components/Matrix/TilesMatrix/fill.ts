@@ -1,58 +1,12 @@
 import { uniq } from 'lodash';
 import { pipe } from 'lodash/fp';
 
-import { createComponent, ReturnStruct } from '../../../lib/ECS/Component';
-import Enumerable from '../../../lib/linq';
-import { Matrix } from '../../utils/Matrix';
-import { Item, radialIterate } from '../../utils/Matrix/radialIterate';
-import { Size, Vector } from '../../utils/shape';
-import { createMatrixComponent } from './Matrix';
+import Enumerable from '../../../../lib/linq';
+import { Item, radialIterate } from '../../../utils/Matrix/radialIterate';
+import { Tile, TileSubtype, TileType } from './def';
+import { TilesMatrix, updateTile } from './index';
 
-export enum TileType {
-    empty = 'empty',
-    passable = 'passable',
-    impassable = 'impassable',
-}
-
-export type Tile = {
-    type: TileType;
-};
-
-const GET_EMPTY_TILE = (): Tile => ({
-    type: TileType.empty,
-});
-
-export const TilesMatrixID = 'TILES_MATRIX' as const;
-export type TilesMatrix = ReturnStruct<typeof createTilesMatrixComponent>;
-export const createTilesMatrixComponent = (props: Size) =>
-    createComponent(
-        TilesMatrixID,
-        createMatrixComponent({ ...props, seed: GET_EMPTY_TILE }),
-    );
-
-export function tilesInit(struct: TilesMatrix, x: number, y: number): void {
-    if (Matrix.get(struct.matrix, x, y).type === TileType.empty) {
-        Matrix.set(struct.matrix, x, y, { type: TileType.passable });
-    }
-
-    tilesFillEmpty(struct);
-}
-
-export function tilesMove({ matrix }: TilesMatrix, v: Vector): void {
-    const { w, h } = matrix;
-    const tmp = Matrix.create<Tile>(w, h, GET_EMPTY_TILE);
-
-    for (let i = 0; i < w; i++) {
-        for (let j = 0; j < h; j++) {
-            const prevTile = Matrix.get(matrix, i + v.x, j + v.y);
-            prevTile && Matrix.set(tmp, i, j, prevTile);
-        }
-    }
-
-    Matrix.setSource(matrix, tmp.buffer.slice());
-}
-
-export function tilesFillEmpty({ matrix }: TilesMatrix): void {
+export function fillEmptyTiles({ matrix }: TilesMatrix): void {
     Enumerable.from(
         radialIterate(
             matrix,
@@ -60,7 +14,6 @@ export function tilesFillEmpty({ matrix }: TilesMatrix): void {
             Math.floor(matrix.w / 2),
         ),
     )
-        .skip(1)
         .where(
             (item): item is Item<Tile> => item?.value.type === TileType.empty,
         )
@@ -91,24 +44,27 @@ export function tilesFillEmpty({ matrix }: TilesMatrix): void {
                 getFromProbabilities(Math.random),
             )(summedProbabilities);
 
-            value.type = type as TileType;
+            updateTile(value, {
+                type: type as TileType,
+                subtype: TileSubtype.gross,
+            });
         });
 }
 
 type ProbabilityRecord<T extends string = string> = Record<T, number>;
-const tileProbabilities: Record<TileType, ProbabilityRecord<TileType>> = {
+const tileProbabilities: Record<
+    TileType,
+    Partial<ProbabilityRecord<TileType>>
+> = {
     [TileType.empty]: {
-        [TileType.empty]: 0,
         [TileType.passable]: 0,
         [TileType.impassable]: 0,
     },
     [TileType.passable]: {
-        [TileType.empty]: 0,
         [TileType.passable]: 0.97,
         [TileType.impassable]: 0.03,
     },
     [TileType.impassable]: {
-        [TileType.empty]: 0,
         [TileType.passable]: 0.15,
         [TileType.impassable]: 0.85,
     },

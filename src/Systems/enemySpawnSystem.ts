@@ -1,11 +1,8 @@
 import { getComponentStruct } from '../../lib/ECS/Entity';
 import { addEntity, getEntities } from '../../lib/ECS/Heap';
 import Enumerable from '../../lib/linq';
-import {
-    Tile,
-    TilesMatrixID,
-    TileType,
-} from '../Components/Matrix/TilesMatrix';
+import { TilesMatrixID } from '../Components/Matrix/TilesMatrix';
+import { Tile, TileType } from '../Components/Matrix/TilesMatrix/def';
 import { PositionComponentID } from '../Components/Position';
 import { CardEntityID } from '../Entities/Card';
 import { createEnemyEntity, EnemyEntityID } from '../Entities/Enemy';

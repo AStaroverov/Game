@@ -1,10 +1,7 @@
 import { getComponentStruct } from '../../lib/ECS/Entity';
 import { getEntities } from '../../lib/ECS/Heap';
-import {
-    tilesFillEmpty,
-    TilesMatrixID,
-    tilesMove,
-} from '../Components/Matrix/TilesMatrix';
+import { moveTiles, TilesMatrixID } from '../Components/Matrix/TilesMatrix';
+import { fillEmptyTiles } from '../Components/Matrix/TilesMatrix/fill';
 import { PositionComponentID } from '../Components/Position';
 import { CENTER_CARD_POSITION } from '../CONST';
 import { CardEntityID } from '../Entities/Card';
@@ -43,8 +40,8 @@ export function cardSystem(heap: GameHeap, ticker: TasksScheduler): void {
         );
 
         if (diff.x !== 0 || diff.y !== 0) {
-            tilesMove(cardTiles, diff);
-            tilesFillEmpty(cardTiles);
+            moveTiles(cardTiles, diff);
+            fillEmptyTiles(cardTiles);
         }
 
         setVector(position, nextPosition);

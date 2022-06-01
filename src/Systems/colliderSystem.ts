@@ -8,7 +8,8 @@ import {
     DirectionComponent,
     DirectionComponentID,
 } from '../Components/DirectionComponent';
-import { TilesMatrixID, TileType } from '../Components/Matrix/TilesMatrix';
+import { TilesMatrixID } from '../Components/Matrix/TilesMatrix';
+import { TileType } from '../Components/Matrix/TilesMatrix/def';
 import { PositionComponent, PositionComponentID } from '../Components/Position';
 import { VelocityComponent, VelocityComponentID } from '../Components/Velocity';
 import { CardEntityID } from '../Entities/Card';

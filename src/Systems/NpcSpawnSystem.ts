@@ -3,12 +3,8 @@ import { addEntity, getEntities } from '../../lib/ECS/Heap';
 import Enumerable from '../../lib/linq';
 import { DialogID } from '../Components/Dialogs/data';
 import { DirectionComponentID } from '../Components/DirectionComponent';
-import {
-    Tile,
-    TilesMatrix,
-    TilesMatrixID,
-    TileType,
-} from '../Components/Matrix/TilesMatrix';
+import { TilesMatrix, TilesMatrixID } from '../Components/Matrix/TilesMatrix';
+import { Tile, TileType } from '../Components/Matrix/TilesMatrix/def';
 import {
     PlayerStoryComponentID,
     PlayerStoryStep,
@@ -82,7 +78,6 @@ function updateFirstNPC(
             firstNPC === undefined &&
             (playerDirection.x !== 0 || playerDirection.y !== 0)
         ) {
-            console.log('>>add');
             const npc = tryAddFirstNpc(
                 cardTiles,
                 cardPosition,
