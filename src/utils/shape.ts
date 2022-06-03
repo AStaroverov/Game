@@ -1,4 +1,4 @@
-import { sqrt } from './math';
+import { sign, sqrt } from './math';
 
 export type Size = { w: number; h: number };
 export const newSize = (w: number, h?: number): Size => ({ w, h: h ?? w });
@@ -11,9 +11,10 @@ export type Vector = { x: number; y: number };
 
 export const newVector = (x: number, y: number): Vector => ({ x, y });
 
-export const setVector = (t: Vector, s: Vector): void => {
+export const setVector = (t: Vector, s: Vector): Vector => {
     t.x = s.x;
     t.y = s.y;
+    return t;
 };
 export const copyVector = (v: Vector): Vector => newVector(v.x, v.y);
 
@@ -37,6 +38,9 @@ export const widthVector = (a: Vector): number => sqrt(a.x ** 2 + a.y ** 2);
 export const isEqualVectors = (a: Vector, b: Vector): boolean =>
     a.x === b.x && a.y === b.y;
 
+export const hasEqualDirection = (a: Vector, b: Vector): boolean =>
+    isEqualVectors(mapVector(a, sign), mapVector(b, sign));
+
 export const stringVector = (v: Vector): string => `Vector{${v.x},${v.y}`;
 
-export const emptyVector = newVector(0, 0);
+export const zeroVector = newVector(0, 0);

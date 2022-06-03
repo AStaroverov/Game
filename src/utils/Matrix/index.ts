@@ -18,24 +18,24 @@ export function create<T>(
     return instance;
 }
 
+export function forEach<T>(
+    matrix: TMatrix<T>,
+    callback: (item: T, x: number, y: number, i: number) => void,
+): void {
+    matrix.buffer.forEach((v, i) => {
+        const x = i % matrix.w;
+        const y = (i / matrix.w) | 0;
+
+        callback(v, x, y, i);
+    });
+}
+
 export function seed<T>(
     matrix: TMatrix<T>,
     filler: (x: number, y: number) => T,
 ): void {
     forEach(matrix, (item, x, y) => {
         set(matrix, x, y, filler(x, y));
-    });
-}
-
-export function forEach<T>(
-    matrix: TMatrix<T>,
-    each: (item: T, x: number, y: number, i: number) => void,
-): void {
-    matrix.buffer.forEach((_, i) => {
-        const x = i % matrix.w;
-        const y = (i / matrix.w) | 0;
-
-        each(get(matrix, x, y)!, x, y, i);
     });
 }
 
@@ -55,14 +55,18 @@ export function map<T>(
     const target = create<T>(source.w, source.h);
 
     forEach(source, (_, x, y) => {
-        set(target, x, y, mapper(get(source, x, y), x, y));
+        set(target, x, y, mapper(get(source, x, y)!, x, y));
     });
 
     return target;
 }
 
-export function get<T>(source: TMatrix<T>, x: number, y: number): T {
-    return source.buffer[x + y * source.w];
+export function get<T>(
+    source: TMatrix<T>,
+    x: number,
+    y: number,
+): undefined | T {
+    return inside(source, x, y) ? source.buffer[x + y * source.w] : undefined;
 }
 
 export function set<T>(
@@ -71,7 +75,9 @@ export function set<T>(
     y: number,
     item: T,
 ): void {
-    source.buffer[x + y * source.w] = item;
+    if (inside(source, x, y)) {
+        source.buffer[x + y * source.w] = item;
+    }
 }
 
 export function toArray<T>(source: TMatrix<T>): T[] {
@@ -80,6 +86,10 @@ export function toArray<T>(source: TMatrix<T>): T[] {
 
 export function setSource<T>(source: TMatrix<T>, buffer: T[]): void {
     source.buffer = buffer;
+}
+
+function inside(matrix: TMatrix, x: number, y: number) {
+    return x >= 0 && x < matrix.w && y >= 0 && y < matrix.h;
 }
 
 export const Matrix = {

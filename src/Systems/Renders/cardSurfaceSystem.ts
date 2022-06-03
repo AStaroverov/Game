@@ -7,7 +7,7 @@ import { getEntities } from '../../../lib/ECS/Heap';
 import { getMatrixCell, getMatrixSlice } from '../../Components/Matrix/Matrix';
 import { SurfaceMeshesMatrixID } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
 import { TilesMatrixID } from '../../Components/Matrix/TilesMatrix';
-import { TileSubtype } from '../../Components/Matrix/TilesMatrix/def';
+import { TileType } from '../../Components/Matrix/TilesMatrix/def';
 import { PositionComponentID } from '../../Components/Position';
 import { $ref, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
@@ -86,7 +86,8 @@ export function cardSurfaceSystem(
                     }
 
                     if (
-                        tile.subtype === TileSubtype.gross &&
+                        (tile.type === TileType.wood ||
+                            tile.type === TileType.gross) &&
                         mesh.material.map !== TEXTURE_GRASS
                     ) {
                         mesh.material.map = TEXTURE_GRASS;
@@ -94,7 +95,7 @@ export function cardSurfaceSystem(
                     }
 
                     if (
-                        tile.subtype === TileSubtype.road &&
+                        tile.type === TileType.road &&
                         mesh.material.map !== TEXTURE_ROAD
                     ) {
                         mesh.material.map = TEXTURE_ROAD;

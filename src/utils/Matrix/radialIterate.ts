@@ -1,3 +1,5 @@
+import { max } from '../math';
+import { floor } from '../math';
 import { Point } from '../shape';
 import { Matrix, TMatrix } from './index';
 
@@ -12,7 +14,7 @@ export function* radialIterate<T>(
     sy: number,
     radius?: number,
 ): Iterator<undefined | Item<T>> {
-    radius = radius ?? Math.max(matrix.w, matrix.h);
+    radius = radius ?? floor(max(matrix.w, matrix.h) / 2);
 
     yield getItem(0, 0);
 

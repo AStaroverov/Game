@@ -1,14 +1,15 @@
 import { createComponent, ReturnStruct } from '../../../../lib/ECS/Component';
 import { Matrix, TMatrix } from '../../../utils/Matrix';
-import { Size, Vector } from '../../../utils/shape';
+import { crossIterate } from '../../../utils/Matrix/crossIterate';
+import { random } from '../../../utils/random';
+import { isEqualVectors, Size, Vector } from '../../../utils/shape';
 import { createMatrixComponent } from '../Matrix';
-import { Tile, TileEnv, TileSubtype, TileType } from './def';
-import { fillEmptyTiles } from './fill';
+import { Tile, TileEnv, TileType } from './def';
 
 const GET_EMPTY_TILE = (): Tile => ({
-    env: TileEnv.Forest,
+    env: TileEnv.Empty,
     type: TileType.empty,
-    subtype: TileSubtype.empty,
+    passable: false,
 });
 
 export const TilesMatrixID = 'TILES_MATRIX' as const;
@@ -23,25 +24,35 @@ export function updateTile(target: Tile, source: Partial<Tile>) {
     Object.assign(target, source);
 }
 
-export function setMatrixTile(
-    struct: TilesMatrix,
-    x: number,
-    y: number,
+export function getMatrixTile(
+    matrix: TilesMatrix['matrix'],
+    vec: Vector,
     tile: Tile,
 ) {
-    Matrix.set(struct.matrix, x, y, tile);
+    Matrix.set(matrix, vec.x, vec.y, tile);
 }
 
-export function initTiles(struct: TilesMatrix, x: number, y: number): void {
-    if (Matrix.get(struct.matrix, x, y).type === TileType.empty) {
-        setMatrixTile(struct, x, y, {
-            env: TileEnv.Forest,
-            type: TileType.passable,
-            subtype: TileSubtype.gross,
-        });
-    }
+export function setMatrixTile(
+    matrix: TilesMatrix['matrix'],
+    vec: Vector,
+    tile: Tile,
+) {
+    Matrix.set(matrix, vec.x, vec.y, tile);
+}
 
-    fillEmptyTiles(struct);
+export function initMatrixTiles({ matrix }: TilesMatrix, vec: Vector): void {
+    for (const item of crossIterate(matrix, vec, 1)) {
+        if (
+            item !== undefined &&
+            (random() > 0.5 || isEqualVectors(vec, item))
+        ) {
+            setMatrixTile(matrix, item, {
+                env: TileEnv.Forest,
+                type: TileType.road,
+                passable: true,
+            });
+        }
+    }
 }
 
 export function mergeTiles(

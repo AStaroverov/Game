@@ -2,7 +2,7 @@ import { getComponentStruct } from '../../lib/ECS/Entity';
 import { addEntity, getEntities } from '../../lib/ECS/Heap';
 import Enumerable from '../../lib/linq';
 import { TilesMatrixID } from '../Components/Matrix/TilesMatrix';
-import { Tile, TileType } from '../Components/Matrix/TilesMatrix/def';
+import { Tile } from '../Components/Matrix/TilesMatrix/def';
 import { PositionComponentID } from '../Components/Position';
 import { CardEntityID } from '../Entities/Card';
 import { createEnemyEntity, EnemyEntityID } from '../Entities/Enemy';
@@ -40,11 +40,7 @@ export function EnemySpawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
             .first(({ x, y, value }) => {
                 const dist = abs(start.x + start.y - (x + y));
 
-                return (
-                    value.type === TileType.passable &&
-                    dist > 10 &&
-                    random() > 0.9
-                );
+                return value.passable && dist > 10 && random() > 0.9;
             });
 
         if (suitableItem) {

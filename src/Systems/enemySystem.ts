@@ -5,7 +5,7 @@ import { getComponentStruct } from '../../lib/ECS/Entity';
 import { getEntities } from '../../lib/ECS/Heap';
 import { DirectionComponentID } from '../Components/DirectionComponent';
 import { TilesMatrixID } from '../Components/Matrix/TilesMatrix';
-import { Tile, TileType } from '../Components/Matrix/TilesMatrix/def';
+import { Tile } from '../Components/Matrix/TilesMatrix/def';
 import { PositionComponentID } from '../Components/Position';
 import { setVelocity, VelocityComponentID } from '../Components/Velocity';
 import { CardEntityID } from '../Entities/Card';
@@ -121,7 +121,11 @@ function matrixToNestedArray<T extends Tile>(matrix: TMatrix<T>): number[][] {
         .map(() => new Array(matrix.w).fill(null));
 
     Matrix.forEach(matrix, (v, x, y) => {
-        m[y][x] = v.type === TileType.passable ? 0 : 1;
+        try {
+            m[y][x] = v.passable ? 0 : 1;
+        } catch (e) {
+            debugger;
+        }
     });
 
     return m;

@@ -1,3 +1,5 @@
+export const max = Math.max;
+export const min = Math.min;
 export const abs = Math.abs;
 export const sign = Math.sign;
 export const floor = Math.floor;
