@@ -121,11 +121,7 @@ function matrixToNestedArray<T extends Tile>(matrix: TMatrix<T>): number[][] {
         .map(() => new Array(matrix.w).fill(null));
 
     Matrix.forEach(matrix, (v, x, y) => {
-        try {
-            m[y][x] = v.passable ? 0 : 1;
-        } catch (e) {
-            debugger;
-        }
+        m[y][x] = v.passable ? 0 : 1;
     });
 
     return m;

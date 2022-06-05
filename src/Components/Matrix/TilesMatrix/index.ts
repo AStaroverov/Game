@@ -27,17 +27,16 @@ export function updateTile(target: Tile, source: Partial<Tile>) {
 export function getMatrixTile(
     matrix: TilesMatrix['matrix'],
     vec: Vector,
-    tile: Tile,
-) {
-    Matrix.set(matrix, vec.x, vec.y, tile);
+): undefined | Tile {
+    return Matrix.get(matrix, vec.x, vec.y);
 }
 
 export function setMatrixTile(
     matrix: TilesMatrix['matrix'],
     vec: Vector,
     tile: Tile,
-) {
-    Matrix.set(matrix, vec.x, vec.y, tile);
+): undefined | Tile {
+    return Matrix.set(matrix, vec.x, vec.y, tile);
 }
 
 export function initMatrixTiles({ matrix }: TilesMatrix, vec: Vector): void {
@@ -52,6 +51,18 @@ export function initMatrixTiles({ matrix }: TilesMatrix, vec: Vector): void {
                 passable: true,
             });
         }
+
+        // if (item !== undefined && (random() > 0 || isEqualVectors(vec, item))) {
+        //     setMatrixTile(matrix, item, {
+        //         env: TileEnv.Forest,
+        //         type: TileType.road,
+        //         passable: true,
+        //     });
+        //
+        //     if (!isEqualVectors(vec, item)) {
+        //         return;
+        //     }
+        // }
     }
 }
 

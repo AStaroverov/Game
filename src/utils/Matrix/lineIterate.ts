@@ -5,10 +5,10 @@ import { createGetItem, Item } from './utils';
 
 export function* lineIterate<T>(
     matrix: TMatrix<T>,
-    sv: Vector,
+    start: Vector,
     direction: Vector,
-): Iterator<undefined | Item<T>> {
-    const getItem = createGetItem(matrix, sv);
+): IterableIterator<Item<T>> {
+    const getItem = createGetItem(matrix, start);
     const passed = newVector(0, 0);
     const step = newVector(
         direction.x / max(abs(direction.x), abs(direction.y)),

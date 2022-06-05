@@ -1,19 +1,14 @@
-import { mulVector, newVector, Point, Vector, zeroVector } from '../shape';
+import { mulVector, newVector, Vector, zeroVector } from '../shape';
 import { TMatrix } from './index';
 import { lineIterate } from './lineIterate';
-import { createGetItem } from './utils';
-
-export type Item<T> = Point & {
-    value: T;
-    matrix: TMatrix<T>;
-};
+import { createGetItem, Item } from './utils';
 
 export function* crossIterate<T>(
     matrix: TMatrix<T>,
-    sv: Vector,
+    start: Vector,
     radius: number,
-): IterableIterator<undefined | Item<T>> {
-    const getItem = createGetItem(matrix, sv);
+): IterableIterator<Item<T>> {
+    const getItem = createGetItem(matrix, start);
     const directions = [
         newVector(1, 0),
         newVector(-1, 0),
@@ -24,13 +19,12 @@ export function* crossIterate<T>(
     yield getItem(zeroVector);
 
     for (let i = 0; i < directions.length; i++) {
-        const iterator = lineIterate(matrix, sv, directions[i]);
+        const iterator = lineIterate(matrix, start, directions[i]);
         // skip first element
         let step = iterator.next();
 
-        do {
-            step = iterator.next();
+        while ((step = iterator.next()).done !== true) {
             yield step.value;
-        } while (step.done !== true);
+        }
     }
 }

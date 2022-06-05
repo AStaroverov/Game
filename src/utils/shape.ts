@@ -28,6 +28,7 @@ export const sumVector = (f: Vector, ...vs: Vector[]): Vector => {
         return sum;
     }, copyVector(f));
 };
+
 export const mulVector = (v: Vector, k: number): Vector =>
     newVector(v.x * k, v.y * k);
 

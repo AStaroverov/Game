@@ -120,22 +120,22 @@ function getRandomTile(
     const w = RENDER_CARD_SIZE + 2;
     const h = RENDER_CARD_SIZE + 2;
 
-    return Enumerable.from(
-        rectangleIterate(cardTiles.matrix, sx, sy, w, h),
-    ).firstOrDefault(({ value, x, y }) => {
-        if (!value.passable) {
-            return false;
-        }
+    return Enumerable.from(rectangleIterate(cardTiles.matrix, sx, sy, w, h))
+        .where((item): item is Item<Tile> => item !== undefined)
+        .firstOrDefault(({ value, x, y }) => {
+            if (!value.passable) {
+                return false;
+            }
 
-        const normalizedTilePosition = mapVector(
-            newVector((x - sx) / w, (y - sy) / h),
-            floor,
-        );
+            const normalizedTilePosition = mapVector(
+                newVector((x - sx) / w, (y - sy) / h),
+                floor,
+            );
 
-        if (!isEqualVectors(normalizedTilePosition, playerDirection)) {
-            return false;
-        }
+            if (!isEqualVectors(normalizedTilePosition, playerDirection)) {
+                return false;
+            }
 
-        return random() > 0.9;
-    }, undefined);
+            return random() > 0.9;
+        }, undefined);
 }

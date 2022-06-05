@@ -3,6 +3,10 @@ import { Size } from '../shape';
 export type TMatrix<T = unknown> = Size & { buffer: T[] };
 export type TMatrixSeed<T> = (x: number, y: number) => T;
 
+export type ExtractMatrixItem<M extends TMatrix> = M extends TMatrix<infer T>
+    ? T
+    : never;
+
 export function create<T>(
     w: number,
     h: number,
@@ -74,10 +78,10 @@ export function set<T>(
     x: number,
     y: number,
     item: T,
-): void {
-    if (inside(source, x, y)) {
-        source.buffer[x + y * source.w] = item;
-    }
+): undefined | T {
+    return inside(source, x, y)
+        ? (source.buffer[x + y * source.w] = item)
+        : undefined;
 }
 
 export function toArray<T>(source: TMatrix<T>): T[] {

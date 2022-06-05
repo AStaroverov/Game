@@ -13,7 +13,7 @@ import { GameHeap } from '../../heap';
 import { floor, round, ufloor } from '../../utils/math';
 import { Matrix } from '../../utils/Matrix';
 import { tileYToPositionZ } from '../../utils/positionZ';
-import { getRandomSign } from '../../utils/random';
+import { randomSign } from '../../utils/random';
 import { mapVector, newVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
@@ -44,7 +44,7 @@ export function cardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
         if (!tileIndexToSalt.has(n)) {
             tileIndexToSalt.set(n, {
                 index: Math.round(Math.random() * (TREES_COUNT - 1)),
-                x: getRandomSign() * Math.random() * 0.05,
+                x: randomSign() * Math.random() * 0.05,
                 y: Math.random() * 0.1,
             });
         }

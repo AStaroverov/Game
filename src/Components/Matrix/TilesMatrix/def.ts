@@ -1,15 +1,9 @@
-import { Vector } from '../../../utils/shape';
-
-export type Tile<E = TileEnv> = BaseTile<E> | RoadTile<E>;
+export type Tile<E = TileEnv> = BaseTile<E>;
 
 export type BaseTile<E> = {
     env: E;
     type: TileType;
     passable: boolean;
-};
-
-export type RoadTile<E> = BaseTile<E> & {
-    directions: Vector[];
 };
 
 export enum TileEnv {
@@ -25,12 +19,6 @@ export enum TileType {
     wood = 'wood',
     well = 'well',
     building = 'building',
-}
-
-export function isRoadTile<T extends Tile>(
-    tile: T,
-): tile is Extract<T, RoadTile<T['env']>> {
-    return tile.type === TileType.road;
 }
 
 export function isPassableTileType(type: TileType) {

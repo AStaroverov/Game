@@ -37,7 +37,7 @@ export function EnemySpawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
             radialIterate(cardTiles.matrix, start.x, start.y),
         )
             .where((tile): tile is Item<Tile> => tile !== undefined)
-            .first(({ x, y, value }) => {
+            .firstOrDefault(({ x, y, value }) => {
                 const dist = abs(start.x + start.y - (x + y));
 
                 return value.passable && dist > 10 && random() > 0.9;
@@ -54,8 +54,6 @@ export function EnemySpawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
             setVector(position, seedPosition);
 
             addEntity(heap, enemy);
-        } else {
-            debugger;
         }
     }
 }

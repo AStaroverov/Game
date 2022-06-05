@@ -12,7 +12,7 @@ export function* rectangleIterate<T>(
     sy: number,
     w: number,
     h: number,
-): Iterator<Item<T>> {
+): IterableIterator<undefined | Item<T>> {
     // top
     let shift = 0;
     while (shift < w) {

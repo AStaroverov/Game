@@ -11,7 +11,7 @@ export const CENTER_CARD_POSITION = newVector(
     Math.floor(HALF_CARD_SIZE),
 );
 
-export const RENDER_CARD_SIZE = 15;
+export const RENDER_CARD_SIZE = 21;
 export const HALF_RENDER_CARD_SIZE = RENDER_CARD_SIZE / 2;
 export const CENTER_RENDER_POSITION = newVector(
     Math.floor(HALF_RENDER_CARD_SIZE),
