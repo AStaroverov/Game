@@ -1,18 +1,21 @@
-import { filter, fromEvent, tap } from 'rxjs';
+import { filter, fromEvent } from 'rxjs';
 
 import { getComponentStruct } from '../../lib/ECS/Entity';
 import { getEntities } from '../../lib/ECS/Heap';
 import { DirectionComponentID } from '../Components/DirectionComponent';
 import {
-    setVelocity,
     setVelocityByVector,
     VelocityComponentID,
 } from '../Components/Velocity';
 import { PlayerEntityID } from '../Entities/Player';
 import { GameHeap } from '../heap';
 import { mulVector, Vector } from '../utils/shape';
+import {
+    TasksScheduler,
+    tasksScheduler,
+} from '../utils/TasksScheduler/TasksScheduler';
 
-export function controlsSystem(heap: GameHeap): void {
+export function controlsSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
     const playerVelocity = getComponentStruct(
         playerEntity,
@@ -23,33 +26,21 @@ export function controlsSystem(heap: GameHeap): void {
         DirectionComponentID,
     );
 
-    const pressed = new Set();
-
     fromEvent<KeyboardEvent>(document, 'keydown')
-        .pipe(
-            filter(isArrow),
-            filter((e) => !pressed.has(e.key)),
-            tap((e) => pressed.add(e.key)),
-        )
+        .pipe(filter(isArrow))
         .subscribe((e) => {
             onArrowDown(e, playerDirection);
-            setVelocityByVector(
-                playerVelocity,
-                mulVector(playerDirection, 0.08),
-            );
         });
 
     fromEvent<KeyboardEvent>(document, 'keyup')
-        .pipe(
-            filter(isArrow),
-            tap((e) => pressed.delete(e.key)),
-        )
+        .pipe(filter(isArrow))
         .subscribe((e) => {
             onArrowUp(e, playerDirection);
-            if (pressed.size === 0) {
-                setVelocity(playerVelocity, 0);
-            }
         });
+
+    tasksScheduler.addFrameInterval(() => {
+        setVelocityByVector(playerVelocity, mulVector(playerDirection, 0.08));
+    }, 1);
 }
 
 function isArrow({ key }: KeyboardEvent): boolean {

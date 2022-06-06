@@ -55,7 +55,7 @@ export function game(): void {
     initMatrixMeshesSystem(heap);
 
     // Systems
-    controlsSystem(heap);
+    controlsSystem(heap, ticker);
     runActionSystem(heap);
 
     gameTimeSystem(heap, ticker);

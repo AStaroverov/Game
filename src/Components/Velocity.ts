@@ -1,11 +1,17 @@
 import { createComponent, ExtractStruct } from '../../lib/ECS/Component';
 import { abs, sign } from '../utils/math';
-import { Vector, widthVector } from '../utils/shape';
+import {
+    isEqualVectors,
+    Vector,
+    widthVector,
+    zeroVector,
+} from '../utils/shape';
 
 export const VelocityComponentID = 'VELOCITY' as const;
 
 export type VelocityComponent = ReturnType<typeof createVelocityComponent>;
 
+// Rewrite velocity to vector value
 export const createVelocityComponent = (v = 0) =>
     createComponent(VelocityComponentID, { v });
 
@@ -20,7 +26,8 @@ export function setVelocityByVector(
     struct: ExtractStruct<VelocityComponent>,
     direction: Vector,
 ): void {
-    struct.v =
-        widthVector(direction) /
-        (sign(abs(direction.x)) + sign(abs(direction.y)));
+    struct.v = isEqualVectors(direction, zeroVector)
+        ? 0
+        : widthVector(direction) /
+          (sign(abs(direction.x)) + sign(abs(direction.y)));
 }
