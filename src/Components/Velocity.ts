@@ -1,4 +1,6 @@
 import { createComponent, ExtractStruct } from '../../lib/ECS/Component';
+import { abs, sign } from '../utils/math';
+import { Vector, widthVector } from '../utils/shape';
 
 export const VelocityComponentID = 'VELOCITY' as const;
 
@@ -12,4 +14,13 @@ export function setVelocity(
     v: number,
 ): void {
     struct.v = v;
+}
+
+export function setVelocityByVector(
+    struct: ExtractStruct<VelocityComponent>,
+    direction: Vector,
+): void {
+    struct.v =
+        widthVector(direction) /
+        (sign(abs(direction.x)) + sign(abs(direction.y)));
 }

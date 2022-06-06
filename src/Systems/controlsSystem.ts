@@ -1,12 +1,16 @@
-import { filter, fromEvent, map, tap } from 'rxjs';
+import { filter, fromEvent, tap } from 'rxjs';
 
 import { getComponentStruct } from '../../lib/ECS/Entity';
 import { getEntities } from '../../lib/ECS/Heap';
 import { DirectionComponentID } from '../Components/DirectionComponent';
-import { setVelocity, VelocityComponentID } from '../Components/Velocity';
+import {
+    setVelocity,
+    setVelocityByVector,
+    VelocityComponentID,
+} from '../Components/Velocity';
 import { PlayerEntityID } from '../Entities/Player';
 import { GameHeap } from '../heap';
-import { newVector, setVector, Vector } from '../utils/shape';
+import { mulVector, Vector } from '../utils/shape';
 
 export function controlsSystem(heap: GameHeap): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
@@ -26,25 +30,22 @@ export function controlsSystem(heap: GameHeap): void {
             filter(isArrow),
             filter((e) => !pressed.has(e.key)),
             tap((e) => pressed.add(e.key)),
-            map(arrowDownToVector),
         )
-        .subscribe((vector) => {
-            setVector(
-                playerDirection,
-                newVector(
-                    vector.x ?? playerDirection.x,
-                    vector.y ?? playerDirection.y,
-                ),
+        .subscribe((e) => {
+            onArrowDown(e, playerDirection);
+            setVelocityByVector(
+                playerVelocity,
+                mulVector(playerDirection, 0.08),
             );
-
-            setVelocity(playerVelocity, 0.08);
         });
 
     fromEvent<KeyboardEvent>(document, 'keyup')
-        .pipe(filter(isArrow))
+        .pipe(
+            filter(isArrow),
+            tap((e) => pressed.delete(e.key)),
+        )
         .subscribe((e) => {
-            pressed.delete(e.key);
-
+            onArrowUp(e, playerDirection);
             if (pressed.size === 0) {
                 setVelocity(playerVelocity, 0);
             }
@@ -60,9 +61,22 @@ function isArrow({ key }: KeyboardEvent): boolean {
     );
 }
 
-function arrowDownToVector({ key }: KeyboardEvent): Vector {
-    return {
-        x: key === 'ArrowLeft' ? -1 : key === 'ArrowRight' ? 1 : 0,
-        y: key === 'ArrowDown' ? -1 : key === 'ArrowUp' ? 1 : 0,
-    };
+function onArrowDown({ key }: KeyboardEvent, v: Vector) {
+    v.x = key === 'ArrowLeft' ? -1 : key === 'ArrowRight' ? 1 : v.x;
+    v.y = key === 'ArrowDown' ? -1 : key === 'ArrowUp' ? 1 : v.y;
+}
+
+function onArrowUp({ key }: KeyboardEvent, v: Vector) {
+    v.x =
+        key === 'ArrowLeft' && v.x === -1
+            ? 0
+            : key === 'ArrowRight' && v.x === 1
+            ? 0
+            : v.x;
+    v.y =
+        key === 'ArrowDown' && v.y === -1
+            ? 0
+            : key === 'ArrowUp' && v.y === 1
+            ? 0
+            : v.y;
 }
