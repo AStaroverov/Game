@@ -1,7 +1,8 @@
-export type Tile<E = TileEnv> = BaseTile<E>;
+export type Tile = RoadTile | BaseTile;
 
-export type BaseTile<E> = {
-    env: E;
+export type RoadTile = BaseTile<{ last: boolean }>;
+export type BaseTile<Meta extends object = {}> = Meta & {
+    env: TileEnv;
     type: TileType;
     passable: boolean;
 };
@@ -20,6 +21,12 @@ export enum TileType {
     well = 'well',
     building = 'building',
 }
+
+export const EMPTY_TILE = Object.freeze({
+    env: TileEnv.Empty,
+    type: TileEnv.Empty,
+    passable: false,
+});
 
 export function isPassableTileType(type: TileType) {
     switch (type) {

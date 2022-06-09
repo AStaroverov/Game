@@ -1,76 +1,101 @@
 import { pipe } from 'lodash/fp';
 
-import Enumerable from '../../../../../lib/linq';
-import { Item, radialIterate } from '../../../../utils/Matrix/radialIterate';
+import { RENDER_CARD_SIZE } from '../../../../CONST';
+import { floor } from '../../../../utils/math';
+import { Matrix } from '../../../../utils/Matrix';
+import { Item } from '../../../../utils/Matrix/methods/utils';
 import { isPassableTileType, Tile, TileType } from '../def';
-import { TilesMatrix, updateTile } from '../index';
+import { TilesMatrix } from '../index';
 import {
-    getFromProbabilities,
+    getProbabilityRecord,
+    getRandomProbability,
+    normalizeProbabilities,
     ProbabilityRecord,
-    sumProbabilities,
 } from './utils';
 
+const isEmptyItem = (item: Item<Tile>) => item.value?.type === TileType.empty;
+const isNotEmptyItem = (item: Item<Tile>) =>
+    item.value === undefined ? false : item.value.type !== TileType.empty;
+
+const matchNotEmpty = {
+    match: isNotEmptyItem,
+};
+const matchEmptyReplaceToSome = {
+    match: isEmptyItem,
+    replace: updateTile,
+};
+
+const matchReplaceEnvironment = Matrix.getAllVariants(
+    Matrix.fromNestedArray([
+        /* eslint-disable */
+        [matchEmptyReplaceToSome, matchNotEmpty],
+        /* eslint-enable */
+    ]),
+);
+
 export function fillEnvironment({ matrix }: TilesMatrix): void {
-    Enumerable.from(
-        radialIterate(
-            matrix,
-            Math.floor(matrix.h / 2),
-            Math.floor(matrix.w / 2),
-        ),
-    )
-        .where(
-            (item): item is Item<Tile> => item?.value.type === TileType.empty,
-        )
-        .forEach(({ value, x, y }) => {
-            const summedProbabilities = Enumerable.from(
-                radialIterate(matrix, x, y, 1),
-            )
-                .skip(1)
-                .where((item): item is Item<Tile> => item !== undefined)
-                .scan({} as ProbabilityRecord, (acc, { value, x, y }) => {
-                    const newProbabilities = getTileTypeProbabilities(value);
-                    return newProbabilities === undefined
-                        ? acc
-                        : sumProbabilities(acc, newProbabilities);
-                })
-                .last();
+    const sliceMatrix = Matrix.slice(
+        matrix,
+        floor(matrix.w / 2) - floor(RENDER_CARD_SIZE / 2),
+        floor(matrix.h / 2) - floor(RENDER_CARD_SIZE / 2),
+        RENDER_CARD_SIZE,
+        RENDER_CARD_SIZE,
+    );
 
-            const type = pipe(
-                (probabilities: ProbabilityRecord): ProbabilityRecord => {
-                    const keys = Object.keys(probabilities);
-                    const sum = keys.reduce((s, k) => s + probabilities[k], 0);
-                    const ratio = 1 / sum;
+    while (true) {
+        const step1 = Matrix.matchReplaceAll(
+            sliceMatrix,
+            matchReplaceEnvironment,
+        );
 
-                    return sum === 0
-                        ? probabilities
-                        : keys.reduce((acc, key) => {
-                              acc[key] = ratio * probabilities[key];
-                              return acc;
-                          }, {} as ProbabilityRecord);
-                },
-                getFromProbabilities(Math.random),
-            )(summedProbabilities) as TileType;
-
-            updateTile(value, {
-                type,
-                passable: isPassableTileType(type),
-            });
-        });
+        if (!step1) {
+            break;
+        }
+    }
 }
 
-function getTileTypeProbabilities(tile: Tile): undefined | ProbabilityRecord {
+function updateTile(itemTile: Item<Tile>): Tile {
+    const slice = Matrix.slice<undefined | Tile>(
+        itemTile.matrix,
+        itemTile.x - 1,
+        itemTile.y - 1,
+        3,
+        3,
+    );
+
+    const type = pipe(
+        getProbabilityRecord(getTileProbabilities),
+        normalizeProbabilities,
+        getRandomProbability,
+    )(slice) as TileType;
+
+    return Object.assign(itemTile.value, {
+        type,
+        passable: isPassableTileType(type),
+    });
+}
+
+function getTileProbabilities(
+    tile: undefined | Tile,
+): undefined | ProbabilityRecord {
+    if (tile === undefined) {
+        return undefined;
+    }
+
     if (tile.type === TileType.road) {
         return {
             [TileType.gross]: 0.95,
             [TileType.wood]: 0.05,
         };
     }
+
     if (tile.type === TileType.gross) {
         return {
             [TileType.gross]: 0.97,
             [TileType.wood]: 0.03,
         };
     }
+
     if (tile.type === TileType.wood) {
         return {
             [TileType.gross]: 0.15,

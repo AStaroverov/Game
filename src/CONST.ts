@@ -4,7 +4,7 @@ export const GAME_VERSION = 0;
 
 export const TILE_SIZE = 64;
 
-export const CARD_SIZE = 61;
+export const CARD_SIZE = 51;
 export const HALF_CARD_SIZE = CARD_SIZE / 2;
 export const CENTER_CARD_POSITION = newVector(
     Math.floor(HALF_CARD_SIZE),

@@ -1,7 +1,13 @@
-import { abs, floor, max } from '../math';
-import { mapVector, newVector, setVector, sumVector, Vector } from '../shape';
-import { TMatrix } from './index';
-import { createGetItem, Item } from './utils';
+import { abs, floor, max } from '../../../math';
+import {
+    mapVector,
+    newVector,
+    setVector,
+    sumVector,
+    Vector,
+} from '../../../shape';
+import { TMatrix } from '../../index';
+import { createGetItem, Item } from '../utils';
 
 export function* lineIterate<T>(
     matrix: TMatrix<T>,

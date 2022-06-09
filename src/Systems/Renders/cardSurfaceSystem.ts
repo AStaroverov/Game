@@ -66,6 +66,11 @@ export function cardSurfaceSystem(
                 const mesh = cell?.[$ref];
 
                 if (tile && mesh) {
+                    if (tile.type === TileType.empty) {
+                        // mesh.visible = false;
+                        // return;
+                    }
+
                     mesh.visible = true;
                     mesh.position.x = floor(
                         (x - fractionPosition.x) * TILE_SIZE,
@@ -83,6 +88,14 @@ export function cardSurfaceSystem(
 
                     if (mesh.material.color !== salt.color) {
                         mesh.material.color = salt.color;
+                    }
+
+                    if (
+                        tile.type === TileType.empty &&
+                        mesh.material.map !== null
+                    ) {
+                        mesh.material.map = null;
+                        mesh.material.needsUpdate = true;
                     }
 
                     if (

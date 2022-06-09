@@ -1,5 +1,5 @@
-import { Point } from '../shape';
-import { Matrix, TMatrix } from './index';
+import { Point } from '../../../shape';
+import { Matrix, TMatrix } from '../../index';
 
 export type Item<T> = Point & {
     value: T;

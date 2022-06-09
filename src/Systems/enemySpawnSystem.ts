@@ -8,7 +8,8 @@ import { CardEntityID } from '../Entities/Card';
 import { createEnemyEntity, EnemyEntityID } from '../Entities/Enemy';
 import { GameHeap } from '../heap';
 import { abs, floor } from '../utils/math';
-import { Item, radialIterate } from '../utils/Matrix/radialIterate';
+import { radialIterate } from '../utils/Matrix/methods/iterate/radialIterate';
+import { ExistedItem } from '../utils/Matrix/methods/utils';
 import { random } from '../utils/random';
 import { mulVector, newVector, setVector, sumVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
@@ -36,7 +37,9 @@ export function EnemySpawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
         const suitableItem = Enumerable.from(
             radialIterate(cardTiles.matrix, start.x, start.y),
         )
-            .where((tile): tile is Item<Tile> => tile !== undefined)
+            .where(
+                (item): item is ExistedItem<Tile> => item.value !== undefined,
+            )
             .firstOrDefault(({ x, y, value }) => {
                 const dist = abs(start.x + start.y - (x + y));
 

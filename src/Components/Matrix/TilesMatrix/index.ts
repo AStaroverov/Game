@@ -1,8 +1,6 @@
 import { createComponent, ReturnStruct } from '../../../../lib/ECS/Component';
 import { Matrix, TMatrix } from '../../../utils/Matrix';
-import { crossIterate } from '../../../utils/Matrix/crossIterate';
-import { random } from '../../../utils/random';
-import { isEqualVectors, Size, Vector } from '../../../utils/shape';
+import { newVector, Size, Vector } from '../../../utils/shape';
 import { createMatrixComponent } from '../Matrix';
 import { Tile, TileEnv, TileType } from './def';
 
@@ -40,30 +38,37 @@ export function setMatrixTile(
 }
 
 export function initMatrixTiles({ matrix }: TilesMatrix, vec: Vector): void {
-    for (const item of crossIterate(matrix, vec, 1)) {
-        if (
-            item !== undefined &&
-            (random() > 0.5 || isEqualVectors(vec, item))
-        ) {
-            setMatrixTile(matrix, item, {
-                env: TileEnv.Forest,
-                type: TileType.road,
-                passable: true,
-            });
-        }
+    // for (const item of crossIterate(matrix, vec, 1)) {
+    // if (
+    //     item !== undefined &&
+    //     (random() > 0.5 || isEqualVectors(vec, item))
+    // ) {
+    //     setMatrixTile(matrix, item, {
+    //         env: TileEnv.Forest,
+    //         type: TileType.road,
+    //         passable: true,
+    //     });
+    // }
+    // }
 
-        // if (item !== undefined && (random() > 0 || isEqualVectors(vec, item))) {
-        //     setMatrixTile(matrix, item, {
-        //         env: TileEnv.Forest,
-        //         type: TileType.road,
-        //         passable: true,
-        //     });
-        //
-        //     if (!isEqualVectors(vec, item)) {
-        //         return;
-        //     }
-        // }
-    }
+    setMatrixTile(matrix, newVector(vec.x - 1, vec.y), {
+        passable: true,
+        env: TileEnv.Forest,
+        type: TileType.road,
+        last: true,
+    });
+    setMatrixTile(matrix, vec, {
+        passable: true,
+        env: TileEnv.Forest,
+        type: TileType.road,
+        last: false,
+    });
+    setMatrixTile(matrix, newVector(vec.x + 1, vec.y), {
+        passable: true,
+        env: TileEnv.Forest,
+        type: TileType.road,
+        last: true,
+    });
 }
 
 export function mergeTiles(

@@ -1,20 +1,16 @@
-import { max } from '../math';
-import { floor } from '../math';
-import { Point } from '../shape';
-import { Matrix, TMatrix } from './index';
-
-export type Item<T> = Point & {
-    value: T;
-    matrix: TMatrix<T>;
-};
+import { max } from '../../../math';
+import { floor } from '../../../math';
+import { TMatrix } from '../../index';
+import { createGetItem, Item } from '../utils';
 
 export function* radialIterate<T>(
     matrix: TMatrix<T>,
     sx: number,
     sy: number,
     radius?: number,
-): Iterator<undefined | Item<T>> {
-    radius = radius ?? floor(max(matrix.w, matrix.h) / 2);
+): IterableIterator<Item<T>> {
+    const getItem = createGetItem(matrix, sx, sy);
+    radius = (radius ?? floor(max(matrix.w, matrix.h) / 2)) - 1;
 
     yield getItem(0, 0);
 
@@ -58,10 +54,5 @@ export function* radialIterate<T>(
             dy = +step - shift++;
             yield getItem(dx, dy);
         }
-    }
-
-    function getItem(dx: number, dy: number) {
-        const value = Matrix.get(matrix, sx + dx, sy + dy);
-        return value ? { value, x: sx + dx, y: sy + dy, matrix } : undefined;
     }
 }

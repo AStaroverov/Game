@@ -5,6 +5,7 @@ import { getEntities } from '../../../lib/ECS/Heap';
 import { getMatrixCell, getMatrixSlice } from '../../Components/Matrix/Matrix';
 import { ReliefMeshesMatrixID } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
 import { TilesMatrixID } from '../../Components/Matrix/TilesMatrix';
+import { TileType } from '../../Components/Matrix/TilesMatrix/def';
 import { PositionComponentID } from '../../Components/Position';
 import { $ref, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { atlasTrees, CardEntityID } from '../../Entities/Card';
@@ -70,7 +71,11 @@ export function cardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
                     return;
                 }
 
-                if (tile === undefined || tile.passable) {
+                if (
+                    tile === undefined ||
+                    tile.type === TileType.empty ||
+                    tile.passable === true
+                ) {
                     mesh.visible = false;
                     return;
                 }

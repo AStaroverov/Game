@@ -1,7 +1,7 @@
-import { mulVector, newVector, Vector, zeroVector } from '../shape';
-import { TMatrix } from './index';
+import { mulVector, newVector, Vector, zeroVector } from '../../../shape';
+import { TMatrix } from '../../index';
+import { createGetItem, Item } from '../utils';
 import { lineIterate } from './lineIterate';
-import { createGetItem, Item } from './utils';
 
 export function* crossIterate<T>(
     matrix: TMatrix<T>,

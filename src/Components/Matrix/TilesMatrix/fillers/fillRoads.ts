@@ -1,125 +1,141 @@
-import Enumerable from '../../../../../lib/linq';
-import { floor, round } from '../../../../utils/math';
-import { TMatrix } from '../../../../utils/Matrix';
-import { crossIterate } from '../../../../utils/Matrix/crossIterate';
-import { lineIterate } from '../../../../utils/Matrix/lineIterate';
-import { Item, radialIterate } from '../../../../utils/Matrix/radialIterate';
-import { random, randomArbitrary } from '../../../../utils/random';
-import {
-    isEqualVectors,
-    mulVector,
-    negateVector,
-    sumVector,
-    Vector,
-} from '../../../../utils/shape';
-import { Tile, TileEnv, TileType } from '../def';
-import { getMatrixTile, setMatrixTile, TilesMatrix } from '../index';
+import { shuffle } from 'lodash';
 
-type ItemTile = Pick<Item<undefined | Tile>, 'value' | 'x' | 'y'>;
+import { RENDER_CARD_SIZE } from '../../../../CONST';
+import { floor } from '../../../../utils/math';
+import { Matrix } from '../../../../utils/Matrix';
+import { Item } from '../../../../utils/Matrix/methods/utils';
+import { random } from '../../../../utils/random';
+import { Tile, TileType } from '../def';
+import { TilesMatrix } from '../index';
 
-export function fillRoads({ matrix }: TilesMatrix): void {
-    const items = Enumerable.from(
-        radialIterate(matrix, floor(matrix.h / 2), floor(matrix.w / 2)),
-    )
-        .skip(1)
-        .where((item): item is Item<Tile> => item?.value.type === TileType.road)
-        .toArray();
+const isRoadItem = (item: Item<Tile>) => item.value?.type === TileType.road;
+const isLastRoadItem = (item: Item<Tile>) =>
+    item.value !== undefined &&
+    item.value.type === TileType.road &&
+    'last' in item.value &&
+    item.value.last === true;
+const isNotLastRoadItem = (item: Item<Tile>) =>
+    item.value !== undefined &&
+    item.value.type === TileType.road &&
+    'last' in item.value &&
+    item.value.last === false;
 
-    items.forEach((item) => {
-        const prevItems = Enumerable.from(crossIterate(matrix, item, 1))
-            .skip(1)
-            .where(isRoadItemTile)
-            .toArray();
+const isNotRoadItem = (item: Item<Tile>) =>
+    item.value === undefined || item.value.type !== TileType.road;
+const isEmptyItem = (item: Item<Tile>) => item.value?.type === TileType.empty;
 
-        if (prevItems.length === 0 || prevItems.length > 1) {
-            return;
-        }
-
-        // we cant uncomment it,cause TS error
-        let lastItem: ItemTile = item;
-        let lastPrevItem: ItemTile = prevItems[0];
-
-        while (true) {
-            const possibleNextItems = Enumerable.from(
-                crossIterate(matrix, lastItem, 1),
-            )
-                .skip(1)
-                .where(isPossibleRoadItemTile)
-                .toArray();
-
-            if (possibleNextItems.length === 0) {
-                break;
-            }
-
-            const randomNextPosition =
-                possibleNextItems[
-                    round(randomArbitrary(0, possibleNextItems.length - 1))
-                ];
-            const forwardDirection = getDirection(lastItem, lastPrevItem);
-            const nextForwardPosition = sumVector(lastItem, forwardDirection);
-
-            const canRotate = isCanRotate(matrix, lastItem, forwardDirection);
-            const canGoForward = possibleNextItems.some((item) =>
-                isEqualVectors(item, nextForwardPosition),
-            );
-
-            const nextPosition = !canRotate
-                ? nextForwardPosition
-                : canGoForward
-                ? random() > 0.1
-                    ? nextForwardPosition
-                    : randomNextPosition
-                : randomNextPosition;
-
-            const nextTile = trySetNextTile(matrix, nextPosition);
-
-            if (nextTile === undefined) {
-                break;
-            }
-
-            lastPrevItem = lastItem;
-            lastItem = createItemTile(nextTile, nextPosition);
-        }
+const replaceToNotLastRoad = ({ value }: Item<Tile>) => {
+    return Object.assign(value, {
+        last: false,
     });
-}
+};
 
-function isRoadItemTile<T extends ItemTile>(item: T): item is T {
-    return item.value?.type === TileType.road;
-}
+const replaceToLastRoad = ({ value }: Item<Tile>) => {
+    return Object.assign(value, {
+        last: true,
+    });
+};
 
-function isPossibleRoadItemTile<T extends ItemTile>(item: T): item is T {
-    return item.value === undefined || item.value.type === TileType.empty;
-}
+const matchEmpty = {
+    match: isEmptyItem,
+};
+const matchRoad = {
+    match: isRoadItem,
+};
+const matchNotRoad = {
+    match: isNotRoadItem,
+};
 
-function getDirection(item: ItemTile, prevItem: ItemTile): Vector {
-    return sumVector(negateVector(prevItem), item);
-}
+const matchLastRoadReplaceToNotLastRoad = {
+    match: isLastRoadItem,
+    replace: replaceToNotLastRoad,
+};
+const matchNotLastRoadReplaceToLastRoad = {
+    match: isNotLastRoadItem,
+    replace: replaceToLastRoad,
+};
+const matchEmptyReplaceToRoad = {
+    match: isEmptyItem,
+    replace: ({ value }: Item<Tile>) => {
+        return Object.assign(value, {
+            passable: true,
+            type: TileType.road,
+            last: false,
+        });
+    },
+};
+const matchEmptyReplaceToLastRoad = {
+    match: isEmptyItem,
+    replace: ({ value }: Item<Tile>) => {
+        return Object.assign(value, {
+            passable: true,
+            type: TileType.road,
+            last: true,
+        });
+    },
+};
 
-function isCanRotate(
-    matrix: TMatrix<Tile>,
-    start: Vector,
-    direction: Vector,
-): boolean {
-    return [
-        ...lineIterate(matrix, start, mulVector(negateVector(direction), 3)),
-    ].every(isRoadItemTile);
-}
+const matchReplacesFixLastRoad1 = Matrix.getAllVariants(
+    Matrix.fromNestedArray([
+        /* eslint-disable */
+        [matchNotRoad, matchEmpty],
+        [matchNotLastRoadReplaceToLastRoad, matchEmpty],
+        /* eslint-enable */
+    ]),
+);
+const matchReplacesFixLastRoad2 = Matrix.getAllVariants(
+    Matrix.fromNestedArray([
+        /* eslint-disable */
+        [matchLastRoadReplaceToNotLastRoad, matchRoad],
+        [matchRoad,                         matchNotRoad],
+        /* eslint-enable */
+    ]),
+);
+const matchReplacesRoadGrow = Matrix.getAllVariants(
+    Matrix.fromNestedArray([
+        /* eslint-disable */
+        [matchRoad, matchLastRoadReplaceToNotLastRoad, matchEmptyReplaceToLastRoad],
+        /* eslint-enable */
+    ]),
+);
 
-function trySetNextTile(
-    matrix: TMatrix<Tile>,
-    position: Vector,
-): undefined | Tile {
-    const tile = getMatrixTile(matrix, position);
+const matchReplacesRoadRotate = Matrix.getAllVariants(
+    Matrix.fromNestedArray([
+        /* eslint-disable */
+        [matchNotRoad, matchNotRoad, matchEmptyReplaceToLastRoad],
+        [matchRoad, matchLastRoadReplaceToNotLastRoad, matchEmptyReplaceToRoad],
+        /* eslint-enable */
+    ]),
+);
 
-    return tile?.type === TileType.empty
-        ? setMatrixTile(matrix, position, {
-              env: TileEnv.Forest,
-              type: TileType.road,
-              passable: true,
-          })
-        : undefined;
-}
+export function fillRoads({ matrix }: TilesMatrix, moved = false): void {
+    const sliceMatrix = Matrix.slice(
+        matrix,
+        floor(matrix.w / 2) - floor(RENDER_CARD_SIZE / 2),
+        floor(matrix.h / 2) - floor(RENDER_CARD_SIZE / 2),
+        RENDER_CARD_SIZE,
+        RENDER_CARD_SIZE,
+    );
 
-function createItemTile(tile: Tile, position: Vector): ItemTile {
-    return { ...position, value: tile };
+    if (moved) {
+        Matrix.matchReplaceAll(sliceMatrix, matchReplacesFixLastRoad1);
+        Matrix.matchReplaceAll(sliceMatrix, matchReplacesFixLastRoad2);
+    }
+
+    while (true) {
+        const step1 =
+            random() > 0.9
+                ? Matrix.matchReplace(
+                      sliceMatrix,
+                      shuffle(matchReplacesRoadRotate),
+                  )
+                : false;
+        const step2 = Matrix.matchReplace(
+            sliceMatrix,
+            shuffle(matchReplacesRoadGrow),
+        );
+        if (!(step1 || step2)) {
+            break;
+        }
+    }
 }

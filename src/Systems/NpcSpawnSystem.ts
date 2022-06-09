@@ -27,7 +27,10 @@ import {
 import { PlayerEntityID } from '../Entities/Player';
 import { GameHeap } from '../heap';
 import { floor } from '../utils/math';
-import { Item, rectangleIterate } from '../utils/Matrix/rectangleIterate';
+import {
+    Item,
+    rectangleIterate,
+} from '../utils/Matrix/methods/iterate/rectangleIterate';
 import { random } from '../utils/random';
 import {
     isEqualVectors,
