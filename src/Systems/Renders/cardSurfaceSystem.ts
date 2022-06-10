@@ -108,11 +108,13 @@ export function cardSurfaceSystem(
                         mesh.material.needsUpdate = true;
                     }
 
-                    if (
-                        tile.type === TileType.road &&
-                        mesh.material.map !== TEXTURE_ROAD
-                    ) {
-                        mesh.material.map = TEXTURE_ROAD;
+                    if (tile.type === TileType.road) {
+                        mesh.material.color =
+                            'last' in tile && tile.last
+                                ? new Color(0, 255, 0)
+                                : new Color(255, 255, 255);
+
+                        mesh.material.map = null;
                         mesh.material.needsUpdate = true;
                     }
                 } else if (mesh) {

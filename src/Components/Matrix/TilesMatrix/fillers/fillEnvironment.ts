@@ -10,7 +10,7 @@ import {
 } from '../../../../utils/shape';
 import { isPassableTileType, Tile, TileType } from '../def';
 import { TilesMatrix } from '../index';
-import { getMatrixSide } from './utils/getMatrixSide';
+import { getMatrixSide, getRenderMatrix } from './utils/getMatrixSide';
 import {
     getProbabilityRecord,
     getRandomProbability,
@@ -41,7 +41,7 @@ const matchReplaceEnvironment = Matrix.getAllVariants(
 export function fillEnvironment({ matrix }: TilesMatrix, move: Vector): void {
     toOneWayVectors(move).forEach((move) => {
         const sliceMatrix = isEqualVectors(move, zeroVector)
-            ? matrix
+            ? getRenderMatrix(matrix)
             : getMatrixSide(matrix, move, 2);
 
         while (true) {
@@ -94,8 +94,8 @@ function getTileProbabilities(
 
     if (tile.type === TileType.gross) {
         return {
-            [TileType.gross]: 0.97,
-            [TileType.wood]: 0.03,
+            [TileType.gross]: 0.95,
+            [TileType.wood]: 0.05,
         };
     }
 

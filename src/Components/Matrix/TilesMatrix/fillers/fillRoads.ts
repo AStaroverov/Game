@@ -11,7 +11,7 @@ import {
 } from '../../../../utils/shape';
 import { Tile, TileType } from '../def';
 import { TilesMatrix } from '../index';
-import { getMatrixSide } from './utils/getMatrixSide';
+import { getMatrixSide, getRenderMatrix } from './utils/getMatrixSide';
 
 const isExisted = (item: Item<Tile>): item is ExistedItem<Tile> =>
     item.value !== undefined;
@@ -39,13 +39,25 @@ const isNotLastRoadItem = (item: Item<Tile>) =>
 
 const replaceToNotLastRoad = ({ value }: Item<Tile>) => {
     return Object.assign(value, {
+        passable: true,
+        type: TileType.road,
         last: false,
     });
 };
 
 const replaceToLastRoad = ({ value }: Item<Tile>) => {
     return Object.assign(value, {
+        passable: true,
+        type: TileType.road,
         last: true,
+    });
+};
+
+const replaceToSomeRoad = ({ value }: Item<Tile>) => {
+    return Object.assign(value, {
+        passable: true,
+        type: TileType.road,
+        last: random() > 0.9,
     });
 };
 
@@ -58,6 +70,10 @@ const matchRoad = {
 const matchNotRoad = {
     match: isNotRoadItem,
 };
+const matchLastRoadReplaceSomeRoad = {
+    match: isLastRoadItem,
+    replace: replaceToSomeRoad,
+};
 const matchLastRoadReplaceToNotLastRoad = {
     match: isLastRoadItem,
     replace: replaceToNotLastRoad,
@@ -66,25 +82,13 @@ const matchNotLastRoadReplaceToLastRoad = {
     match: isNotLastRoadItem,
     replace: replaceToLastRoad,
 };
-const matchEmptyReplaceToRoad = {
+const matchEmptyReplaceToSomeRoad = {
     match: isEmptyItem,
-    replace: ({ value }: Item<Tile>) => {
-        return Object.assign(value, {
-            passable: true,
-            type: TileType.road,
-            last: false,
-        });
-    },
+    replace: replaceToSomeRoad,
 };
 const matchEmptyReplaceToLastRoad = {
     match: isEmptyItem,
-    replace: ({ value }: Item<Tile>) => {
-        return Object.assign(value, {
-            passable: true,
-            type: TileType.road,
-            last: true,
-        });
-    },
+    replace: replaceToLastRoad,
 };
 
 const fixLastRoad1 = Matrix.getAllVariants(
@@ -98,7 +102,7 @@ const fixLastRoad1 = Matrix.getAllVariants(
 const fixLastRoad2 = Matrix.getAllVariants(
     Matrix.fromNestedArray([
         /* eslint-disable */
-        [matchLastRoadReplaceToNotLastRoad, matchRoad],
+        [matchLastRoadReplaceSomeRoad, matchRoad],
         [matchRoad,                         matchNotRoad],
         /* eslint-enable */
     ]),
@@ -106,12 +110,12 @@ const fixLastRoad2 = Matrix.getAllVariants(
 const randomSpawnRoad = Matrix.getAllVariants(
     Matrix.fromNestedArray([
         /* eslint-disable */
-        [matchEmptyReplaceToRoad, matchEmptyReplaceToLastRoad],
+        [matchEmptyReplaceToSomeRoad, matchEmptyReplaceToLastRoad],
         /* eslint-enable */
     ]),
 );
 
-const roadGrow = Matrix.getAllVariants(
+const roadGrowPatterns = Matrix.getAllVariants(
     Matrix.fromNestedArray([
         /* eslint-disable */
         [matchRoad, matchLastRoadReplaceToNotLastRoad, matchEmptyReplaceToLastRoad],
@@ -119,37 +123,45 @@ const roadGrow = Matrix.getAllVariants(
     ]),
 );
 
-const roadRotate = Matrix.getAllVariants(
+const roadRotatePattern = Matrix.getAllVariants(
     Matrix.fromNestedArray([
         /* eslint-disable */
-        [matchNotRoad, matchNotRoad, matchEmptyReplaceToLastRoad],
-        [matchRoad, matchLastRoadReplaceToNotLastRoad, matchEmptyReplaceToRoad],
+        [matchNotRoad, matchNotRoad,                   matchEmptyReplaceToLastRoad],
+        [matchRoad, matchLastRoadReplaceToNotLastRoad, matchEmptyReplaceToSomeRoad],
         /* eslint-enable */
     ]),
 );
+const filterRoadRotate = () => random() > 0.6;
+const getRoadRotatePattern = () => roadRotatePattern.filter(filterRoadRotate);
 
 export function fillRoads({ matrix }: TilesMatrix, move: Vector): void {
     toOneWayVectors(move).forEach((move) => {
         const sliceMatrix = isEqualVectors(move, zeroVector)
-            ? matrix
+            ? getRenderMatrix(matrix)
             : getMatrixSide(matrix, move, 3);
+        const shouldSpawnNewRoad =
+            random() > 0.9 &&
+            Matrix.every(
+                getRenderMatrix(matrix),
+                (tile) => tile.type !== TileType.road,
+            );
 
         Matrix.matchReplaceAll(sliceMatrix, fixLastRoad1);
         Matrix.matchReplaceAll(sliceMatrix, fixLastRoad2);
 
-        if (
-            random() > 0.965 &&
-            Matrix.every(sliceMatrix, (tile) => tile.type !== TileType.road)
-        ) {
+        if (shouldSpawnNewRoad) {
             Matrix.matchReplaceAll(sliceMatrix, randomSpawnRoad);
         }
 
         while (true) {
             const step1 =
-                random() > 0.8
-                    ? Matrix.matchReplace(sliceMatrix, shuffle(roadRotate))
-                    : false;
-            const step2 = Matrix.matchReplace(sliceMatrix, shuffle(roadGrow));
+                random() > 0.9 &&
+                Matrix.matchReplace(sliceMatrix, getRoadRotatePattern());
+
+            const step2 = Matrix.matchReplace(
+                sliceMatrix,
+                shuffle(roadGrowPatterns),
+            );
 
             if (!(step1 || step2)) {
                 break;

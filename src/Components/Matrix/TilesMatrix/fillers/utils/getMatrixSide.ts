@@ -25,3 +25,13 @@ export function getMatrixSide<T>(
         abs(move.y * shift) || RENDER_CARD_SIZE,
     );
 }
+
+export function getRenderMatrix<T>(matrix: TMatrix<T>): TMatrix<T> {
+    return Matrix.slice(
+        matrix,
+        floor(matrix.w / 2) - floor(RENDER_CARD_SIZE / 2),
+        floor(matrix.h / 2) - floor(RENDER_CARD_SIZE / 2),
+        RENDER_CARD_SIZE,
+        RENDER_CARD_SIZE,
+    );
+}
