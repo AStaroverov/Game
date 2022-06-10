@@ -16,7 +16,7 @@ import {
 import { atlasTrees, CardEntityID } from '../../Entities/Card';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
-import { floor, round, ufloor } from '../../utils/math';
+import { floor, round } from '../../utils/math';
 import { Matrix } from '../../utils/Matrix';
 import { tileYToPositionZ } from '../../utils/positionZ';
 import { randomSign } from '../../utils/random';
@@ -61,10 +61,10 @@ export function cardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
     function tick() {
         const abs = mapVector(sumVector(playerPosition, cardPosition), round);
         const fractionPosition = newVector(
-            -cardPosition.x % 1,
-            -cardPosition.y % 1,
+            (cardPosition.x > 0 ? 1 : 0) - (cardPosition.x % 1),
+            (cardPosition.y > 0 ? 1 : 0) - (cardPosition.y % 1),
         );
-        const uflooredPosition = mapVector(cardPosition, ufloor);
+        const uflooredPosition = mapVector(cardPosition, floor);
 
         Matrix.forEach(
             getMatrixSlice(cardTiles, abs.x, abs.y, RENDER_RADIUS),

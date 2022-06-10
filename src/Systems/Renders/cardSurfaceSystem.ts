@@ -13,7 +13,7 @@ import { $ref, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
-import { round, ufloor } from '../../utils/math';
+import { floor, round } from '../../utils/math';
 import { Matrix } from '../../utils/Matrix';
 import { randomArbitrary } from '../../utils/random';
 import { mapVector, newVector, sumVector } from '../../utils/shape';
@@ -57,12 +57,11 @@ export function cardSurfaceSystem(
             round,
         );
         const fractionPosition = newVector(
-            -cardPosition.x % 1,
-            -cardPosition.y % 1,
+            (cardPosition.x > 0 ? 1 : 0) - (cardPosition.x % 1),
+            (cardPosition.y > 0 ? 1 : 0) - (cardPosition.y % 1),
         );
-        const uflooredPosition = mapVector(cardPosition, ufloor);
+        const uflooredPosition = mapVector(cardPosition, floor);
 
-        // console.log('>>', absPosition, fractionPosition);
         Matrix.forEach(
             getMatrixSlice(
                 cardTiles,
@@ -81,10 +80,10 @@ export function cardSurfaceSystem(
                     }
 
                     mesh.visible = true;
-                    mesh.position.x = ufloor(
+                    mesh.position.x = floor(
                         (x - fractionPosition.x) * TILE_SIZE,
                     );
-                    mesh.position.y = ufloor(
+                    mesh.position.y = floor(
                         (y - fractionPosition.y) * TILE_SIZE,
                     );
 

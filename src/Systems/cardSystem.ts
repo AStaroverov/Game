@@ -8,14 +8,14 @@ import { CENTER_CARD_POSITION } from '../CONST';
 import { CardEntityID } from '../Entities/Card';
 import { PlayerEntityID } from '../Entities/Player';
 import { GameHeap } from '../heap';
-import { ufloor } from '../utils/math';
+import { floor } from '../utils/math';
 import { mapVector, mulVector, setVector, sumVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function cardSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const cardEntity = getEntities(heap, CardEntityID)[0];
     const cardTiles = getComponentStruct(cardEntity, TilesMatrixID);
-    const position = getComponentStruct(cardEntity, PositionComponentID);
+    const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
 
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
     const playerPosition = getComponentStruct(
@@ -30,11 +30,15 @@ export function cardSystem(heap: GameHeap, ticker: TasksScheduler): void {
             playerPosition,
             mulVector(CENTER_CARD_POSITION, -1),
         );
-        const cardDelta = sumVector(playerPast, position);
-        const nextPosition = sumVector(position, mulVector(cardDelta, -1));
 
-        const flooredPosition = mapVector(position, ufloor);
-        const flooredNextPosition = mapVector(nextPosition, ufloor);
+        const cardDelta = sumVector(playerPast, cardPosition);
+        const nextCardPosition = sumVector(
+            cardPosition,
+            mulVector(cardDelta, -1),
+        );
+
+        const flooredPosition = mapVector(cardPosition, floor);
+        const flooredNextPosition = mapVector(nextCardPosition, floor);
         const diff = sumVector(
             flooredPosition,
             mulVector(flooredNextPosition, -1),
@@ -46,6 +50,6 @@ export function cardSystem(heap: GameHeap, ticker: TasksScheduler): void {
             fillEnvironment(cardTiles, diff);
         }
 
-        setVector(position, nextPosition);
+        setVector(cardPosition, nextCardPosition);
     }
 }

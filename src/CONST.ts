@@ -1,4 +1,4 @@
-import { mapVector, newVector } from './utils/shape';
+import { newVector, sumVector } from './utils/shape';
 
 export const GAME_VERSION = 0;
 
@@ -18,9 +18,10 @@ export const CENTER_RENDER_POSITION = newVector(
     Math.floor(HALF_RENDER_CARD_SIZE),
 );
 
-export const PLAYER_START_POSITION = mapVector(
+export const PLAYER_START_DELTA = newVector(0.5, 0.5);
+export const PLAYER_START_POSITION = sumVector(
     CENTER_CARD_POSITION,
-    (v) => v + 0.5,
+    PLAYER_START_DELTA,
 );
 
 export const DIALOG_Z = 110;
