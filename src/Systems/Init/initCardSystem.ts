@@ -24,7 +24,7 @@ export function initCardSystem(heap: GameHeap) {
         addEntity(heap, cardEntity);
         initMatrixTiles(cardTiles, CENTER_CARD_POSITION);
         fillRoads(cardTiles, zeroVector);
-        fillEnvironment(cardTiles);
+        fillEnvironment(cardTiles, zeroVector);
 
         // const matrix = createVillageMatrix(7, 7);
         //

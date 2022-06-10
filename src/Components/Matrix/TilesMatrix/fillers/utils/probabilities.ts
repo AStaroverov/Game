@@ -1,7 +1,7 @@
 import { uniq } from 'lodash';
 
-import { Matrix, TMatrix } from '../../../../utils/Matrix';
-import { random } from '../../../../utils/random';
+import { Matrix, TMatrix } from '../../../../../utils/Matrix';
+import { random } from '../../../../../utils/random';
 
 export type ProbabilityRecord = Record<string, number>;
 

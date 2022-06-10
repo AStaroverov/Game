@@ -43,7 +43,7 @@ export function cardSystem(heap: GameHeap, ticker: TasksScheduler): void {
         if (diff.x !== 0 || diff.y !== 0) {
             moveTiles(cardTiles, diff);
             fillRoads(cardTiles, diff);
-            fillEnvironment(cardTiles);
+            fillEnvironment(cardTiles, diff);
         }
 
         setVector(position, nextPosition);

@@ -42,6 +42,17 @@ export const isEqualVectors = (a: Vector, b: Vector): boolean =>
 export const hasEqualDirection = (a: Vector, b: Vector): boolean =>
     isEqualVectors(mapVector(a, sign), mapVector(b, sign));
 
+export const toOneWayVectors = (a: Vector): Vector[] => {
+    if (isEqualVectors(a, zeroVector)) return [zeroVector];
+
+    const result: Vector[] = [];
+
+    a.x !== 0 && result.push(newVector(a.x, 0));
+    a.y !== 0 && result.push(newVector(0, a.y));
+
+    return result;
+};
+
 export const stringVector = (v: Vector): string => `Vector{${v.x},${v.y}`;
 
 export const zeroVector = newVector(0, 0);

@@ -1,17 +1,22 @@
 import { pipe } from 'lodash/fp';
 
-import { RENDER_CARD_SIZE } from '../../../../CONST';
-import { floor } from '../../../../utils/math';
 import { Matrix } from '../../../../utils/Matrix';
 import { Item } from '../../../../utils/Matrix/methods/utils';
+import {
+    isEqualVectors,
+    toOneWayVectors,
+    Vector,
+    zeroVector,
+} from '../../../../utils/shape';
 import { isPassableTileType, Tile, TileType } from '../def';
 import { TilesMatrix } from '../index';
+import { getMatrixSide } from './utils/getMatrixSide';
 import {
     getProbabilityRecord,
     getRandomProbability,
     normalizeProbabilities,
     ProbabilityRecord,
-} from './utils';
+} from './utils/probabilities';
 
 const isEmptyItem = (item: Item<Tile>) => item.value?.type === TileType.empty;
 const isNotEmptyItem = (item: Item<Tile>) =>
@@ -33,25 +38,23 @@ const matchReplaceEnvironment = Matrix.getAllVariants(
     ]),
 );
 
-export function fillEnvironment({ matrix }: TilesMatrix): void {
-    const sliceMatrix = Matrix.slice(
-        matrix,
-        floor(matrix.w / 2) - floor(RENDER_CARD_SIZE / 2),
-        floor(matrix.h / 2) - floor(RENDER_CARD_SIZE / 2),
-        RENDER_CARD_SIZE,
-        RENDER_CARD_SIZE,
-    );
+export function fillEnvironment({ matrix }: TilesMatrix, move: Vector): void {
+    toOneWayVectors(move).forEach((move) => {
+        const sliceMatrix = isEqualVectors(move, zeroVector)
+            ? matrix
+            : getMatrixSide(matrix, move, 2);
 
-    while (true) {
-        const step1 = Matrix.matchReplaceAll(
-            sliceMatrix,
-            matchReplaceEnvironment,
-        );
+        while (true) {
+            const step1 = Matrix.matchReplaceAll(
+                sliceMatrix,
+                matchReplaceEnvironment,
+            );
 
-        if (!step1) {
-            break;
+            if (!step1) {
+                break;
+            }
         }
-    }
+    });
 }
 
 function updateTile(itemTile: Item<Tile>): Tile {
