@@ -13,7 +13,7 @@ import { $ref, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
-import { floor, round, ufloor } from '../../utils/math';
+import { round, ufloor } from '../../utils/math';
 import { Matrix } from '../../utils/Matrix';
 import { randomArbitrary } from '../../utils/random';
 import { mapVector, newVector, sumVector } from '../../utils/shape';
@@ -52,30 +52,39 @@ export function cardSurfaceSystem(
     }
 
     function updateSurface() {
-        const abs = mapVector(sumVector(playerPosition, cardPosition), round);
+        const absPosition = mapVector(
+            sumVector(playerPosition, cardPosition),
+            round,
+        );
         const fractionPosition = newVector(
             -cardPosition.x % 1,
             -cardPosition.y % 1,
         );
         const uflooredPosition = mapVector(cardPosition, ufloor);
 
+        // console.log('>>', absPosition, fractionPosition);
         Matrix.forEach(
-            getMatrixSlice(cardTiles, abs.x, abs.y, RENDER_RADIUS),
+            getMatrixSlice(
+                cardTiles,
+                absPosition.x,
+                absPosition.y,
+                RENDER_RADIUS,
+            ),
             (tile, x, y) => {
                 const cell = getMatrixCell(cardMeshes, x, y);
                 const mesh = cell?.[$ref];
 
                 if (tile && mesh) {
                     if (tile.type === TileType.empty) {
-                        // mesh.visible = false;
-                        // return;
+                        mesh.visible = false;
+                        return;
                     }
 
                     mesh.visible = true;
-                    mesh.position.x = floor(
+                    mesh.position.x = ufloor(
                         (x - fractionPosition.x) * TILE_SIZE,
                     );
-                    mesh.position.y = floor(
+                    mesh.position.y = ufloor(
                         (y - fractionPosition.y) * TILE_SIZE,
                     );
 
@@ -88,14 +97,6 @@ export function cardSurfaceSystem(
 
                     if (mesh.material.color !== salt.color) {
                         mesh.material.color = salt.color;
-                    }
-
-                    if (
-                        tile.type === TileType.empty &&
-                        mesh.material.map !== null
-                    ) {
-                        mesh.material.map = null;
-                        mesh.material.needsUpdate = true;
                     }
 
                     if (

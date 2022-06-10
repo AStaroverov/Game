@@ -7,7 +7,12 @@ import { ReliefMeshesMatrixID } from '../../Components/Matrix/ReliefMeshesMatrix
 import { TilesMatrixID } from '../../Components/Matrix/TilesMatrix';
 import { TileType } from '../../Components/Matrix/TilesMatrix/def';
 import { PositionComponentID } from '../../Components/Position';
-import { $ref, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
+import {
+    $ref,
+    HALF_RENDER_CARD_SIZE,
+    RENDER_CARD_SIZE,
+    TILE_SIZE,
+} from '../../CONST';
 import { atlasTrees, CardEntityID } from '../../Entities/Card';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
@@ -20,7 +25,7 @@ import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 const TREES_MUL = 2;
 const TREES_COUNT = atlasTrees.list.length;
-const RENDER_RADIUS = Math.floor(RENDER_CARD_SIZE / 2);
+const RENDER_RADIUS = floor(HALF_RENDER_CARD_SIZE);
 
 export function cardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];

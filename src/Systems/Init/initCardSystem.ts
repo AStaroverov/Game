@@ -9,7 +9,7 @@ import { fillRoads } from '../../Components/Matrix/TilesMatrix/fillers/fillRoads
 import { CARD_SIZE, CENTER_CARD_POSITION, RENDER_CARD_SIZE } from '../../CONST';
 import { CardEntityID, createCardEntity } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
-import { newSize } from '../../utils/shape';
+import { newSize, zeroVector } from '../../utils/shape';
 
 export function initCardSystem(heap: GameHeap) {
     const cardEntity = getEntities(heap, CardEntityID);
@@ -23,7 +23,7 @@ export function initCardSystem(heap: GameHeap) {
 
         addEntity(heap, cardEntity);
         initMatrixTiles(cardTiles, CENTER_CARD_POSITION);
-        fillRoads(cardTiles);
+        fillRoads(cardTiles, zeroVector);
         fillEnvironment(cardTiles);
 
         // const matrix = createVillageMatrix(7, 7);

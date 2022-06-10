@@ -68,14 +68,16 @@ export function find<T>(
 ): undefined | Item<T> {
     let item;
 
-    forEach(matrix, (v, x, y, i) => {
+    forEach(matrix, _forEach);
+
+    return item;
+
+    function _forEach(v: any, x: number, y: number, i: number) {
         if (callback(v, x, y, i)) {
             item = getItem(matrix, x, y, matrix.buffer[i]);
             return STOP_ITERATE;
         }
-    });
-
-    return item;
+    }
 }
 
 export function some<T>(
@@ -91,19 +93,25 @@ export function many<T>(
 ): boolean {
     let result = false;
 
-    forEach(matrix, (v, x, y, i) => {
-        const r = callback(v, x, y, i);
-        result = result || r;
-    });
+    forEach(matrix, _forEach);
 
     return result;
+
+    function _forEach(v: any, x: number, y: number, i: number) {
+        const r = callback(v, x, y, i);
+        result = result || r;
+    }
 }
 
 export function every<T>(
     matrix: TMatrix<T>,
     callback: (item: T, x: number, y: number, i: number) => boolean,
 ): boolean {
-    return find(matrix, (v, x, y, i) => !callback(v, x, y, i)) === undefined;
+    return find(matrix, _find) === undefined;
+
+    function _find(v: any, x: number, y: number, i: number) {
+        return !callback(v, x, y, i);
+    }
 }
 
 export function seed<T>(

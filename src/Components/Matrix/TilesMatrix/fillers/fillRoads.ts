@@ -1,28 +1,37 @@
 import { shuffle } from 'lodash';
 
-import { RENDER_CARD_SIZE } from '../../../../CONST';
-import { floor } from '../../../../utils/math';
+import { CARD_SIZE, RENDER_CARD_SIZE } from '../../../../CONST';
+import { abs, min } from '../../../../utils/math';
 import { Matrix } from '../../../../utils/Matrix';
-import { Item } from '../../../../utils/Matrix/methods/utils';
+import { ExistedItem, Item } from '../../../../utils/Matrix/methods/utils';
 import { random } from '../../../../utils/random';
+import { isEqualVectors, Vector, zeroVector } from '../../../../utils/shape';
 import { Tile, TileType } from '../def';
 import { TilesMatrix } from '../index';
 
-const isRoadItem = (item: Item<Tile>) => item.value?.type === TileType.road;
+const isExisted = (item: Item<Tile>): item is ExistedItem<Tile> =>
+    item.value !== undefined;
+
+const isEmptyItem = (item: Item<Tile>) =>
+    isExisted(item) && item.value.type === TileType.empty;
+
+const isRoadItem = (item: Item<Tile>) =>
+    isExisted(item) && item.value.type === TileType.road;
+
+const isNotRoadItem = (item: Item<Tile>) =>
+    isExisted(item) && item.value.type !== TileType.road;
+
 const isLastRoadItem = (item: Item<Tile>) =>
-    item.value !== undefined &&
+    isExisted(item) &&
     item.value.type === TileType.road &&
     'last' in item.value &&
     item.value.last === true;
+
 const isNotLastRoadItem = (item: Item<Tile>) =>
-    item.value !== undefined &&
+    isExisted(item) &&
     item.value.type === TileType.road &&
     'last' in item.value &&
     item.value.last === false;
-
-const isNotRoadItem = (item: Item<Tile>) =>
-    item.value === undefined || item.value.type !== TileType.road;
-const isEmptyItem = (item: Item<Tile>) => item.value?.type === TileType.empty;
 
 const replaceToNotLastRoad = ({ value }: Item<Tile>) => {
     return Object.assign(value, {
@@ -45,7 +54,6 @@ const matchRoad = {
 const matchNotRoad = {
     match: isNotRoadItem,
 };
-
 const matchLastRoadReplaceToNotLastRoad = {
     match: isLastRoadItem,
     replace: replaceToNotLastRoad,
@@ -75,7 +83,7 @@ const matchEmptyReplaceToLastRoad = {
     },
 };
 
-const matchReplacesFixLastRoad1 = Matrix.getAllVariants(
+const fixLastRoad1 = Matrix.getAllVariants(
     Matrix.fromNestedArray([
         /* eslint-disable */
         [matchNotRoad, matchEmpty],
@@ -83,7 +91,7 @@ const matchReplacesFixLastRoad1 = Matrix.getAllVariants(
         /* eslint-enable */
     ]),
 );
-const matchReplacesFixLastRoad2 = Matrix.getAllVariants(
+const fixLastRoad2 = Matrix.getAllVariants(
     Matrix.fromNestedArray([
         /* eslint-disable */
         [matchLastRoadReplaceToNotLastRoad, matchRoad],
@@ -91,7 +99,8 @@ const matchReplacesFixLastRoad2 = Matrix.getAllVariants(
         /* eslint-enable */
     ]),
 );
-const matchReplacesRoadGrow = Matrix.getAllVariants(
+
+const roadGrow = Matrix.getAllVariants(
     Matrix.fromNestedArray([
         /* eslint-disable */
         [matchRoad, matchLastRoadReplaceToNotLastRoad, matchEmptyReplaceToLastRoad],
@@ -99,7 +108,7 @@ const matchReplacesRoadGrow = Matrix.getAllVariants(
     ]),
 );
 
-const matchReplacesRoadRotate = Matrix.getAllVariants(
+const roadRotate = Matrix.getAllVariants(
     Matrix.fromNestedArray([
         /* eslint-disable */
         [matchNotRoad, matchNotRoad, matchEmptyReplaceToLastRoad],
@@ -108,32 +117,28 @@ const matchReplacesRoadRotate = Matrix.getAllVariants(
     ]),
 );
 
-export function fillRoads({ matrix }: TilesMatrix, moved = false): void {
-    const sliceMatrix = Matrix.slice(
-        matrix,
-        floor(matrix.w / 2) - floor(RENDER_CARD_SIZE / 2),
-        floor(matrix.h / 2) - floor(RENDER_CARD_SIZE / 2),
-        RENDER_CARD_SIZE,
-        RENDER_CARD_SIZE,
-    );
+export function fillRoads({ matrix }: TilesMatrix, move: Vector): void {
+    const shift = min(RENDER_CARD_SIZE, 3);
+    const sliceMatrix = isEqualVectors(move, zeroVector)
+        ? matrix
+        : Matrix.slice(
+              matrix,
+              move.x === -1 ? 0 : move.x === 1 ? CARD_SIZE - shift : 0,
+              move.y === -1 ? 0 : move.y === 1 ? CARD_SIZE - shift : 0,
+              abs(move.x * shift) || CARD_SIZE,
+              abs(move.y * shift) || CARD_SIZE,
+          );
 
-    if (moved) {
-        Matrix.matchReplaceAll(sliceMatrix, matchReplacesFixLastRoad1);
-        Matrix.matchReplaceAll(sliceMatrix, matchReplacesFixLastRoad2);
-    }
+    Matrix.matchReplaceAll(sliceMatrix, fixLastRoad1);
+    Matrix.matchReplaceAll(sliceMatrix, fixLastRoad2);
 
     while (true) {
         const step1 =
-            random() > 0.9
-                ? Matrix.matchReplace(
-                      sliceMatrix,
-                      shuffle(matchReplacesRoadRotate),
-                  )
+            random() > 0.8
+                ? Matrix.matchReplace(sliceMatrix, shuffle(roadRotate))
                 : false;
-        const step2 = Matrix.matchReplace(
-            sliceMatrix,
-            shuffle(matchReplacesRoadGrow),
-        );
+        const step2 = Matrix.matchReplace(sliceMatrix, shuffle(roadGrow));
+
         if (!(step1 || step2)) {
             break;
         }
