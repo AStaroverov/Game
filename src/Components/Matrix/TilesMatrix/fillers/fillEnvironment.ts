@@ -94,8 +94,8 @@ function getTileProbabilities(
 
     if (tile.type === TileType.gross) {
         return {
-            [TileType.gross]: 0.95,
-            [TileType.wood]: 0.05,
+            [TileType.gross]: 0.9,
+            [TileType.wood]: 0.1,
         };
     }
 
