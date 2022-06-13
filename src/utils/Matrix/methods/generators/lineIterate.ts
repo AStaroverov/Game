@@ -14,17 +14,20 @@ export function* lineIterate<T>(
     start: Vector,
     direction: Vector,
 ): IterableIterator<Item<T>> {
-    const getItem = createGetItem(matrix, start);
+    const getItem = createGetItem(matrix, start.x, start.y);
     const passed = newVector(0, 0);
     const step = newVector(
         direction.x / max(abs(direction.x), abs(direction.y)),
         direction.y / max(abs(direction.x), abs(direction.y)),
     );
 
-    yield getItem(passed);
+    yield getItem(passed.x, passed.y);
 
     while (passed.x !== direction.x || passed.y !== direction.y) {
         setVector(passed, sumVector(passed, step));
-        yield getItem(mapVector(passed, floor));
+
+        const coord = mapVector(passed, floor);
+
+        yield getItem(coord.x, coord.y);
     }
 }

@@ -20,6 +20,7 @@ import { NpcSpawnSystem } from '../Systems/NpcSpawnSystem';
 import { playerSystem } from '../Systems/playerSystem';
 import { positionBodySystem } from '../Systems/positionBodySystem';
 import { atlasAnimationRenderSystem } from '../Systems/Renders/atlasAnimationRenderSystem';
+import { cardMeshPositionSystem } from '../Systems/Renders/cardMeshPositionSystem';
 import { cardReliefSystem } from '../Systems/Renders/cardReliefSystem';
 import { cardSurfaceSystem } from '../Systems/Renders/cardSurfaceSystem';
 import { runDialogRenderSystem } from '../Systems/Renders/DialogRenderSystem';
@@ -75,6 +76,7 @@ export function game(): void {
     globalLightRenderSystem(heap, ticker);
     meshesSystem(heap, ticker, renderer.scenes);
 
+    cardMeshPositionSystem(heap, ticker);
     cardSurfaceSystem(heap, ticker);
     cardReliefSystem(heap, ticker);
 

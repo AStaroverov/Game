@@ -8,7 +8,7 @@ import { CardEntityID } from '../Entities/Card';
 import { createEnemyEntity, EnemyEntityID } from '../Entities/Enemy';
 import { GameHeap } from '../heap';
 import { abs, floor } from '../utils/math';
-import { radialIterate } from '../utils/Matrix/methods/iterate/radialIterate';
+import { radialIterate } from '../utils/Matrix/methods/generators/radialIterate';
 import { ExistedItem } from '../utils/Matrix/methods/utils';
 import { random } from '../utils/random';
 import { mulVector, newVector, setVector, sumVector } from '../utils/shape';

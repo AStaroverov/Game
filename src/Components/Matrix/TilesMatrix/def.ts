@@ -22,10 +22,20 @@ export enum TileType {
     building = 'building',
 }
 
-export const EMPTY_TILE = Object.freeze({
+export const getEmptyTile = () => ({
     env: TileEnv.Empty,
-    type: TileEnv.Empty,
+    type: TileType.empty,
     passable: false,
+});
+export const getLastRoadTile = () => ({
+    env: TileEnv.Empty,
+    type: TileType.road,
+    passable: true,
+    last: true,
+});
+export const getRoadTile = () => ({
+    ...getLastRoadTile(),
+    last: false,
 });
 
 export function isPassableTileType(type: TileType) {

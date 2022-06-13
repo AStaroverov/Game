@@ -1,7 +1,6 @@
 import { shuffle } from 'lodash';
 
-import { Matrix } from '../../../../utils/Matrix';
-import { ExistedItem, Item } from '../../../../utils/Matrix/methods/utils';
+import { Matrix, TMatrix } from '../../../../utils/Matrix';
 import { random } from '../../../../utils/random';
 import {
     isEqualVectors,
@@ -9,52 +8,35 @@ import {
     Vector,
     zeroVector,
 } from '../../../../utils/shape';
-import { Tile, TileType } from '../def';
-import { TilesMatrix } from '../index';
-import { getMatrixSide, getRenderMatrix } from './utils/getMatrixSide';
+import { getLastRoadTile, getRoadTile, Tile, TileType } from '../def';
+import { getRenderMatrixSide } from './utils/getRenderMatrixSide';
+import { getRenderMatrixSlice } from './utils/getRenderMatrixSlice';
+import {
+    isEmptyItem,
+    isLastRoadItem,
+    isNotLastRoadItem,
+    isNotRoadItem,
+    isRoadItem,
+} from './utils/is';
 
-const isExisted = (item: Item<Tile>): item is ExistedItem<Tile> =>
-    item.value !== undefined;
-
-const isEmptyItem = (item: Item<Tile>) =>
-    isExisted(item) && item.value.type === TileType.empty;
-
-const isRoadItem = (item: Item<Tile>) =>
-    isExisted(item) && item.value.type === TileType.road;
-
-const isNotRoadItem = (item: Item<Tile>) =>
-    isExisted(item) && item.value.type !== TileType.road;
-
-const isLastRoadItem = (item: Item<Tile>) =>
-    isExisted(item) &&
-    isRoadItem(item) &&
-    'last' in item.value &&
-    item.value.last === true;
-
-const isNotLastRoadItem = (item: Item<Tile>) =>
-    isExisted(item) &&
-    isRoadItem(item) &&
-    'last' in item.value &&
-    item.value.last === false;
-
-const replaceToNotLastRoad = ({ value }: Item<Tile>) => {
-    return Object.assign(value, {
+const replaceToNotLastRoad = (tile: Tile) => {
+    return Object.assign(tile, {
         passable: true,
         type: TileType.road,
         last: false,
     });
 };
 
-const replaceToLastRoad = ({ value }: Item<Tile>) => {
-    return Object.assign(value, {
+const replaceToLastRoad = (tile: Tile) => {
+    return Object.assign(tile, {
         passable: true,
         type: TileType.road,
         last: true,
     });
 };
 
-const replaceToSomeRoad = ({ value }: Item<Tile>) => {
-    return Object.assign(value, {
+const replaceToSomeRoad = (tile: Tile) => {
+    return Object.assign(tile, {
         passable: true,
         type: TileType.road,
         last: random() > 0.9,
@@ -134,15 +116,29 @@ const roadRotatePattern = Matrix.getAllVariants(
 const filterRoadRotate = () => random() > 0.6;
 const getRoadRotatePattern = () => roadRotatePattern.filter(filterRoadRotate);
 
-export function fillRoads({ matrix }: TilesMatrix, move: Vector): void {
+export function fillRoads(matrix: TMatrix<Tile>, rotateChance = 0.1): void {
+    while (true) {
+        const step1 =
+            random() < rotateChance &&
+            Matrix.matchReplace(matrix, getRoadRotatePattern());
+
+        const step2 = Matrix.matchReplace(matrix, shuffle(roadGrowPatterns));
+
+        if (!(step1 || step2)) {
+            break;
+        }
+    }
+}
+
+export function updateRoads(matrix: TMatrix<Tile>, move: Vector): void {
     toOneWayVectors(move).forEach((move) => {
         const sliceMatrix = isEqualVectors(move, zeroVector)
-            ? getRenderMatrix(matrix)
-            : getMatrixSide(matrix, move, 3);
+            ? getRenderMatrixSlice(matrix)
+            : getRenderMatrixSide(matrix, move, 3);
         const shouldSpawnNewRoad =
             random() > 0.9 &&
             Matrix.every(
-                getRenderMatrix(matrix),
+                getRenderMatrixSlice(matrix),
                 (tile) => tile.type !== TileType.road,
             );
 
@@ -153,19 +149,19 @@ export function fillRoads({ matrix }: TilesMatrix, move: Vector): void {
             Matrix.matchReplaceAll(sliceMatrix, randomSpawnRoad);
         }
 
-        while (true) {
-            const step1 =
-                random() > 0.9 &&
-                Matrix.matchReplace(sliceMatrix, getRoadRotatePattern());
-
-            const step2 = Matrix.matchReplace(
-                sliceMatrix,
-                shuffle(roadGrowPatterns),
-            );
-
-            if (!(step1 || step2)) {
-                break;
-            }
-        }
+        fillRoads(sliceMatrix);
     });
+}
+
+export function fillCrossroads(
+    matrix: TMatrix<Tile>,
+    vec: Vector,
+): TMatrix<Tile> {
+    Matrix.set(matrix, vec.x, vec.y, getRoadTile());
+    Matrix.set(matrix, vec.x + 1, vec.y, getLastRoadTile());
+    Matrix.set(matrix, vec.x - 1, vec.y, getLastRoadTile());
+    Matrix.set(matrix, vec.x, vec.y + 1, getLastRoadTile());
+    Matrix.set(matrix, vec.x, vec.y - 1, getLastRoadTile());
+
+    return matrix;
 }

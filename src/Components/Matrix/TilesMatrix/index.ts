@@ -1,6 +1,6 @@
 import { createComponent, ReturnStruct } from '../../../../lib/ECS/Component';
-import { Matrix, TMatrix } from '../../../utils/Matrix';
-import { newVector, Size, Vector } from '../../../utils/shape';
+import { Matrix } from '../../../utils/Matrix';
+import { Size, Vector } from '../../../utils/shape';
 import { createMatrixComponent } from '../Matrix';
 import { Tile, TileEnv, TileType } from './def';
 
@@ -18,71 +18,6 @@ export const createTilesMatrixComponent = (props: Size) =>
         createMatrixComponent({ ...props, seed: GET_EMPTY_TILE }),
     );
 
-export function updateTile(target: Tile, source: Partial<Tile>) {
-    Object.assign(target, source);
-}
-
-export function getMatrixTile(
-    matrix: TilesMatrix['matrix'],
-    vec: Vector,
-): undefined | Tile {
-    return Matrix.get(matrix, vec.x, vec.y);
-}
-
-export function setMatrixTile(
-    matrix: TilesMatrix['matrix'],
-    vec: Vector,
-    tile: Tile,
-): undefined | Tile {
-    return Matrix.set(matrix, vec.x, vec.y, tile);
-}
-
-export function initMatrixTiles({ matrix }: TilesMatrix, vec: Vector): void {
-    // for (const item of crossIterate(matrix, vec, 1)) {
-    // if (
-    //     item !== undefined &&
-    //     (random() > 0.5 || isEqualVectors(vec, item))
-    // ) {
-    //     setMatrixTile(matrix, item, {
-    //         env: TileEnv.Forest,
-    //         type: TileType.road,
-    //         passable: true,
-    //     });
-    // }
-    // }
-
-    setMatrixTile(matrix, newVector(vec.x - 1, vec.y), {
-        passable: true,
-        env: TileEnv.Forest,
-        type: TileType.road,
-        last: true,
-    });
-    setMatrixTile(matrix, vec, {
-        passable: true,
-        env: TileEnv.Forest,
-        type: TileType.road,
-        last: false,
-    });
-    setMatrixTile(matrix, newVector(vec.x + 1, vec.y), {
-        passable: true,
-        env: TileEnv.Forest,
-        type: TileType.road,
-        last: true,
-    });
-}
-
-export function mergeTiles(
-    struct: TilesMatrix,
-    source: TMatrix,
-    sx: number,
-    sy: number,
-): void {
-    const target = struct.matrix;
-    Matrix.forEach(source, (item, x, y) => {
-        Matrix.set(target, sx + x, sy + y, item);
-    });
-}
-
 export function moveTiles({ matrix }: TilesMatrix, v: Vector): void {
     const { w, h } = matrix;
     const tmp = Matrix.create<Tile>(w, h, GET_EMPTY_TILE);
@@ -94,5 +29,5 @@ export function moveTiles({ matrix }: TilesMatrix, v: Vector): void {
         }
     }
 
-    Matrix.setSource(matrix, tmp.buffer.slice());
+    Matrix.setSource(matrix, tmp.buffer);
 }

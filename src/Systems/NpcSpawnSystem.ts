@@ -30,7 +30,7 @@ import { floor } from '../utils/math';
 import {
     Item,
     rectangleIterate,
-} from '../utils/Matrix/methods/iterate/rectangleIterate';
+} from '../utils/Matrix/methods/generators/rectangleIterate';
 import { random } from '../utils/random';
 import {
     isEqualVectors,

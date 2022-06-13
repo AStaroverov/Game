@@ -1,27 +1,57 @@
+import { some as arraySome } from 'lodash';
+
 import { TMatrix } from '../index';
-import { create, every, forEach, many, set, some } from './base';
-import { getItem, Item } from './utils';
+import { create, get, set } from './base';
+import { every, forEach, many, some } from './iterators/base';
+import { shuffleMany, shuffleSome } from './iterators/shuffle';
 
 export type ItemMatchReplace<T> = {
-    match: (item: Item<T>) => boolean;
-    replace?: (item: Item<T>, matchedMatrix: TMatrix<T>) => T;
+    match: (item: T, x: number, y: number, matrix: TMatrix<T>) => boolean;
+    replace?: (
+        item: T,
+        x: number,
+        y: number,
+        matrix: TMatrix<T>,
+        matchedMatrix: TMatrix<T>,
+    ) => T;
 };
-export function matchReplace<T>(
+
+export function createMatchReplace(
+    matrixIterator = some,
+    matchReplacesIterator = arraySome,
+) {
+    return function matchReplace<T>(
+        matrix: TMatrix<T>,
+        matchReplaces: TMatrix<ItemMatchReplace<T>>[],
+    ): boolean {
+        return matrixIterator(matrix, (item, x, y) => {
+            return matchReplacesIterator(
+                matchReplaces,
+                createSomeReplaced(matrix, x, y),
+            );
+        });
+    };
+}
+
+export const matchReplace: <T>(
     matrix: TMatrix<T>,
     matchReplaces: TMatrix<ItemMatchReplace<T>>[],
-): boolean {
-    return some(matrix, (item, x, y) => {
-        return matchReplaces.some(createSomeReplaced(matrix, x, y));
-    });
-}
-export function matchReplaceAll<T>(
+) => boolean = createMatchReplace();
+
+export const matchReplaceAll: <T>(
     matrix: TMatrix<T>,
     matchReplaces: TMatrix<ItemMatchReplace<T>>[],
-): boolean {
-    return many(matrix, (item, x, y) => {
-        return matchReplaces.some(createSomeReplaced(matrix, x, y));
-    });
-}
+) => boolean = createMatchReplace(many);
+
+export const matchReplaceShuffle: <T>(
+    matrix: TMatrix<T>,
+    matchReplaces: TMatrix<ItemMatchReplace<T>>[],
+) => boolean = createMatchReplace(shuffleSome);
+
+export const matchReplaceShuffleAll: <T>(
+    matrix: TMatrix<T>,
+    matchReplaces: TMatrix<ItemMatchReplace<T>>[],
+) => boolean = createMatchReplace(shuffleMany);
 
 export function createSomeReplaced<T>(
     matrix: TMatrix<T>,
@@ -35,16 +65,21 @@ export function createSomeReplaced<T>(
             return false;
         }
 
-        const matchedItems: Item<T>[] = [];
+        const matchedItems: T[] = [];
         const matched = every(matchReplace, ({ match }, x, y, i) => {
-            return match((matchedItems[i] = getItem(matrix, sx + x, sy + y)));
+            return match(
+                (matchedItems[i] = get(matrix, sx + x, sy + y) as T),
+                sx + x,
+                sy + y,
+                matrix,
+            );
         });
 
         if (matched) {
             const matchedMatrix = create<T>(
                 matchReplace.w,
                 matchReplace.h,
-                (x, y, i) => matchedItems[i].value!,
+                (x, y, i) => matchedItems[i]!,
             );
             forEach(matchReplace, ({ replace }, x, y, i) => {
                 set(
@@ -52,8 +87,14 @@ export function createSomeReplaced<T>(
                     sx + x,
                     sy + y,
                     replace === undefined
-                        ? matchedItems[i].value
-                        : replace(matchedItems[i], matchedMatrix),
+                        ? matchedItems[i]
+                        : replace(
+                              matchedItems[i],
+                              sx + x,
+                              sy + y,
+                              matrix,
+                              matchedMatrix,
+                          ),
                 );
             });
 

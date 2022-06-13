@@ -1,8 +1,9 @@
 import { Point } from '../../shape';
 import { TMatrix } from '../index';
-import { get, reduce } from './base';
+import { get } from './base';
 
 export const STOP_ITERATE = Symbol('STOP_ITERATE');
+
 export type Item<T> = Point & {
     value: undefined | T;
     matrix: TMatrix<T>;
@@ -11,13 +12,6 @@ export type ExistedItem<T> = Point & {
     value: T;
     matrix: TMatrix<T>;
 };
-
-export function toItemsArray<T>(matrix: TMatrix<T>): Item<T>[] {
-    return reduce(matrix, [] as Item<T>[], (acc, item, x, y) => {
-        acc.push(getItem(matrix, x, y));
-        return acc;
-    });
-}
 
 export function createGetItem<T>(
     matrix: TMatrix<T>,

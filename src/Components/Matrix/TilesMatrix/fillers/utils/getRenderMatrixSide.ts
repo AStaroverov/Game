@@ -3,9 +3,9 @@ import { abs, floor, min } from '../../../../../utils/math';
 import { Matrix, TMatrix } from '../../../../../utils/Matrix';
 import { newVector, Vector } from '../../../../../utils/shape';
 
-export function getMatrixSide<T>(
+export function getRenderMatrixSide<T>(
     matrix: TMatrix<T>,
-    move: Vector,
+    dir: Vector,
     width: number,
 ): TMatrix<T> {
     const shift = min(RENDER_CARD_SIZE, width);
@@ -19,19 +19,9 @@ export function getMatrixSide<T>(
     );
     return Matrix.slice(
         matrix,
-        move.x === 1 ? renderVecLast.x : renderVecFirst.x,
-        move.y === 1 ? renderVecLast.y : renderVecFirst.y,
-        abs(move.x * shift) || RENDER_CARD_SIZE,
-        abs(move.y * shift) || RENDER_CARD_SIZE,
-    );
-}
-
-export function getRenderMatrix<T>(matrix: TMatrix<T>): TMatrix<T> {
-    return Matrix.slice(
-        matrix,
-        floor(matrix.w / 2) - floor(RENDER_CARD_SIZE / 2),
-        floor(matrix.h / 2) - floor(RENDER_CARD_SIZE / 2),
-        RENDER_CARD_SIZE,
-        RENDER_CARD_SIZE,
+        dir.x === 1 ? renderVecLast.x : renderVecFirst.x,
+        dir.y === 1 ? renderVecLast.y : renderVecFirst.y,
+        abs(dir.x * shift) || RENDER_CARD_SIZE,
+        abs(dir.y * shift) || RENDER_CARD_SIZE,
     );
 }

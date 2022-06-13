@@ -42,6 +42,10 @@ export const isEqualVectors = (a: Vector, b: Vector): boolean =>
 export const hasEqualDirection = (a: Vector, b: Vector): boolean =>
     isEqualVectors(mapVector(a, sign), mapVector(b, sign));
 
+export const isOneWayDirection = (v: Vector): boolean => {
+    return (v.x === 0 && v.y !== 0) || (v.x !== 0 && v.y === 0);
+};
+
 export const toOneWayVectors = (a: Vector): Vector[] => {
     if (isEqualVectors(a, zeroVector)) return [zeroVector];
 

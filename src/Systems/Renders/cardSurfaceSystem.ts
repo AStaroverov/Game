@@ -1,7 +1,6 @@
 import { Color, TextureLoader } from 'three';
 
 import imageGrass from '../../../assets/sprites/tilesets/grass.png';
-import imagePlains from '../../../assets/sprites/tilesets/plains.png';
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { getEntities } from '../../../lib/ECS/Heap';
 import { getMatrixCell, getMatrixSlice } from '../../Components/Matrix/Matrix';
@@ -9,19 +8,18 @@ import { SurfaceMeshesMatrixID } from '../../Components/Matrix/SurfaceMeshesMatr
 import { TilesMatrixID } from '../../Components/Matrix/TilesMatrix';
 import { TileType } from '../../Components/Matrix/TilesMatrix/def';
 import { PositionComponentID } from '../../Components/Position';
-import { $ref, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
+import { $ref, RENDER_CARD_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
 import { floor, round } from '../../utils/math';
 import { Matrix } from '../../utils/Matrix';
 import { randomArbitrary } from '../../utils/random';
-import { mapVector, newVector, sumVector } from '../../utils/shape';
+import { mapVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 const RENDER_RADIUS = Math.floor(RENDER_CARD_SIZE / 2);
 const TEXTURE_GRASS = new TextureLoader().load(imageGrass);
-const TEXTURE_ROAD = new TextureLoader().load(imagePlains);
 
 export function cardSurfaceSystem(
     heap: GameHeap,
@@ -56,10 +54,6 @@ export function cardSurfaceSystem(
             sumVector(playerPosition, cardPosition),
             round,
         );
-        const fractionPosition = newVector(
-            (cardPosition.x > 0 ? 1 : 0) - (cardPosition.x % 1),
-            (cardPosition.y > 0 ? 1 : 0) - (cardPosition.y % 1),
-        );
         const uflooredPosition = mapVector(cardPosition, floor);
 
         Matrix.forEach(
@@ -73,20 +67,7 @@ export function cardSurfaceSystem(
                 const cell = getMatrixCell(cardMeshes, x, y);
                 const mesh = cell?.[$ref];
 
-                if (tile && mesh) {
-                    if (tile.type === TileType.empty) {
-                        mesh.visible = false;
-                        return;
-                    }
-
-                    mesh.visible = true;
-                    mesh.position.x = floor(
-                        (x - fractionPosition.x) * TILE_SIZE,
-                    );
-                    mesh.position.y = floor(
-                        (y - fractionPosition.y) * TILE_SIZE,
-                    );
-
+                if (tile && mesh && tile.type !== TileType.empty) {
                     const index =
                         x +
                         y * RENDER_CARD_SIZE -
@@ -116,8 +97,6 @@ export function cardSurfaceSystem(
                         mesh.material.map = null;
                         mesh.material.needsUpdate = true;
                     }
-                } else if (mesh) {
-                    mesh.visible = false;
                 }
             },
         );

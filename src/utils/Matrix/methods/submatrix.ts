@@ -1,5 +1,7 @@
 import { newVector, Vector, zeroVector } from '../../shape';
-import { Matrix, TMatrix } from '../index';
+import { TMatrix } from '../index';
+import { get } from './base';
+import { find } from './iterators/base';
 import { Item } from './utils';
 
 export function isSubMatrix<A, B = A>(isEqual: (a: A, b: B) => boolean) {
@@ -14,8 +16,8 @@ export function isSubMatrix<A, B = A>(isEqual: (a: A, b: B) => boolean) {
 
         return (
             undefined ===
-            Matrix.find(submatrix, (b, x, y) => {
-                const a = Matrix.get(matrix, offset.x + x, offset.y + y);
+            find(submatrix, (b, x, y) => {
+                const a = get(matrix, offset.x + x, offset.y + y);
                 return a === undefined ? true : !isEqual(a, b);
             })
         );
@@ -29,7 +31,7 @@ export function findSubMatrix<A, B = A>(
         matrix: TMatrix<A>,
         submatrix: TMatrix<B>,
     ): undefined | Item<A> {
-        return Matrix.find(matrix, (_, x, y) => {
+        return find(matrix, (_, x, y) => {
             return isSubMatrix(matrix, submatrix, newVector(x, y));
         });
     };
@@ -44,7 +46,7 @@ export function findSubMatrices<A, B = A>(
     ): undefined | { item: Item<A>; submatrix: TMatrix<B> } {
         for (let i = 0; i < submatrices.length; i++) {
             const submatrix = submatrices[i];
-            const item = Matrix.find(matrix, (_, x, y) => {
+            const item = find(matrix, (_, x, y) => {
                 return isSubMatrix(matrix, submatrix, newVector(x, y));
             });
 

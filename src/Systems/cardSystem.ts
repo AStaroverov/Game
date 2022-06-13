@@ -1,8 +1,9 @@
 import { getComponentStruct } from '../../lib/ECS/Entity';
 import { getEntities } from '../../lib/ECS/Heap';
 import { moveTiles, TilesMatrixID } from '../Components/Matrix/TilesMatrix';
-import { fillEnvironment } from '../Components/Matrix/TilesMatrix/fillers/fillEnvironment';
-import { fillRoads } from '../Components/Matrix/TilesMatrix/fillers/fillRoads';
+import { updateEnvironment } from '../Components/Matrix/TilesMatrix/fillers/environment';
+import { updateRoads } from '../Components/Matrix/TilesMatrix/fillers/roads';
+import { spawnVillage } from '../Components/Matrix/TilesMatrix/fillers/village';
 import { PositionComponentID } from '../Components/Position';
 import { CENTER_CARD_POSITION } from '../CONST';
 import { CardEntityID } from '../Entities/Card';
@@ -46,8 +47,10 @@ export function cardSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
         if (diff.x !== 0 || diff.y !== 0) {
             moveTiles(cardTiles, diff);
-            fillRoads(cardTiles, diff);
-            fillEnvironment(cardTiles, diff);
+            updateRoads(cardTiles.matrix, diff);
+            updateEnvironment(cardTiles.matrix, diff);
+
+            spawnVillage(cardTiles.matrix, diff);
         }
 
         setVector(cardPosition, nextCardPosition);
