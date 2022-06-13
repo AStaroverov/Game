@@ -9,6 +9,7 @@ import {
     DirectionComponentID,
 } from '../Components/DirectionComponent';
 import { TilesMatrixID } from '../Components/Matrix/TilesMatrix';
+import { isPassableTileType } from '../Components/Matrix/TilesMatrix/def';
 import { PositionComponent, PositionComponentID } from '../Components/Position';
 import { VelocityComponent, VelocityComponentID } from '../Components/Velocity';
 import { CardEntityID } from '../Entities/Card';
@@ -64,7 +65,7 @@ export function colliderSystem(heap: GameHeap, ticker: TasksScheduler): void {
                 );
                 const tile = Matrix.get(tiles.matrix, coord.x, coord.y);
 
-                if (tile !== undefined && !tile.passable) {
+                if (tile !== undefined && !isPassableTileType(tile.type)) {
                     velocity.v = 0;
                 }
             }

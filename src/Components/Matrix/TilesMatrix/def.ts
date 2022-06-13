@@ -4,7 +4,6 @@ export type RoadTile = BaseTile<{ last: boolean }>;
 export type BaseTile<Meta extends object = {}> = Meta & {
     env: TileEnv;
     type: TileType;
-    passable: boolean;
 };
 
 export enum TileEnv {

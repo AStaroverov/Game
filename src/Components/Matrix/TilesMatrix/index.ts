@@ -7,7 +7,6 @@ import { Tile, TileEnv, TileType } from './def';
 const GET_EMPTY_TILE = (): Tile => ({
     env: TileEnv.Empty,
     type: TileType.empty,
-    passable: false,
 });
 
 export const TilesMatrixID = 'TILES_MATRIX' as const;

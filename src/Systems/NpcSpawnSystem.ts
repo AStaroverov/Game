@@ -4,7 +4,7 @@ import Enumerable from '../../lib/linq';
 import { DialogID } from '../Components/Dialogs/data';
 import { DirectionComponentID } from '../Components/DirectionComponent';
 import { TilesMatrix, TilesMatrixID } from '../Components/Matrix/TilesMatrix';
-import { Tile } from '../Components/Matrix/TilesMatrix/def';
+import { isPassableTileType, Tile } from '../Components/Matrix/TilesMatrix/def';
 import {
     PlayerStoryComponentID,
     PlayerStoryStep,
@@ -126,7 +126,7 @@ function getRandomTile(
     return Enumerable.from(rectangleIterate(cardTiles.matrix, sx, sy, w, h))
         .where((item): item is Item<Tile> => item !== undefined)
         .firstOrDefault(({ value, x, y }) => {
-            if (!value.passable) {
+            if (!isPassableTileType(value.type)) {
                 return false;
             }
 
