@@ -11,10 +11,7 @@ import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 const ONE_DAY = 5 * 60 * 1000; // 5 min
 
-export function globalLightRenderSystem(
-    heap: GameHeap,
-    ticker: TasksScheduler,
-): void {
+export function globalLightRenderSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const globalLight = getEntities(heap, GlobalLightEntityID)[0];
     const spotLight = getComponentStruct(globalLight, SpotLightMeshComponentID);
 

@@ -12,10 +12,7 @@ export function saveSystem(heap: GameHeap) {
 
     press$.pipe(filter((e) => e.code === 'KeyS')).subscribe((e) => {
         e.preventDefault();
-        localStorage.setItem(
-            `SAVE_${GAME_VERSION}`,
-            JSON.stringify(getSnapshot(heap)),
-        );
+        localStorage.setItem(`SAVE_${GAME_VERSION}`, JSON.stringify(getSnapshot(heap)));
     });
 
     press$.pipe(filter((e) => e.code === 'KeyL')).subscribe(() => {

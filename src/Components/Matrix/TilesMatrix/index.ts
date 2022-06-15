@@ -1,6 +1,6 @@
 import { createComponent, ReturnStruct } from '../../../../lib/ECS/Component';
 import { Matrix } from '../../../utils/Matrix';
-import { Size, Vector } from '../../../utils/shape';
+import { TSize, TVector } from '../../../utils/shape';
 import { createMatrixComponent } from '../Matrix';
 import { Tile, TileEnv, TileType } from './def';
 
@@ -11,13 +11,10 @@ const GET_EMPTY_TILE = (): Tile => ({
 
 export const TilesMatrixID = 'TILES_MATRIX' as const;
 export type TilesMatrix = ReturnStruct<typeof createTilesMatrixComponent>;
-export const createTilesMatrixComponent = (props: Size) =>
-    createComponent(
-        TilesMatrixID,
-        createMatrixComponent({ ...props, seed: GET_EMPTY_TILE }),
-    );
+export const createTilesMatrixComponent = (props: TSize) =>
+    createComponent(TilesMatrixID, createMatrixComponent({ ...props, seed: GET_EMPTY_TILE }));
 
-export function moveTiles({ matrix }: TilesMatrix, v: Vector): void {
+export function moveTiles({ matrix }: TilesMatrix, v: TVector): void {
     const { w, h } = matrix;
     const tmp = Matrix.create<Tile>(w, h, GET_EMPTY_TILE);
 

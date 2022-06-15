@@ -21,17 +21,11 @@ import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 const RENDER_RADIUS = Math.floor(RENDER_CARD_SIZE / 2);
 const TEXTURE_GRASS = new TextureLoader().load(imageGrass);
 
-export function cardSurfaceSystem(
-    heap: GameHeap,
-    ticker: TasksScheduler,
-): void {
+export function cardSurfaceSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
     const cardEntity = getEntities(heap, CardEntityID)[0];
 
-    const playerPosition = getComponentStruct(
-        playerEntity,
-        PositionComponentID,
-    );
+    const playerPosition = getComponentStruct(playerEntity, PositionComponentID);
     const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
     const cardTiles = getComponentStruct(cardEntity, TilesMatrixID);
     const cardMeshes = getComponentStruct(cardEntity, SurfaceMeshesMatrixID);
@@ -50,19 +44,11 @@ export function cardSurfaceSystem(
     }
 
     function updateSurface() {
-        const absPosition = mapVector(
-            sumVector(playerPosition, cardPosition),
-            round,
-        );
+        const absPosition = mapVector(sumVector(playerPosition, cardPosition), round);
         const uflooredPosition = mapVector(cardPosition, floor);
 
         Matrix.forEach(
-            getMatrixSlice(
-                cardTiles,
-                absPosition.x,
-                absPosition.y,
-                RENDER_RADIUS,
-            ),
+            getMatrixSlice(cardTiles, absPosition.x, absPosition.y, RENDER_RADIUS),
             (tile, x, y) => {
                 const cell = getMatrixCell(cardMeshes, x, y);
                 const mesh = cell?.[$ref];
@@ -71,8 +57,7 @@ export function cardSurfaceSystem(
                     const index =
                         x +
                         y * RENDER_CARD_SIZE -
-                        (uflooredPosition.x +
-                            uflooredPosition.y * RENDER_CARD_SIZE);
+                        (uflooredPosition.x + uflooredPosition.y * RENDER_CARD_SIZE);
                     const salt = getSalt(index);
 
                     if (mesh.material.color !== salt.color) {
@@ -80,8 +65,7 @@ export function cardSurfaceSystem(
                     }
 
                     if (
-                        (tile.type === TileType.wood ||
-                            tile.type === TileType.gross) &&
+                        (tile.type === TileType.wood || tile.type === TileType.gross) &&
                         mesh.material.map !== TEXTURE_GRASS
                     ) {
                         mesh.material.map = TEXTURE_GRASS;

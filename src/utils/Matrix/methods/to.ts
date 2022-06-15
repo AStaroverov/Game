@@ -7,9 +7,7 @@ export function toArray<T>(source: TMatrix<T>): T[] {
 }
 
 export function toNestedArray<T>(matrix: TMatrix<T>): T[][] {
-    const m = new Array(matrix.h)
-        .fill(null)
-        .map(() => new Array(matrix.w).fill(null));
+    const m = new Array(matrix.h).fill(null).map(() => new Array(matrix.w).fill(null));
 
     forEach(matrix, (v, x, y) => {
         m[y][x] = v;

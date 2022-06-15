@@ -1,20 +1,9 @@
-import {
-    filter,
-    finalize,
-    interval,
-    map,
-    takeUntil,
-    takeWhile,
-    tap,
-} from 'rxjs';
+import { filter, finalize, interval, map, takeUntil, takeWhile, tap } from 'rxjs';
 
 import { getComponentStruct } from '../../lib/ECS/Entity';
 import { deleteEntity, getEntities } from '../../lib/ECS/Heap';
 import { dialogs } from '../Components/Dialogs/data';
-import {
-    DialogComponentID,
-    updateDialogComponent,
-} from '../Components/Dialogs/Dialog';
+import { DialogComponentID, updateDialogComponent } from '../Components/Dialogs/Dialog';
 import {
     PlayerStoryComponentID,
     PlayerStoryStep,
@@ -27,13 +16,7 @@ import { PlayerEntityID } from '../Entities/Player';
 import { GameHeap } from '../heap';
 import { abs } from '../utils/math';
 import { fromKeyPress } from '../utils/RX/keypress';
-import {
-    negateVector,
-    newVector,
-    setVector,
-    sumVector,
-    widthVector,
-} from '../utils/shape';
+import { negateVector, newVector, setVector, sumVector, widthVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 const startPosition = newVector(0, 0);
@@ -66,10 +49,7 @@ export function runDialogSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
                         if (dialog.step >= dialogLength) {
                             updatePlayerStoryStep(
-                                getComponentStruct(
-                                    story,
-                                    PlayerStoryComponentID,
-                                ),
+                                getComponentStruct(story, PlayerStoryComponentID),
                                 PlayerStoryStep.SearchFirstVillage,
                             );
                         }
@@ -82,9 +62,7 @@ export function runDialogSystem(heap: GameHeap, ticker: TasksScheduler): void {
     }, 100);
 
     function shouldStopByDistance() {
-        const width = abs(
-            widthVector(sumVector(startPosition, negateVector(playerPosition))),
-        );
+        const width = abs(widthVector(sumVector(startPosition, negateVector(playerPosition))));
 
         return width > 1;
     }

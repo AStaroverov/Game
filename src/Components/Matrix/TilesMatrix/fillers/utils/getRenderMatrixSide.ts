@@ -1,11 +1,11 @@
 import { RENDER_CARD_SIZE } from '../../../../../CONST';
 import { abs, floor, min } from '../../../../../utils/math';
 import { Matrix, TMatrix } from '../../../../../utils/Matrix';
-import { newVector, Vector } from '../../../../../utils/shape';
+import { newVector, TVector } from '../../../../../utils/shape';
 
 export function getRenderMatrixSide<T>(
     matrix: TMatrix<T>,
-    dir: Vector,
+    dir: TVector,
     width: number,
 ): TMatrix<T> {
     const shift = min(RENDER_CARD_SIZE, width);

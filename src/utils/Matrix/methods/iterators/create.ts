@@ -8,13 +8,7 @@ export function createReduce(iterate: typeof forEach | typeof shuffleForEach) {
     return function reduce<T, Acc>(
         matrix: TMatrix<T>,
         accumulator: Acc,
-        callback: (
-            accumulator: Acc,
-            item: T,
-            x: number,
-            y: number,
-            i: number,
-        ) => Acc,
+        callback: (accumulator: Acc, item: T, x: number, y: number, i: number) => Acc,
     ): Acc {
         function _reduce(item: T, x: number, y: number, i: number) {
             accumulator = callback(accumulator, item, x, y, i);
@@ -62,7 +56,7 @@ export function createMany(iterate: typeof forEach | typeof shuffleForEach) {
     ): boolean {
         let result = false;
 
-        forEach(matrix, (v: any, x: number, y: number, i: number) => {
+        iterate(matrix, (v: any, x: number, y: number, i: number) => {
             const r = callback(v, x, y, i);
             result = result || r;
         });

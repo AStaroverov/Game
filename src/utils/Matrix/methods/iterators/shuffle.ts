@@ -3,14 +3,7 @@ import { shuffle } from 'lodash';
 import { TMatrix } from '../../index';
 import { get } from '../base';
 import { STOP_ITERATE } from '../utils';
-import {
-    createEvery,
-    createFind,
-    createMany,
-    createMap,
-    createReduce,
-    createSome,
-} from './create';
+import { createEvery, createFind, createMany, createMap, createReduce, createSome } from './create';
 
 const NUMBERS = new Int32Array(1_000_000).map((_, i) => i);
 

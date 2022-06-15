@@ -1,4 +1,4 @@
-import { newVector, Vector, zeroVector } from '../../shape';
+import { newVector, TVector, zeroVector } from '../../shape';
 import { TMatrix } from '../index';
 import { get } from './base';
 import { find } from './iterators/base';
@@ -8,7 +8,7 @@ export function isSubMatrix<A, B = A>(isEqual: (a: A, b: B) => boolean) {
     return function _isSubMatrix(
         matrix: TMatrix<A>,
         submatrix: TMatrix<B>,
-        offset: Vector = zeroVector,
+        offset: TVector = zeroVector,
     ): boolean {
         if (submatrix.w > matrix.w || submatrix.h > matrix.h) {
             return false;
@@ -25,12 +25,9 @@ export function isSubMatrix<A, B = A>(isEqual: (a: A, b: B) => boolean) {
 }
 
 export function findSubMatrix<A, B = A>(
-    isSubMatrix: (a: TMatrix<A>, b: TMatrix<B>, offset: Vector) => boolean,
+    isSubMatrix: (a: TMatrix<A>, b: TMatrix<B>, offset: TVector) => boolean,
 ) {
-    return function _findSubMatrix(
-        matrix: TMatrix<A>,
-        submatrix: TMatrix<B>,
-    ): undefined | Item<A> {
+    return function _findSubMatrix(matrix: TMatrix<A>, submatrix: TMatrix<B>): undefined | Item<A> {
         return find(matrix, (_, x, y) => {
             return isSubMatrix(matrix, submatrix, newVector(x, y));
         });
@@ -38,7 +35,7 @@ export function findSubMatrix<A, B = A>(
 }
 
 export function findSubMatrices<A, B = A>(
-    isSubMatrix: (a: TMatrix<A>, b: TMatrix<B>, offset: Vector) => boolean,
+    isSubMatrix: (a: TMatrix<A>, b: TMatrix<B>, offset: TVector) => boolean,
 ) {
     return function _findSubMatrices(
         matrix: TMatrix<A>,

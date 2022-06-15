@@ -1,20 +1,10 @@
 import { filter, fromEvent } from 'rxjs';
 
-import {
-    getComponentStruct,
-    hasComponent,
-    SomeEntity,
-} from '../../../lib/ECS/Entity';
+import { getComponentStruct, hasComponent, SomeEntity } from '../../../lib/ECS/Entity';
 import { addEntity, filterEntities, getEntities } from '../../../lib/ECS/Heap';
-import {
-    ActionableComponent,
-    ActionableComponentID,
-} from '../../Components/Actionable';
+import { ActionableComponent, ActionableComponentID } from '../../Components/Actionable';
 import { DirectionComponentID } from '../../Components/DirectionComponent';
-import {
-    PositionComponent,
-    PositionComponentID,
-} from '../../Components/Position';
+import { PositionComponent, PositionComponentID } from '../../Components/Position';
 import { createDialogEntity } from '../../Entities/Dilog';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
@@ -36,9 +26,7 @@ export function runActionSystem(heap: GameHeap): void {
             const playerLookingAtPosition = sumVector(position, direction);
             const actionableEntities = filterEntities(
                 heap,
-                (
-                    e,
-                ): e is SomeEntity<PositionComponent | ActionableComponent> => {
+                (e): e is SomeEntity<PositionComponent | ActionableComponent> => {
                     return (
                         hasComponent(e, PositionComponentID) &&
                         hasComponent(e, ActionableComponentID)
@@ -47,26 +35,17 @@ export function runActionSystem(heap: GameHeap): void {
             );
 
             actionableEntities.forEach((entity) => {
-                const position = getComponentStruct(
-                    entity,
-                    PositionComponentID,
-                );
+                const position = getComponentStruct(entity, PositionComponentID);
                 const dist = widthVector(
                     sumVector(playerLookingAtPosition, negateVector(position)),
                 );
 
                 if (dist > 1) return;
 
-                const action = getComponentStruct(
-                    entity,
-                    ActionableComponentID,
-                );
+                const action = getComponentStruct(entity, ActionableComponentID);
 
                 if (action.type === CommonAction.Dialog) {
-                    addEntity(
-                        heap,
-                        createDialogEntity({ id: action.dialogID }),
-                    );
+                    addEntity(heap, createDialogEntity({ id: action.dialogID }));
                 }
             });
         });

@@ -1,14 +1,7 @@
 import { TMatrix } from '../../index';
 import { create, get, set } from '../base';
 import { STOP_ITERATE } from '../utils';
-import {
-    createEvery,
-    createFind,
-    createMany,
-    createMap,
-    createReduce,
-    createSome,
-} from './create';
+import { createEvery, createFind, createMany, createMap, createReduce, createSome } from './create';
 
 export function slice<T>(
     matrix: TMatrix<T>,
@@ -38,19 +31,13 @@ export function forEach<T>(
     return false;
 }
 
-export function seed<T>(
-    matrix: TMatrix<T>,
-    filler: (x: number, y: number, i: number) => T,
-): void {
+export function seed<T>(matrix: TMatrix<T>, filler: (x: number, y: number, i: number) => T): void {
     forEach(matrix, (item, x, y, i) => {
         set(matrix, x, y, filler(x, y, i));
     });
 }
 
-export function fill<T>(
-    matrix: TMatrix<T>,
-    filler: (item: T, x: number, y: number) => T,
-): void {
+export function fill<T>(matrix: TMatrix<T>, filler: (item: T, x: number, y: number) => T): void {
     forEach(matrix, (item, x, y) => {
         set(matrix, x, y, filler(item, x, y));
     });

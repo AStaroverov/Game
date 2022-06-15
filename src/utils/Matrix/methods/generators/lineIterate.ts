@@ -1,18 +1,12 @@
 import { abs, floor, max } from '../../../math';
-import {
-    mapVector,
-    newVector,
-    setVector,
-    sumVector,
-    Vector,
-} from '../../../shape';
+import { mapVector, newVector, setVector, sumVector, TVector } from '../../../shape';
 import { TMatrix } from '../../index';
 import { createGetItem, Item } from '../utils';
 
 export function* lineIterate<T>(
     matrix: TMatrix<T>,
-    start: Vector,
-    direction: Vector,
+    start: TVector,
+    direction: TVector,
 ): IterableIterator<Item<T>> {
     const getItem = createGetItem(matrix, start.x, start.y);
     const passed = newVector(0, 0);

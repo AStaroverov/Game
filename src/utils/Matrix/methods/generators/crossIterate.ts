@@ -1,20 +1,17 @@
-import { mulVector, newVector, Vector } from '../../../shape';
+import { mulVector, newVector, TVector } from '../../../shape';
 import { TMatrix } from '../../index';
 import { createGetItem, Item } from '../utils';
 import { lineIterate } from './lineIterate';
 
 export function* crossIterate<T>(
     matrix: TMatrix<T>,
-    start: Vector,
+    start: TVector,
     radius: number,
 ): IterableIterator<Item<T>> {
     const getItem = createGetItem(matrix, start.x, start.y);
-    const directions = [
-        newVector(1, 0),
-        newVector(-1, 0),
-        newVector(0, 1),
-        newVector(0, -1),
-    ].map((v) => mulVector(v, radius));
+    const directions = [newVector(1, 0), newVector(-1, 0), newVector(0, 1), newVector(0, -1)].map(
+        (v) => mulVector(v, radius),
+    );
 
     yield getItem(0, 0);
 

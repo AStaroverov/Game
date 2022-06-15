@@ -6,19 +6,12 @@ import { Layer } from '../../Renderer';
 import { createMeshComponent } from './MeshComponent';
 
 export const HealBarMeshComponentID = 'HEAL_BAR_MESH' as const;
-export type HealBarMeshComponent = ReturnType<
-    typeof createHealBarMeshComponent
->;
+export type HealBarMeshComponent = ReturnType<typeof createHealBarMeshComponent>;
 export const createHealBarMeshComponent = () => {
-    return createComponent(
-        HealBarMeshComponentID,
-        createMeshComponent(Layer.Main),
-    );
+    return createComponent(HealBarMeshComponentID, createMeshComponent(Layer.Main));
 };
 
-export function initHealBarStruct(
-    struct: ExtractStruct<HealBarMeshComponent>,
-): void {
+export function initHealBarStruct(struct: ExtractStruct<HealBarMeshComponent>): void {
     const group = new Group();
     const healMesh = new Mesh(
         new PlaneGeometry(60, 6),

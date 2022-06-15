@@ -12,14 +12,9 @@ export const createLightMeshComponent = <L extends Light>() =>
     });
 
 export const SpotLightMeshComponentID = 'SPOT_LIGHT_MESH' as const;
-export type SpotLightMeshComponent = ReturnType<
-    typeof createSpotLightMeshComponent
->;
+export type SpotLightMeshComponent = ReturnType<typeof createSpotLightMeshComponent>;
 export const createSpotLightMeshComponent = () =>
-    createComponent(
-        SpotLightMeshComponentID,
-        createLightMeshComponent<SpotLight>(),
-    );
+    createComponent(SpotLightMeshComponentID, createLightMeshComponent<SpotLight>());
 
 export function initLightStruct<T extends Light>(
     struct: LightMeshStruct,

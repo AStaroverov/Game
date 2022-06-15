@@ -19,10 +19,7 @@ export const CENTER_RENDER_POSITION = newVector(
 );
 
 export const PLAYER_START_DELTA = newVector(0.5, 0.5);
-export const PLAYER_START_POSITION = sumVector(
-    CENTER_CARD_POSITION,
-    PLAYER_START_DELTA,
-);
+export const PLAYER_START_POSITION = sumVector(CENTER_CARD_POSITION, PLAYER_START_DELTA);
 
 export const DIALOG_Z = 110;
 export const HEAL_BAR_Z = 100;

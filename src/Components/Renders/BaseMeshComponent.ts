@@ -4,7 +4,7 @@ import { MeshLambertMaterialParameters } from 'three/src/materials/MeshLambertMa
 import { createComponent, ExtractStruct } from '../../../lib/ECS/Component';
 import { $ref } from '../../CONST';
 import { Layer } from '../../Renderer';
-import { Size } from '../../utils/shape';
+import { TSize } from '../../utils/shape';
 import { createMeshComponent } from './MeshComponent';
 
 type BaseMesh = Mesh<PlaneGeometry, MeshLambertMaterial>;
@@ -12,15 +12,8 @@ type BaseMesh = Mesh<PlaneGeometry, MeshLambertMaterial>;
 export const BaseMeshComponentID = 'BASE_MESH' as const;
 export type BaseMeshComponent = ReturnType<typeof createBaseMeshComponent>;
 export const createBaseMeshComponent = (
-    props: Partial<
-        Size & Pick<MeshLambertMaterialParameters, 'transparent' | 'alphaTest'>
-    >,
-) =>
-    createComponent(
-        BaseMeshComponentID,
-        props,
-        createMeshComponent<BaseMesh>(Layer.Main),
-    );
+    props: Partial<TSize & Pick<MeshLambertMaterialParameters, 'transparent' | 'alphaTest'>>,
+) => createComponent(BaseMeshComponentID, props, createMeshComponent<BaseMesh>(Layer.Main));
 
 export function initBaseMeshStruct<M extends BaseMesh = BaseMesh>(
     struct: ExtractStruct<BaseMeshComponent>,

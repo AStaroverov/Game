@@ -5,22 +5,12 @@ import { CENTER_CARD_POSITION, RENDER_CARD_SIZE } from '../../../../CONST';
 import { floor } from '../../../../utils/math';
 import { Matrix, TMatrix } from '../../../../utils/Matrix';
 import { randomArbitrary } from '../../../../utils/random';
-import {
-    isOneWayDirection,
-    negateVector,
-    newVector,
-    Vector,
-} from '../../../../utils/shape';
-import { getEmptyTile, Tile, TileType } from '../def';
+import { isOneWayDirection, negateVector, newVector, TVector } from '../../../../utils/shape';
+import { getEmptyTile, Tile, TileEnv, TileType } from '../def';
 import { fillEnvironment } from './environment';
 import { fillCrossroads, fillRoads } from './roads';
 import { getRenderMatrixSide } from './utils/getRenderMatrixSide';
-import {
-    isEmptyItem,
-    isLastRoadItem,
-    isNotBuildingItem,
-    isRoadItem,
-} from './utils/is';
+import { isEmptyItem, isLastRoadItem, isNotBuildingItem, isRoadItem } from './utils/is';
 import { mergeMatrix } from './utils/mergeMatrix';
 
 const replaceToBuilding = (value: Tile): Tile => {
@@ -97,10 +87,7 @@ const buildingPatterns = [
 
 export function fillBuildings(matrix: TMatrix<Tile>): void {
     while (true) {
-        const step1 = Matrix.matchReplaceShuffle(
-            matrix,
-            shuffle(buildingPatterns),
-        );
+        const step1 = Matrix.matchReplaceShuffle(matrix, shuffle(buildingPatterns));
 
         if (!step1) {
             break;
@@ -113,22 +100,21 @@ export function fillVillage<T extends TMatrix<Tile>>(matrix: T): T {
     fillBuildings(matrix);
     fillEnvironment(matrix);
 
+    Matrix.forEach(matrix, (item) => (item.env = TileEnv.Village));
+
     return matrix;
 }
 
 export function createVillage(w: number, h: number): TMatrix<Tile> {
     return pipe(
-        (matrix) =>
-            fillCrossroads(matrix, newVector(floor(w / 2), floor(h / 2))),
+        (matrix) => fillCrossroads(matrix, newVector(floor(w / 2), floor(h / 2))),
         fillVillage,
     )(Matrix.create(w, h, getEmptyTile));
 }
 
-let merged = false;
-export function spawnVillage(cardMatrix: TMatrix<Tile>, _move: Vector): void {
-    if (!isOneWayDirection(_move) || merged) return;
+export function spawnVillage(cardMatrix: TMatrix<Tile>, move: TVector): void {
+    if (!isOneWayDirection(move)) return;
 
-    const move = newVector(_move.x, _move.y);
     const side = getRenderMatrixSide(cardMatrix, move, 1);
     const roads = Matrix.reduce(
         side,
@@ -155,8 +141,7 @@ export function spawnVillage(cardMatrix: TMatrix<Tile>, _move: Vector): void {
     if (villageRoads.length === 0) return;
 
     const cardRoad = roads[floor(randomArbitrary(0, roads.length - 1))];
-    const villageRoad =
-        villageRoads[floor(randomArbitrary(0, villageRoads.length - 1))];
+    const villageRoad = villageRoads[floor(randomArbitrary(0, villageRoads.length - 1))];
 
     const relX = stepNormalize(
         move.x,
@@ -174,14 +159,8 @@ export function spawnVillage(cardMatrix: TMatrix<Tile>, _move: Vector): void {
     const absY = CENTER_CARD_POSITION.y - floor(RENDER_CARD_SIZE / 2) + relY;
 
     mergeMatrix(cardMatrix, villageMatrix, absX, absY);
-    merged = true;
 }
 
-function stepNormalize(
-    v: number,
-    min: number,
-    zero: number,
-    max: number = zero,
-): number {
+function stepNormalize(v: number, min: number, zero: number, max: number = zero): number {
     return v === -1 ? min : v === 0 ? zero : max;
 }

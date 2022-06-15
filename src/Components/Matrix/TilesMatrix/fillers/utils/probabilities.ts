@@ -8,21 +8,15 @@ export type ProbabilityRecord = Record<string, number>;
 export function getProbabilityRecord<T>(
     getProbabilities: (item: T) => undefined | ProbabilityRecord,
 ) {
-    return function _getProbabilityRecord(
-        matrix: TMatrix<T>,
-    ): ProbabilityRecord {
+    return function _getProbabilityRecord(matrix: TMatrix<T>): ProbabilityRecord {
         return Matrix.reduce(matrix, {} as ProbabilityRecord, (acc, item) => {
             const newProbabilities = getProbabilities(item);
-            return newProbabilities === undefined
-                ? acc
-                : sumProbabilities(acc, newProbabilities);
+            return newProbabilities === undefined ? acc : sumProbabilities(acc, newProbabilities);
         });
     };
 }
 
-export function normalizeProbabilities(
-    probabilities: ProbabilityRecord,
-): ProbabilityRecord {
+export function normalizeProbabilities(probabilities: ProbabilityRecord): ProbabilityRecord {
     const keys = Object.keys(probabilities);
     const sum = keys.reduce((s, k) => s + probabilities[k], 0);
     const ratio = 1 / sum;
@@ -35,9 +29,7 @@ export function normalizeProbabilities(
           }, {} as ProbabilityRecord);
 }
 
-export function getRandomProbability<T extends ProbabilityRecord>(
-    probabilities: T,
-): keyof T {
+export function getRandomProbability<T extends ProbabilityRecord>(probabilities: T): keyof T {
     const num = random();
     const entries = Object.entries(probabilities).sort(([, a], [, b]) => a - b);
     const index = entries

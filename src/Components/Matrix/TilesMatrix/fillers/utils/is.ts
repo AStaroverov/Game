@@ -5,8 +5,7 @@ export const creteTypeDetector =
     (item: Tile): item is Tile =>
         isExisted(item) && (item.type === type) === value;
 
-export const isExisted = (item: undefined | Tile): item is Tile =>
-    item !== undefined;
+export const isExisted = (item: undefined | Tile): item is Tile => item !== undefined;
 
 export const isEmptyItem = creteTypeDetector(TileType.empty, true);
 export const isNotEmptyItem = creteTypeDetector(TileType.empty, false);

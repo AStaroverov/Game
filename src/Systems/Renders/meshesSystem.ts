@@ -9,15 +9,9 @@ import {
 import { filterEntities, getEntities } from '../../../lib/ECS/Heap';
 import { ReliefMeshesMatrixID } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
 import { SurfaceMeshesMatrixID } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
-import {
-    PositionComponent,
-    PositionComponentID,
-} from '../../Components/Position';
+import { PositionComponent, PositionComponentID } from '../../Components/Position';
 import { SpotLightMeshComponentID } from '../../Components/Renders/LightComponent';
-import {
-    MeshComponent,
-    MeshComponentID,
-} from '../../Components/Renders/MeshComponent';
+import { MeshComponent, MeshComponentID } from '../../Components/Renders/MeshComponent';
 import { $ref, CENTER_CARD_POSITION, HALF_RENDER_CARD_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GlobalLightEntityID } from '../../Entities/GlobalLight';
@@ -28,16 +22,9 @@ import { Matrix } from '../../utils/Matrix';
 import { mulVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
-export function meshesSystem(
-    heap: GameHeap,
-    ticker: TasksScheduler,
-    scenes: Scenes,
-): void {
+export function meshesSystem(heap: GameHeap, ticker: TasksScheduler, scenes: Scenes): void {
     const globalLightEntity = getEntities(heap, GlobalLightEntityID)[0];
-    const spotLight = getComponentStruct(
-        globalLightEntity,
-        SpotLightMeshComponentID,
-    );
+    const spotLight = getComponentStruct(globalLightEntity, SpotLightMeshComponentID);
 
     const cardEntity = getEntities(heap, CardEntityID)[0];
     const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
@@ -53,9 +40,7 @@ export function meshesSystem(
             spotLight[$ref]?.target,
             ...Matrix.toArray(surfaceMeshes.matrix).map((v) => v[$ref]),
             ...Matrix.toArray(reliefMeshes.matrix).map((v) => v[$ref]),
-        ].filter(
-            <T>(object: undefined | T): object is T => object !== undefined,
-        );
+        ].filter(<T>(object: undefined | T): object is T => object !== undefined);
 
         scenes[Layer.Main].clear();
         scenes[Layer.Fixed].clear();
@@ -64,25 +49,14 @@ export function meshesSystem(
             scenes[Layer.Main].add(...staticMeshes);
         }
 
-        filterEntities(
-            heap,
-            (e): e is SomeEntity<InheritedComponent<MeshComponent>> => {
-                return hasInheritedComponent(e, MeshComponentID);
-            },
-        ).forEach((entity) => {
+        filterEntities(heap, (e): e is SomeEntity<InheritedComponent<MeshComponent>> => {
+            return hasInheritedComponent(e, MeshComponentID);
+        }).forEach((entity) => {
             const mesh = getInheritedComponentStructs(entity, MeshComponentID);
-            const position = tryGetComponentStruct<PositionComponent>(
-                entity,
-                PositionComponentID,
-            );
+            const position = tryGetComponentStruct<PositionComponent>(entity, PositionComponentID);
 
             const diff =
-                position &&
-                sumVector(
-                    position,
-                    mulVector(CENTER_CARD_POSITION, -1),
-                    cardPosition,
-                );
+                position && sumVector(position, mulVector(CENTER_CARD_POSITION, -1), cardPosition);
             const isVisible =
                 diff &&
                 !(

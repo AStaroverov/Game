@@ -18,17 +18,11 @@ import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 const RENDER_RADIUS = floor(HALF_RENDER_CARD_SIZE);
 
-export function cardMeshPositionSystem(
-    heap: GameHeap,
-    ticker: TasksScheduler,
-): void {
+export function cardMeshPositionSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
     const cardEntity = getEntities(heap, CardEntityID)[0];
 
-    const playerPosition = getComponentStruct(
-        playerEntity,
-        PositionComponentID,
-    );
+    const playerPosition = getComponentStruct(playerEntity, PositionComponentID);
     const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
     const cardTiles = getComponentStruct(cardEntity, TilesMatrixID);
     const surfaceMatrix = getComponentStruct(cardEntity, SurfaceMeshesMatrixID);
@@ -37,12 +31,7 @@ export function cardMeshPositionSystem(
 
     ticker.addFrameInterval(tick, 1);
 
-    function setPosition(
-        mesh: undefined | Mesh,
-        visible: boolean,
-        x: number,
-        y: number,
-    ): void {
+    function setPosition(mesh: undefined | Mesh, visible: boolean, x: number, y: number): void {
         if (mesh === undefined) return;
 
         mesh.visible = visible;
@@ -57,18 +46,15 @@ export function cardMeshPositionSystem(
             (cardPosition.y > 0 ? 1 : 0) - (cardPosition.y % 1),
         );
 
-        Matrix.forEach(
-            getMatrixSlice(cardTiles, abs.x, abs.y, RENDER_RADIUS),
-            (tile, x, y) => {
-                matrices.forEach(({ matrix }) =>
-                    setPosition(
-                        Matrix.get(matrix, x, y)?.[$ref],
-                        tile !== undefined,
-                        floor((x - fractionPosition.x) * TILE_SIZE),
-                        floor((y - fractionPosition.y) * TILE_SIZE),
-                    ),
-                );
-            },
-        );
+        Matrix.forEach(getMatrixSlice(cardTiles, abs.x, abs.y, RENDER_RADIUS), (tile, x, y) => {
+            matrices.forEach(({ matrix }) =>
+                setPosition(
+                    Matrix.get(matrix, x, y)?.[$ref],
+                    tile !== undefined,
+                    floor((x - fractionPosition.x) * TILE_SIZE),
+                    floor((y - fractionPosition.y) * TILE_SIZE),
+                ),
+            );
+        });
     }
 }

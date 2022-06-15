@@ -1,11 +1,7 @@
 import { TMatrix, TMatrixSeed } from '../index';
 import { seed } from './iterators/base';
 
-export function create<T>(
-    w: number,
-    h: number,
-    filler?: TMatrixSeed<T>,
-): TMatrix<T> {
+export function create<T>(w: number, h: number, filler?: TMatrixSeed<T>): TMatrix<T> {
     const buffer = new Array(w * h).fill(null);
     const instance = { w, h, buffer };
 
@@ -16,23 +12,12 @@ export function create<T>(
     return instance;
 }
 
-export function get<T>(
-    source: TMatrix<T>,
-    x: number,
-    y: number,
-): undefined | T {
+export function get<T>(source: TMatrix<T>, x: number, y: number): undefined | T {
     return inside(source, x, y) ? source.buffer[x + y * source.w] : undefined;
 }
 
-export function set<T>(
-    source: TMatrix<T>,
-    x: number,
-    y: number,
-    item: T,
-): undefined | T {
-    return inside(source, x, y)
-        ? (source.buffer[x + y * source.w] = item)
-        : undefined;
+export function set<T>(source: TMatrix<T>, x: number, y: number, item: T): undefined | T {
+    return inside(source, x, y) ? (source.buffer[x + y * source.w] = item) : undefined;
 }
 
 export function copy<T>(source: TMatrix<T>): TMatrix<T> {

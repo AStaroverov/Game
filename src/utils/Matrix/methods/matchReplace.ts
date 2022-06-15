@@ -7,28 +7,16 @@ import { shuffleMany, shuffleSome } from './iterators/shuffle';
 
 export type ItemMatchReplace<T> = {
     match: (item: T, x: number, y: number, matrix: TMatrix<T>) => boolean;
-    replace?: (
-        item: T,
-        x: number,
-        y: number,
-        matrix: TMatrix<T>,
-        matchedMatrix: TMatrix<T>,
-    ) => T;
+    replace?: (item: T, x: number, y: number, matrix: TMatrix<T>, matchedMatrix: TMatrix<T>) => T;
 };
 
-export function createMatchReplace(
-    matrixIterator = some,
-    matchReplacesIterator = arraySome,
-) {
+export function createMatchReplace(matrixIterator = some, matchReplacesIterator = arraySome) {
     return function matchReplace<T>(
         matrix: TMatrix<T>,
         matchReplaces: TMatrix<ItemMatchReplace<T>>[],
     ): boolean {
         return matrixIterator(matrix, (item, x, y) => {
-            return matchReplacesIterator(
-                matchReplaces,
-                createSomeReplaced(matrix, x, y),
-            );
+            return matchReplacesIterator(matchReplaces, createSomeReplaced(matrix, x, y));
         });
     };
 }
@@ -53,14 +41,8 @@ export const matchReplaceShuffleAll: <T>(
     matchReplaces: TMatrix<ItemMatchReplace<T>>[],
 ) => boolean = createMatchReplace(shuffleMany);
 
-export function createSomeReplaced<T>(
-    matrix: TMatrix<T>,
-    sx: number,
-    sy: number,
-) {
-    return function someReplaced(
-        matchReplace: TMatrix<ItemMatchReplace<T>>,
-    ): boolean {
+export function createSomeReplaced<T>(matrix: TMatrix<T>, sx: number, sy: number) {
+    return function someReplaced(matchReplace: TMatrix<ItemMatchReplace<T>>): boolean {
         if (sx + matchReplace.w > matrix.w || sy + matchReplace.h > matrix.h) {
             return false;
         }
@@ -88,13 +70,7 @@ export function createSomeReplaced<T>(
                     sy + y,
                     replace === undefined
                         ? matchedItems[i]
-                        : replace(
-                              matchedItems[i],
-                              sx + x,
-                              sy + y,
-                              matrix,
-                              matchedMatrix,
-                          ),
+                        : replace(matchedItems[i], sx + x, sy + y, matrix, matchedMatrix),
                 );
             });
 

@@ -1,14 +1,8 @@
 import { createEntity } from '../../../lib/ECS/Entity';
-import {
-    ActionableComponentProps,
-    createActionableComponent,
-} from '../../Components/Actionable';
+import { ActionableComponentProps, createActionableComponent } from '../../Components/Actionable';
 import { createAtlasAnimationComponent } from '../../Components/AtlasAnimation';
 import { atlases, AtlasName } from '../../Components/AtlasAnimation/atlases';
-import {
-    createAutoUnspawnableComponent,
-    UnspawnReason,
-} from '../../Components/AutoRemovable';
+import { createAutoUnspawnableComponent, UnspawnReason } from '../../Components/AutoRemovable';
 import { createDirectionComponent } from '../../Components/DirectionComponent';
 import { createPositionComponent } from '../../Components/Position';
 import { createBaseMeshComponent } from '../../Components/Renders/BaseMeshComponent';
@@ -26,10 +20,7 @@ export enum NPCType {
 
 export const NPCEntityID = 'NPC_ENTITY' as const;
 export type NpcEntity = ReturnType<typeof createNpcEntity>;
-export const createNpcEntity = (props: {
-    type: NPCType;
-    action: ActionableComponentProps;
-}) => {
+export const createNpcEntity = (props: { type: NPCType; action: ActionableComponentProps }) => {
     return createEntity(NPCEntityID, [
         createTypeComponent(props.type),
         createAutoUnspawnableComponent([UnspawnReason.OutOfCard]),
@@ -37,6 +28,7 @@ export const createNpcEntity = (props: {
         createPositionComponent(),
         createDirectionComponent(),
         createVelocityComponent(),
+
         createBaseMeshComponent({
             w: enemyAtlas.w * 2.2,
             h: enemyAtlas.h * 2.2,

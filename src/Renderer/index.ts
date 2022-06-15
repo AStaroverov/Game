@@ -48,10 +48,7 @@ export class Renderer {
         const width = window.innerWidth;
         const height = window.innerHeight;
 
-        const controls = new OrbitControls(
-            this.camera,
-            this.renderers[Layer.Fixed].domElement,
-        );
+        const controls = new OrbitControls(this.camera, this.renderers[Layer.Fixed].domElement);
         controls.minDistance = 20;
         controls.maxDistance = 500;
         controls.enablePan = false;
@@ -65,19 +62,14 @@ export class Renderer {
         this.camera.position.z = 1000;
         this.camera.updateProjectionMatrix();
 
-        this.scenes[Layer.Main].position.x -=
-            TILE_SIZE * CENTER_RENDER_POSITION.x;
-        this.scenes[Layer.Main].position.y -=
-            TILE_SIZE * CENTER_RENDER_POSITION.y;
+        this.scenes[Layer.Main].position.x -= TILE_SIZE * CENTER_RENDER_POSITION.x;
+        this.scenes[Layer.Main].position.y -= TILE_SIZE * CENTER_RENDER_POSITION.y;
 
         ticker.addFrameInterval(this.render, 1, this);
     }
 
     private render(): void {
         this.renderers[Layer.Main].render(this.scenes[Layer.Main], this.camera);
-        this.renderers[Layer.Fixed].render(
-            this.scenes[Layer.Fixed],
-            this.camera,
-        );
+        this.renderers[Layer.Fixed].render(this.scenes[Layer.Fixed], this.camera);
     }
 }

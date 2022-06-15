@@ -1,8 +1,5 @@
 import { addEntity, getEntities } from '../../../lib/ECS/Heap';
-import {
-    createGameStoryEntity,
-    GameStoryEntityID,
-} from '../../Entities/GameStory';
+import { createGameStoryEntity, GameStoryEntityID } from '../../Entities/GameStory';
 import { GameHeap } from '../../heap';
 
 export function initGameStorySystem(heap: GameHeap) {

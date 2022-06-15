@@ -1,15 +1,7 @@
-import { Size } from '../shape';
+import { TSize } from '../shape';
 import { copy, create, get, set, setSource } from './methods/base';
 import { fromNestedArray } from './methods/from';
-import {
-    every,
-    find,
-    forEach,
-    reduce,
-    seed,
-    slice,
-    some,
-} from './methods/iterators/base';
+import { every, find, forEach, reduce, seed, slice, some } from './methods/iterators/base';
 import { fill } from './methods/iterators/base';
 import { map } from './methods/iterators/base';
 import {
@@ -19,22 +11,12 @@ import {
     matchReplaceShuffleAll,
 } from './methods/matchReplace';
 import { getSide } from './methods/side';
-import {
-    findSubMatrices,
-    findSubMatrix,
-    isSubMatrix,
-} from './methods/submatrix';
+import { findSubMatrices, findSubMatrix, isSubMatrix } from './methods/submatrix';
 import { toArray, toItemsArray, toNestedArray } from './methods/to';
-import {
-    flipX,
-    flipY,
-    getAllVariants,
-    rotate,
-    transpose,
-} from './methods/transform';
+import { flipX, flipY, getAllVariants, rotate, transpose } from './methods/transform';
 import { STOP_ITERATE } from './methods/utils';
 
-export type TMatrix<T = unknown> = Size & { buffer: T[] };
+export type TMatrix<T = unknown> = TSize & { buffer: T[] };
 export type TMatrixSeed<T> = (x: number, y: number, i: number) => T;
 
 export const Matrix = {

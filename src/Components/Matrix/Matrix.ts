@@ -1,6 +1,6 @@
 import { Component, createComponent } from '../../../lib/ECS/Component';
 import { Matrix, TMatrix, TMatrixSeed } from '../../utils/Matrix';
-import { newSize, Size } from '../../utils/shape';
+import { newSize, TSize } from '../../utils/shape';
 
 export const MatrixComponentID = 'MATRIX' as const;
 export type MatrixStruct<T = unknown> = {
@@ -8,7 +8,7 @@ export type MatrixStruct<T = unknown> = {
 };
 
 export const createMatrixComponent = <T>(
-    props: Size & { seed?: TMatrixSeed<T> },
+    props: TSize & { seed?: TMatrixSeed<T> },
 ): Component<typeof MatrixComponentID, MatrixStruct<T>> =>
     createComponent(MatrixComponentID, {
         matrix: Matrix.create<T>(props.w, props.h, props.seed),
@@ -16,7 +16,7 @@ export const createMatrixComponent = <T>(
 
 export type ExtractMatrixType<M> = M extends MatrixStruct<infer T> ? T : never;
 
-export function getMatrixSize({ matrix }: MatrixStruct): Size {
+export function getMatrixSize({ matrix }: MatrixStruct): TSize {
     return newSize(matrix.w, matrix.h);
 }
 
@@ -28,10 +28,12 @@ export function getMatrixCell<C extends MatrixStruct, T = ExtractMatrixType<C>>(
     return Matrix.get(matrix, x, y) as undefined | T;
 }
 
-export function getMatrixSlice<
-    C extends MatrixStruct,
-    T = ExtractMatrixType<C>,
->(comp: C, x: number, y: number, r: number): TMatrix<undefined | T> {
+export function getMatrixSlice<C extends MatrixStruct, T = ExtractMatrixType<C>>(
+    comp: C,
+    x: number,
+    y: number,
+    r: number,
+): TMatrix<undefined | T> {
     const slice = Matrix.create<undefined | T>(r * 2 + 1, r * 2 + 1);
 
     for (let i = -r; i <= r; i++) {

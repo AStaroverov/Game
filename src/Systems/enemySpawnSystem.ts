@@ -34,29 +34,18 @@ export function EnemySpawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
             floor(cardTiles.matrix.w / 2), // Start must be relative to user
             floor(cardTiles.matrix.h / 2),
         );
-        const suitableItem = Enumerable.from(
-            radialIterate(cardTiles.matrix, start.x, start.y),
-        )
-            .where(
-                (item): item is ExistedItem<Tile> => item.value !== undefined,
-            )
+        const suitableItem = Enumerable.from(radialIterate(cardTiles.matrix, start.x, start.y))
+            .where((item): item is ExistedItem<Tile> => item.value !== undefined)
             .firstOrDefault(({ x, y, value }) => {
                 const dist = abs(start.x + start.y - (x + y));
 
-                return (
-                    isPassableTileType(value.type) &&
-                    dist > 10 &&
-                    random() > 0.9
-                );
+                return isPassableTileType(value.type) && dist > 10 && random() > 0.9;
             });
 
         if (suitableItem) {
             const enemy = createEnemyEntity();
             const position = getComponentStruct(enemy, PositionComponentID);
-            const seedPosition = sumVector(
-                suitableItem,
-                mulVector(cardPosition, -1),
-            );
+            const seedPosition = sumVector(suitableItem, mulVector(cardPosition, -1));
 
             setVector(position, seedPosition);
 

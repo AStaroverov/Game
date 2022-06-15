@@ -1,12 +1,7 @@
 import { pipe } from 'lodash/fp';
 
 import { Matrix, TMatrix } from '../../../../utils/Matrix';
-import {
-    isEqualVectors,
-    toOneWayVectors,
-    Vector,
-    zeroVector,
-} from '../../../../utils/shape';
+import { isEqualVectors, toOneWayVectors, TVector, zeroVector } from '../../../../utils/shape';
 import { isPassableTileType, Tile, TileType } from '../def';
 import { getRenderMatrixSide } from './utils/getRenderMatrixSide';
 import { getRenderMatrixSlice } from './utils/getRenderMatrixSlice';
@@ -34,7 +29,7 @@ const matchReplaceEnvironment = Matrix.getAllVariants(
     ]),
 );
 
-export function updateEnvironment(matrix: TMatrix<Tile>, move: Vector): void {
+export function updateEnvironment(matrix: TMatrix<Tile>, move: TVector): void {
     toOneWayVectors(move).forEach((move) => {
         const sliceMatrix = isEqualVectors(move, zeroVector)
             ? getRenderMatrixSlice(matrix)
@@ -54,12 +49,7 @@ export function fillEnvironment(matrix: TMatrix<Tile>) {
     }
 }
 
-function updateTile(
-    tile: Tile,
-    x: number,
-    y: number,
-    matrix: TMatrix<Tile>,
-): Tile {
+function updateTile(tile: Tile, x: number, y: number, matrix: TMatrix<Tile>): Tile {
     const slice = Matrix.slice<Tile>(matrix, x - 1, y - 1, 3, 3);
     const type = pipe(
         getProbabilityRecord(getTileProbabilities),
@@ -73,9 +63,7 @@ function updateTile(
     });
 }
 
-function getTileProbabilities(
-    tile: undefined | Tile,
-): undefined | ProbabilityRecord {
+function getTileProbabilities(tile: undefined | Tile): undefined | ProbabilityRecord {
     if (tile === undefined) {
         return undefined;
     }

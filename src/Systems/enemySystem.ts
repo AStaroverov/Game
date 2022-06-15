@@ -20,9 +20,9 @@ import {
     negateVector,
     newVector,
     setVector,
-    stringVector,
     sumVector,
-    Vector,
+    toStringVector,
+    TVector,
 } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 import { isInsideCard } from '../utils/tiles';
@@ -33,10 +33,7 @@ export function enemySystem(heap: GameHeap, ticker: TasksScheduler): void {
     const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
 
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
-    const playerPosition = getComponentStruct(
-        playerEntity,
-        PositionComponentID,
-    );
+    const playerPosition = getComponentStruct(playerEntity, PositionComponentID);
 
     const pathFinder = new BiAStarFinder({
         diagonalMovement: DiagonalMovement.OnlyWhenNoObstacles,
@@ -54,14 +51,8 @@ export function enemySystem(heap: GameHeap, ticker: TasksScheduler): void {
         const velocity = getComponentStruct(enemy, VelocityComponentID);
 
         const cardTilePosition = mapVector(cardPosition, ufloor);
-        const enemyTilePosition = sumVector(
-            mapVector(position, floor),
-            cardTilePosition,
-        );
-        const playerTilePosition = sumVector(
-            mapVector(playerPosition, floor),
-            cardTilePosition,
-        );
+        const enemyTilePosition = sumVector(mapVector(position, floor), cardTilePosition);
+        const playerTilePosition = sumVector(mapVector(playerPosition, floor), cardTilePosition);
 
         if (!isInsideCard(enemyTilePosition)) {
             return;
@@ -71,18 +62,11 @@ export function enemySystem(heap: GameHeap, ticker: TasksScheduler): void {
             return setVelocity(velocity, 0);
         }
 
-        const path = findPath(
-            enemyTilePosition,
-            playerTilePosition,
-            cardTilePosition,
-        );
+        const path = findPath(enemyTilePosition, playerTilePosition, cardTilePosition);
 
         if (path.length > 1) {
             const nextTilePosition = newVector(path[1][0], path[1][1]);
-            const nextDirection = sumVector(
-                nextTilePosition,
-                negateVector(enemyTilePosition),
-            );
+            const nextDirection = sumVector(nextTilePosition, negateVector(enemyTilePosition));
 
             setVector(direction, nextDirection);
             setVelocity(velocity, 0.05);
@@ -90,35 +74,24 @@ export function enemySystem(heap: GameHeap, ticker: TasksScheduler): void {
     }
 
     const findPath = memoize(
-        (from: Vector, to: Vector, card: Vector) => {
-            return pathFinder.findPath(
-                from.x,
-                from.y,
-                to.x,
-                to.y,
-                new Grid(getMatrix(card)),
-            );
+        (from: TVector, to: TVector, card: TVector) => {
+            return pathFinder.findPath(from.x, from.y, to.x, to.y, new Grid(getMatrix(card)));
         },
         {
             max: 100,
             normalizer: ([from, to, card]) =>
-                `${stringVector(from)}${stringVector(to)}${stringVector(card)}`,
+                `${toStringVector(from)}${toStringVector(to)}${toStringVector(card)}`,
         },
     );
 
-    const getMatrix = memoize(
-        (_: Vector) => matrixToNestedArray(cardTiles.matrix),
-        {
-            max: 100,
-            normalizer: ([p]: [Vector]) => stringVector(p),
-        },
-    );
+    const getMatrix = memoize((_: TVector) => matrixToNestedArray(cardTiles.matrix), {
+        max: 100,
+        normalizer: ([p]: [TVector]) => toStringVector(p),
+    });
 }
 
 function matrixToNestedArray<T extends Tile>(matrix: TMatrix<T>): number[][] {
-    const m = new Array(matrix.h)
-        .fill(null)
-        .map(() => new Array(matrix.w).fill(null));
+    const m = new Array(matrix.h).fill(null).map(() => new Array(matrix.w).fill(null));
 
     Matrix.forEach(matrix, (v, x, y) => {
         m[y][x] = isPassableTileType(v.type) ? 0 : 1;
