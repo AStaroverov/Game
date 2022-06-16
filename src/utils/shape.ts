@@ -5,6 +5,7 @@ export const newSize = (w: number, h?: number): TSize => ({ w, h: h ?? w });
 
 export const Size = {
     create: newSize,
+    toVector: (s: TSize) => Vector.create(s.w, s.h),
 };
 
 export type Point = { x: number; y: number };
@@ -33,7 +34,8 @@ export const sumVector = (f: TVector, ...vs: TVector[]): TVector => {
     }, copyVector(f));
 };
 
-export const mulVector = (v: TVector, k: number): TVector => newVector(v.x * k, v.y * k);
+export const mulVector = (v: TVector, k: number | TVector): TVector =>
+    typeof k === 'number' ? newVector(v.x * k, v.y * k) : newVector(v.x * k.x, v.y * k.y);
 
 export const negateVector = (v: TVector): TVector => mulVector(v, -1);
 
@@ -41,6 +43,11 @@ export const widthVector = (a: TVector): number => sqrt(a.x ** 2 + a.y ** 2);
 
 export const distanceVector = (a: TVector, b: TVector): number =>
     widthVector(newVector(b.x - a.x, b.y - a.y));
+
+export const normalize = (a: TVector): TVector => {
+    const width = widthVector(a);
+    return newVector(a.x / width, a.y / width);
+};
 
 export const isEqualVectors = (a: TVector, b: TVector): boolean => a.x === b.x && a.y === b.y;
 
@@ -76,6 +83,7 @@ export const Vector = {
     negate: negateVector,
     width: widthVector,
     distance: distanceVector,
+    normalize: normalize,
     isEqual: isEqualVectors,
     hasEqualDirection: hasEqualDirection,
     isOneWayDirection: isOneWayDirection,

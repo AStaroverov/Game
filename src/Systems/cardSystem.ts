@@ -53,9 +53,11 @@ export function cardSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
             updateVillages(cardVillages, playerPosition);
 
-            if (shouldSpawnVillage(playerPosition, cardTiles.matrix, cardVillages.villages)) {
+            const village = suitableVillage(playerPosition, cardVillages.villages);
+
+            if (village && shouldSpawnVillage(playerPosition, diff, cardTiles.matrix, village)) {
                 console.log('>> SHOULD SPAWN');
-                spawnVillage(cardTiles.matrix, diff);
+                spawnVillage(village, playerPosition, cardTiles.matrix, cardPosition);
             }
         }
 
@@ -82,7 +84,7 @@ function updateVillages(villagesStruct: ExtractStruct<VillagesComponent>, player
     );
     const w = floor(rightVillage === undefined ? 100 : rightVillage.area.x - x);
     const h = floor(upVillage === undefined ? 100 : upVillage.area.y - y);
-    debugger;
+    // debugger;
 
     setVillage(
         villagesStruct,
@@ -97,24 +99,23 @@ function updateVillages(villagesStruct: ExtractStruct<VillagesComponent>, player
 
 function shouldSpawnVillage(
     playerPosition: TVector,
+    playerDirection: TVector,
     cardMatrix: TMatrix<Tile>,
-    villages: Village[],
+    village: Village,
 ): boolean {
-    const village = suitableVillage(playerPosition, villages);
-
     console.log('>> -------');
-    console.log('>> suitableVillage', village);
-    console.log('>> withoutVillage', withoutVillage(cardMatrix));
-    console.log(
-        '>> distance',
-        village?.position,
-        playerPosition,
-        village && abs(Vector.distance(village.position, playerPosition)),
+    const extendedVillage = Rect.zoomByCenter(
+        Rect.fromCenterAndSize(village.position, village.size),
+        10,
     );
+    console.log('>> extendedVillage', extendedVillage);
+    console.log('>> playerPosition', playerPosition);
+    console.log('>> inside', Rect.pointInside(extendedVillage, playerPosition));
+
     return (
-        village !== undefined &&
+        Rect.pointInside(extendedVillage, playerPosition) &&
         withoutVillage(cardMatrix) &&
-        abs(Vector.distance(village.position, playerPosition)) < 30
+        random() > 0.2
     );
 }
 

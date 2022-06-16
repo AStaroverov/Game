@@ -9,6 +9,19 @@ export const create = (x: number, y: number, w: number, h: number): TRect => {
     return { x, y, w, h, mx: x + w, my: y + h };
 };
 
+export const map = (r: TRect, map: (v: number, i: number) => number): TRect => {
+    return create(map(r.x, 0), map(r.y, 1), map(r.w, 2), map(r.h, 3));
+};
+
+export const add = (t: TRect, s: TRect): TRect => {
+    return create(t.x + s.x, t.y + s.y, t.w + s.w, t.h + s.h);
+};
+
+export const zoomByCenter = (s: TRect, v: number | TVector): TRect => {
+    const r = typeof v === 'number' ? Vector.create(v, v) : v;
+    return create(s.x - r.x / 2, s.y - r.y / 2, s.w + r.x, s.h + r.y);
+};
+
 export const inside = (a: TRect, b: TRect): boolean => {
     return a.x >= b.x && a.y >= b.y && a.mx <= b.mx && a.my <= b.my;
 };
@@ -34,11 +47,20 @@ export const getAllVertexes = (r: TRect): TVector[] => {
     ];
 };
 
+export const fromCenterAndSize = (c: TVector, s: TSize): TRect => {
+    return create(c.x - s.w / 2, c.y - s.h / 2, c.x + s.w / 2, c.y + s.h / 2);
+};
+
 export const Rect = {
     create,
+    map,
+    add,
+    zoomByCenter,
     inside,
     pointInside,
     intersect,
     notIntersect,
     getAllVertexes,
+
+    fromCenterAndSize,
 };
