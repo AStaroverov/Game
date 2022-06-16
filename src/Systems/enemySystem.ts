@@ -69,7 +69,7 @@ export function enemySystem(heap: GameHeap, ticker: TasksScheduler): void {
             const nextDirection = sumVector(nextTilePosition, negateVector(enemyTilePosition));
 
             setVector(direction, nextDirection);
-            setVelocity(velocity, 0.05);
+            setVelocity(velocity, 0.003);
         }
     }
 

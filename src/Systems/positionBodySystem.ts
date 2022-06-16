@@ -10,7 +10,7 @@ import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 export function positionBodySystem(heap: GameHeap, ticker: TasksScheduler): void {
     ticker.addFrameInterval(tick, 1);
 
-    function tick() {
+    function tick(delta: number) {
         const entities = filterEntities(
             heap,
             (e): e is SomeEntity<VelocityComponent | DirectionComponent | PositionComponent> =>
@@ -24,7 +24,7 @@ export function positionBodySystem(heap: GameHeap, ticker: TasksScheduler): void
             const direction = getComponentStruct(entity, DirectionComponentID);
             const velocity = getComponentStruct(entity, VelocityComponentID);
 
-            setVector(position, sumVector(position, mulVector(direction, velocity.v)));
+            setVector(position, sumVector(position, mulVector(direction, delta * velocity.v)));
         });
     }
 }

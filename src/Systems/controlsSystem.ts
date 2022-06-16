@@ -27,7 +27,7 @@ export function controlsSystem(heap: GameHeap, ticker: TasksScheduler): void {
         });
 
     ticker.addFrameInterval(() => {
-        setVelocityByVector(playerVelocity, mulVector(playerDirection, 0.08));
+        setVelocityByVector(playerVelocity, mulVector(playerDirection, 0.005));
     }, 1);
 }
 
