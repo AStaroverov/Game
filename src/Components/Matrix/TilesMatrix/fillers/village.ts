@@ -1,16 +1,17 @@
 import { shuffle } from 'lodash';
 import { pipe } from 'lodash/fp';
 
-import { HALF_CARD_SIZE, HALF_RENDER_CARD_SIZE, RENDER_CARD_SIZE } from '../../../../CONST';
+import { CENTER_CARD_POSITION, PLAYER_START_POSITION, RENDER_CARD_SIZE } from '../../../../CONST';
 import { floor } from '../../../../utils/math';
 import { Matrix, TMatrix } from '../../../../utils/Matrix';
-import { newVector, TVector, Vector } from '../../../../utils/shape';
+import { randomArbitraryInt } from '../../../../utils/random';
+import { negateVector, newVector, TVector, Vector } from '../../../../utils/shape';
 import { Rect } from '../../../../utils/shapes/rect';
-import { Village } from '../../../Villages';
 import { getEmptyTile, Tile, TileEnv, TileType } from '../def';
 import { fillEnvironment } from './environment';
 import { fillCrossroads, fillRoads } from './roads';
-import { isEmptyItem, isNotBuildingItem, isRoadItem } from './utils/is';
+import { getRenderMatrixSide } from './utils/getRenderMatrixSide';
+import { isEmptyItem, isLastRoadItem, isNotBuildingItem, isRoadItem } from './utils/is';
 import { mergeMatrix } from './utils/mergeMatrix';
 
 const replaceToBuilding = (value: Tile): Tile => {
@@ -112,90 +113,97 @@ export function createVillage(w: number, h: number): TMatrix<Tile> {
     )(Matrix.create(w, h, getEmptyTile));
 }
 
-export function spawnVillage(
-    village: Village,
-    playerPosition: TVector,
+export interface IVillageMerger {
+    shouldMerge(playerPosition: TVector): boolean;
+    merge(playerPosition: TVector): void;
+}
+export function createVillageMerger(
     cardMatrix: TMatrix<Tile>,
-    cardPosition: TVector,
-): void {
-    const direction = Vector.sum(village.position, Vector.negate(playerPosition), cardPosition);
-    const step = Vector.normalize(direction);
-    const delta = Vector.ZERO;
-    const renderRect = Rect.create(
-        HALF_CARD_SIZE - HALF_RENDER_CARD_SIZE,
-        HALF_CARD_SIZE - HALF_RENDER_CARD_SIZE,
-        RENDER_CARD_SIZE,
-        RENDER_CARD_SIZE,
+    villageMatrix: TMatrix<Tile>,
+    playerPosition: TVector,
+    playerDirection: TVector,
+): IVillageMerger {
+    const moves = Vector.toOneWayVectors(playerDirection);
+
+    playerDirection = moves[randomArbitraryInt(0, moves.length - 1)];
+
+    const side = getRenderMatrixSide(cardMatrix, playerDirection, 1);
+    const roads = Matrix.reduce(
+        side,
+        [] as { tile: Tile; x: number; y: number }[],
+        (acc, tile, x, y) => {
+            if (isLastRoadItem(tile)) acc.push({ tile, x, y });
+            return acc;
+        },
     );
 
-    while (true) {
-        if (Rect.pointInside(renderRect, delta)) {
-            break;
-        }
-
-        Vector.set(delta, Vector.sum(delta, step));
+    if (roads.length === 0) {
+        throw new Error('Card doesnt have suitable roads');
     }
 
-    const villageMatrix = createVillage(village.size.w, village.size.h);
-
-    console.log('>>', village.position);
-    console.log('>>', floor(playerPosition.x + delta.x), floor(playerPosition.y + delta.y));
-    mergeMatrix(
-        cardMatrix,
-        villageMatrix,
-        floor(playerPosition.x + delta.x),
-        floor(playerPosition.y + delta.y),
+    const villageSide = Matrix.getSide(villageMatrix, negateVector(playerDirection), 1);
+    const villageRoads = Matrix.reduce(
+        villageSide,
+        [] as { tile: Tile; x: number; y: number }[],
+        (acc, tile, x, y) => {
+            if (isLastRoadItem(tile)) acc.push({ tile, x, y });
+            return acc;
+        },
     );
+
+    if (villageRoads.length === 0) {
+        throw new Error('Village doesnt have suitable roads');
+    }
+
+    const cardRoad = roads[randomArbitraryInt(0, roads.length - 1)];
+    const villageRoad = villageRoads[randomArbitraryInt(0, villageRoads.length - 1)];
+
+    const relX = stepNormalize(
+        playerDirection.x,
+        -villageMatrix.w,
+        cardRoad.x - villageRoad.x,
+        RENDER_CARD_SIZE,
+    );
+    const relY = stepNormalize(
+        playerDirection.y,
+        -villageMatrix.h,
+        cardRoad.y - villageRoad.y,
+        RENDER_CARD_SIZE,
+    );
+    const matrixX = CENTER_CARD_POSITION.x - floor(RENDER_CARD_SIZE / 2) + relX;
+    const matrixY = CENTER_CARD_POSITION.y - floor(RENDER_CARD_SIZE / 2) + relY;
+
+    const merge = (newPlayerPosition: TVector) => {
+        const delta = Vector.map(
+            Vector.sum(newPlayerPosition, Vector.negate(playerPosition)),
+            floor,
+        );
+
+        debugger;
+        mergeMatrix(cardMatrix, villageMatrix, delta.x + matrixX, delta.y + matrixY);
+    };
+
+    debugger;
+    const triggerRect = Rect.zoomByCenter(
+        Rect.create(
+            floor(playerPosition.x - PLAYER_START_POSITION.x) + relX,
+            floor(playerPosition.y - PLAYER_START_POSITION.y) + relY,
+            villageMatrix.w,
+            villageMatrix.h,
+        ),
+        floor(RENDER_CARD_SIZE / 2),
+    );
+    const shouldMerge = (playerPosition: TVector): boolean => {
+        debugger;
+        return Rect.pointInside(triggerRect, playerPosition);
+    };
+
+    return {
+        shouldMerge,
+        merge,
+    };
 }
-// export function trySpawnVillage(cardMatrix: TMatrix<Tile>, move: TVector): void {
-//     if (!isOneWayDirection(move)) return;
-//
-//     const side = getRenderMatrixSide(cardMatrix, move, 1);
-//     const roads = Matrix.reduce(
-//         side,
-//         [] as { tile: Tile; x: number; y: number }[],
-//         (acc, tile, x, y) => {
-//             if (isLastRoadItem(tile)) acc.push({ tile, x, y });
-//             return acc;
-//         },
-//     );
-//
-//     if (roads.length === 0) return;
-//
-//     const villageMatrix = createVillage(21, 21);
-//     const villageSide = Matrix.getSide(villageMatrix, negateVector(move), 1);
-//     const villageRoads = Matrix.reduce(
-//         villageSide,
-//         [] as { tile: Tile; x: number; y: number }[],
-//         (acc, tile, x, y) => {
-//             if (isLastRoadItem(tile)) acc.push({ tile, x, y });
-//             return acc;
-//         },
-//     );
-//
-//     if (villageRoads.length === 0) return;
-//
-//     const cardRoad = roads[floor(randomArbitrary(0, roads.length - 1))];
-//     const villageRoad = villageRoads[floor(randomArbitrary(0, villageRoads.length - 1))];
-//
-//     const relX = stepNormalize(
-//         move.x,
-//         -villageMatrix.w,
-//         cardRoad.x - villageRoad.x,
-//         RENDER_CARD_SIZE,
-//     );
-//     const relY = stepNormalize(
-//         move.y,
-//         -villageMatrix.h,
-//         cardRoad.y - villageRoad.y,
-//         RENDER_CARD_SIZE,
-//     );
-//     const absX = CENTER_CARD_POSITION.x - floor(RENDER_CARD_SIZE / 2) + relX;
-//     const absY = CENTER_CARD_POSITION.y - floor(RENDER_CARD_SIZE / 2) + relY;
-//
-//     mergeMatrix(cardMatrix, villageMatrix, absX, absY);
-// }
-//
-// function stepNormalize(v: number, min: number, zero: number, max: number = zero): number {
-//     return v === -1 ? min : v === 0 ? zero : max;
-// }
+
+function stepNormalize(v: number, min: number, zero: number, max: number = zero): number {
+    return v === -1 ? min : v === 0 ? zero : max;
+}

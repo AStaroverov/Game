@@ -2,25 +2,30 @@ import { ExtractStruct } from '../../lib/ECS/Component';
 import { getComponentStruct } from '../../lib/ECS/Entity';
 import { getEntities } from '../../lib/ECS/Heap';
 import { moveTiles, TilesMatrixID } from '../Components/Matrix/TilesMatrix';
-import { Tile, TileEnv } from '../Components/Matrix/TilesMatrix/def';
+import { Tile, TileEnv, TileType } from '../Components/Matrix/TilesMatrix/def';
 import { updateEnvironment } from '../Components/Matrix/TilesMatrix/fillers/environment';
 import { updateRoads } from '../Components/Matrix/TilesMatrix/fillers/roads';
-import { spawnVillage } from '../Components/Matrix/TilesMatrix/fillers/village';
-import { PositionComponentID } from '../Components/Position';
+import { getRenderMatrixSide } from '../Components/Matrix/TilesMatrix/fillers/utils/getRenderMatrixSide';
 import {
     createVillage,
+    createVillageMerger,
+    IVillageMerger,
+} from '../Components/Matrix/TilesMatrix/fillers/village';
+import { PositionComponentID } from '../Components/Position';
+import {
+    createVillageStruct,
     setVillage,
     Village,
     VillagesComponent,
     VillagesComponentID,
 } from '../Components/Villages';
-import { CENTER_CARD_POSITION } from '../CONST';
+import { CARD_SIZE, CENTER_CARD_POSITION, RENDER_CARD_SIZE } from '../CONST';
 import { CardEntityID } from '../Entities/Card';
 import { PlayerEntityID } from '../Entities/Player';
 import { GameHeap } from '../heap';
 import { abs, floor, min } from '../utils/math';
 import { Matrix, TMatrix } from '../utils/Matrix';
-import { random } from '../utils/random';
+import { random, randomArbitraryInt } from '../utils/random';
 import { mapVector, mulVector, setVector, Size, sumVector, TVector, Vector } from '../utils/shape';
 import { Rect } from '../utils/shapes/rect';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
@@ -33,8 +38,11 @@ export function cardSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
     const playerPosition = getComponentStruct(playerEntity, PositionComponentID);
+    const stepBetweenVillages = Vector.copy(Vector.ZERO);
 
     ticker.addFrameInterval(moveCard, 1);
+
+    let villageMerger: IVillageMerger | undefined = undefined;
 
     function moveCard() {
         const playerPast = sumVector(playerPosition, mulVector(CENTER_CARD_POSITION, -1));
@@ -53,11 +61,32 @@ export function cardSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
             updateVillages(cardVillages, playerPosition);
 
-            const village = suitableVillage(playerPosition, cardVillages.villages);
+            if (
+                shouldSpawnVillage(
+                    stepBetweenVillages,
+                    cardTiles.matrix,
+                    cardPosition,
+                    playerPosition,
+                    diff,
+                )
+            ) {
+                const villageMatrix = createVillage(
+                    randomArbitraryInt(21, 31),
+                    randomArbitraryInt(21, 31),
+                );
 
-            if (village && shouldSpawnVillage(playerPosition, diff, cardTiles.matrix, village)) {
-                console.log('>> SHOULD SPAWN');
-                spawnVillage(village, playerPosition, cardTiles.matrix, cardPosition);
+                villageMerger = createVillageMerger(
+                    cardTiles.matrix,
+                    villageMatrix,
+                    playerPosition,
+                    diff,
+                );
+
+                Vector.set(stepBetweenVillages, Vector.ZERO);
+            }
+
+            if (villageMerger?.shouldMerge(playerPosition)) {
+                villageMerger?.merge(playerPosition);
             }
         }
 
@@ -88,7 +117,7 @@ function updateVillages(villagesStruct: ExtractStruct<VillagesComponent>, player
 
     setVillage(
         villagesStruct,
-        createVillage({
+        createVillageStruct({
             name: random().toFixed(3),
             area: Rect.create(x, y, w, h),
             size: Size.create(31, 21),
@@ -98,29 +127,36 @@ function updateVillages(villagesStruct: ExtractStruct<VillagesComponent>, player
 }
 
 function shouldSpawnVillage(
+    stepBetweenVillages: TVector,
+    cardMatrix: TMatrix<Tile>,
+    cardPosition: TVector,
     playerPosition: TVector,
     playerDirection: TVector,
-    cardMatrix: TMatrix<Tile>,
-    village: Village,
 ): boolean {
-    console.log('>> -------');
-    const extendedVillage = Rect.zoomByCenter(
-        Rect.fromCenterAndSize(village.position, village.size),
-        10,
+    const currentPosition = Vector.map(Vector.sum(playerPosition, cardPosition), floor);
+    const currentTile = Matrix.get(cardMatrix, currentPosition.x, currentPosition.y);
+
+    if (currentTile === undefined || currentTile.env === TileEnv.Village) return false;
+
+    Vector.set(stepBetweenVillages, Vector.sum(stepBetweenVillages, playerDirection));
+
+    console.log('>>', Vector.width(stepBetweenVillages));
+    if (Vector.width(stepBetweenVillages) < 30) return false;
+
+    const forwardMatrix = Matrix.getSide(
+        cardMatrix,
+        playerDirection,
+        floor((CARD_SIZE - RENDER_CARD_SIZE) / 2),
     );
-    console.log('>> extendedVillage', extendedVillage);
-    console.log('>> playerPosition', playerPosition);
-    console.log('>> inside', Rect.pointInside(extendedVillage, playerPosition));
+
+    const renderedMatrix = getRenderMatrixSide(cardMatrix, playerDirection, 1);
 
     return (
-        Rect.pointInside(extendedVillage, playerPosition) &&
-        withoutVillage(cardMatrix) &&
-        random() > 0.2
+        random() > 0.9 &&
+        Matrix.some(renderedMatrix, (tile) => tile.type === TileType.road) &&
+        Matrix.every(forwardMatrix, (tile) => tile.type === TileType.empty) &&
+        Matrix.every(cardMatrix, (tile) => tile.env !== TileEnv.Village)
     );
-}
-
-function withoutVillage(cardMatrix: TMatrix<Tile>): boolean {
-    return Matrix.every(cardMatrix, (tile) => tile.env !== TileEnv.Village);
 }
 
 function suitableVillage(playerPosition: TVector, villages: Village[]): undefined | Village {

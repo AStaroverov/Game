@@ -18,7 +18,7 @@ export const createVillagesComponent = () =>
         villages: [] as Village[],
     });
 
-export function createVillage(v: Village) {
+export function createVillageStruct(v: Village) {
     return structuredClone(v);
 }
 

@@ -1,9 +1,13 @@
-import { trunc } from './math';
+import { floor, trunc } from './math';
 
 export const random = Math.random;
 
-export function randomArbitrary(min: number, max: number): number {
+export function randomArbitraryFloat(min: number, max: number): number {
     return random() * (max - min) + min;
+}
+
+export function randomArbitraryInt(min: number, max: number): number {
+    return floor(randomArbitraryFloat(min, max));
 }
 
 export function randomSign(): number {

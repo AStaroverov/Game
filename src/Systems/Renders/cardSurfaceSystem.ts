@@ -14,7 +14,7 @@ import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
 import { floor, round } from '../../utils/math';
 import { Matrix } from '../../utils/Matrix';
-import { randomArbitrary } from '../../utils/random';
+import { randomArbitraryFloat } from '../../utils/random';
 import { mapVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
@@ -36,7 +36,7 @@ export function cardSurfaceSystem(heap: GameHeap, ticker: TasksScheduler): void 
 
     function getSalt(n: number): { color: Color } {
         if (!tileIndexToSalt.has(n)) {
-            const v = randomArbitrary(0.96, 1);
+            const v = randomArbitraryFloat(0.96, 1);
             tileIndexToSalt.set(n, { color: new Color(v, v, v) });
         }
 
