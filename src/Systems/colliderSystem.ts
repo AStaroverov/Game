@@ -19,7 +19,7 @@ export function colliderSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
     ticker.addFrameInterval(tick, 1);
 
-    function tick() {
+    function tick(delta: number) {
         const entities = filterEntities(
             heap,
             (e): e is SomeEntity<PositionComponent | DirectionComponent | VelocityComponent> =>
@@ -35,7 +35,7 @@ export function colliderSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
             if (velocity.v === 0) return;
 
-            const shift = mulVector(direction, velocity.v);
+            const shift = mulVector(direction, velocity.v * delta);
             const next = sumVector(position, shift);
             const isNextTile = !isEqualVectors(mapVector(position, floor), mapVector(next, floor));
 
