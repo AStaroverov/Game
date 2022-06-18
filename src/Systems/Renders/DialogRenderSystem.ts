@@ -2,22 +2,12 @@ import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { getEntities } from '../../../lib/ECS/Heap';
 import { dialogs } from '../../Components/Dialogs/data';
 import { DialogComponentID } from '../../Components/Dialogs/Dialog';
-import {
-    MeshComponentID,
-    shouldInitMesh,
-} from '../../Components/Renders/MeshComponent';
-import {
-    DialogEntityID,
-    initDialogEntityMesh,
-    setDialogText,
-} from '../../Entities/Dilog';
+import { MeshComponentID, shouldInitMesh } from '../../Components/Renders/MeshComponent';
+import { DialogEntityID, initDialogEntityMesh, setDialogText } from '../../Entities/Dilog';
 import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
-export function runDialogRenderSystem(
-    heap: GameHeap,
-    ticker: TasksScheduler,
-): void {
+export function runDialogRenderSystem(heap: GameHeap, ticker: TasksScheduler): void {
     let dialogStep = -1;
 
     ticker.addTimeInterval(() => {
@@ -33,13 +23,9 @@ export function runDialogRenderSystem(
             }
 
             if (dialogStep !== dialog.step) {
-                const dialogDataStep =
-                    dialogs[dialog.id][(dialogStep = dialog.step)];
+                const dialogDataStep = dialogs[dialog.id][(dialogStep = dialog.step)];
 
-                setDialogText(
-                    entity,
-                    `${dialogDataStep.speaker}\n\n${dialogDataStep.content}`,
-                );
+                setDialogText(entity, `${dialogDataStep.speaker}\n\n${dialogDataStep.content}`);
             }
         }
     }, 300);

@@ -1,10 +1,7 @@
 import { createEntity } from '../../../lib/ECS/Entity';
 import { createAtlasAnimationComponent } from '../../Components/AtlasAnimation';
 import { atlases, AtlasName } from '../../Components/AtlasAnimation/atlases';
-import {
-    createAutoUnspawnableComponent,
-    UnspawnReason,
-} from '../../Components/AutoRemovable';
+import { createAutoUnspawnableComponent, UnspawnReason } from '../../Components/AutoRemovable';
 import { createDirectionComponent } from '../../Components/DirectionComponent';
 import { createHealComponent } from '../../Components/Heal';
 import { createPositionComponent } from '../../Components/Position';

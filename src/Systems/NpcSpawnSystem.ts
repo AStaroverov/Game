@@ -3,35 +3,19 @@ import { addEntity, getEntities } from '../../lib/ECS/Heap';
 import Enumerable from '../../lib/linq';
 import { DialogID } from '../Components/Dialogs/data';
 import { DirectionComponentID } from '../Components/DirectionComponent';
-import {
-    Tile,
-    TilesMatrix,
-    TilesMatrixID,
-    TileType,
-} from '../Components/Matrix/TilesMatrix';
-import {
-    PlayerStoryComponentID,
-    PlayerStoryStep,
-} from '../Components/PlayerStoryProgress';
+import { TilesMatrix, TilesMatrixID } from '../Components/Matrix/TilesMatrix';
+import { isPassableTileType, Tile } from '../Components/Matrix/TilesMatrix/def';
+import { PlayerStoryComponentID, PlayerStoryStep } from '../Components/PlayerStoryProgress';
 import { PositionComponentID } from '../Components/Position';
 import { TypeComponentID } from '../Components/Type';
-import {
-    HALF_CARD_SIZE,
-    HALF_RENDER_CARD_SIZE,
-    RENDER_CARD_SIZE,
-} from '../CONST';
+import { HALF_CARD_SIZE, HALF_RENDER_CARD_SIZE, RENDER_CARD_SIZE } from '../CONST';
 import { CardEntityID } from '../Entities/Card';
 import { GameStoryEntityID } from '../Entities/GameStory';
-import {
-    createNpcEntity,
-    NpcEntity,
-    NPCEntityID,
-    NPCType,
-} from '../Entities/NPC';
+import { createNpcEntity, NpcEntity, NPCEntityID, NPCType } from '../Entities/NPC';
 import { PlayerEntityID } from '../Entities/Player';
 import { GameHeap } from '../heap';
 import { floor } from '../utils/math';
-import { Item, rectangleIterate } from '../utils/Matrix/rectangleIterate';
+import { Item, rectangleIterate } from '../utils/Matrix/methods/generators/rectangleIterate';
 import { random } from '../utils/random';
 import {
     isEqualVectors,
@@ -40,7 +24,7 @@ import {
     newVector,
     setVector,
     sumVector,
-    Vector,
+    TVector,
 } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 import { CommonAction } from './ActionSystem';
@@ -51,10 +35,7 @@ export function NpcSpawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
 
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
-    const playerDirection = getComponentStruct(
-        playerEntity,
-        DirectionComponentID,
-    );
+    const playerDirection = getComponentStruct(playerEntity, DirectionComponentID);
 
     ticker.addTimeInterval(() => {
         updateFirstNPC(heap, cardTiles, cardPosition, playerDirection);
@@ -64,8 +45,8 @@ export function NpcSpawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
 function updateFirstNPC(
     heap: GameHeap,
     cardTiles: TilesMatrix,
-    cardPosition: Vector,
-    playerDirection: Vector,
+    cardPosition: TVector,
+    playerDirection: TVector,
 ) {
     const gameStory = getEntities(heap, GameStoryEntityID)[0];
     const playerStory = getComponentStruct(gameStory, PlayerStoryComponentID);
@@ -78,16 +59,8 @@ function updateFirstNPC(
             return type.type === NPCType.First;
         });
 
-        if (
-            firstNPC === undefined &&
-            (playerDirection.x !== 0 || playerDirection.y !== 0)
-        ) {
-            console.log('>>add');
-            const npc = tryAddFirstNpc(
-                cardTiles,
-                cardPosition,
-                playerDirection,
-            );
+        if (firstNPC === undefined && (playerDirection.x !== 0 || playerDirection.y !== 0)) {
+            const npc = tryAddFirstNpc(cardTiles, cardPosition, playerDirection);
             npc && addEntity(heap, npc);
         }
     }
@@ -95,8 +68,8 @@ function updateFirstNPC(
 
 function tryAddFirstNpc(
     cardTiles: TilesMatrix,
-    cardPosition: Vector,
-    playerDirection: Vector,
+    cardPosition: TVector,
+    playerDirection: TVector,
 ): undefined | NpcEntity {
     const tileItem = getRandomTile(cardTiles, playerDirection);
 
@@ -116,31 +89,25 @@ function tryAddFirstNpc(
     return npc;
 }
 
-function getRandomTile(
-    cardTiles: TilesMatrix,
-    playerDirection: Vector,
-): Item<Tile> | undefined {
+function getRandomTile(cardTiles: TilesMatrix, playerDirection: TVector): Item<Tile> | undefined {
     const sx = floor(HALF_CARD_SIZE - HALF_RENDER_CARD_SIZE - 1);
     const sy = floor(HALF_CARD_SIZE - HALF_RENDER_CARD_SIZE - 1);
     const w = RENDER_CARD_SIZE + 2;
     const h = RENDER_CARD_SIZE + 2;
 
-    return Enumerable.from(
-        rectangleIterate(cardTiles.matrix, sx, sy, w, h),
-    ).firstOrDefault(({ value, x, y }) => {
-        if (value.type !== TileType.passable) {
-            return false;
-        }
+    return Enumerable.from(rectangleIterate(cardTiles.matrix, sx, sy, w, h))
+        .where((item): item is Item<Tile> => item !== undefined)
+        .firstOrDefault(({ value, x, y }) => {
+            if (!isPassableTileType(value.type)) {
+                return false;
+            }
 
-        const normalizedTilePosition = mapVector(
-            newVector((x - sx) / w, (y - sy) / h),
-            floor,
-        );
+            const normalizedTilePosition = mapVector(newVector((x - sx) / w, (y - sy) / h), floor);
 
-        if (!isEqualVectors(normalizedTilePosition, playerDirection)) {
-            return false;
-        }
+            if (!isEqualVectors(normalizedTilePosition, playerDirection)) {
+                return false;
+            }
 
-        return random() > 0.9;
-    }, undefined);
+            return random() > 0.9;
+        }, undefined);
 }

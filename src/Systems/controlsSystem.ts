@@ -1,68 +1,46 @@
-import { filter, fromEvent, map, tap } from 'rxjs';
+import { filter, fromEvent } from 'rxjs';
 
 import { getComponentStruct } from '../../lib/ECS/Entity';
 import { getEntities } from '../../lib/ECS/Heap';
 import { DirectionComponentID } from '../Components/DirectionComponent';
-import { setVelocity, VelocityComponentID } from '../Components/Velocity';
+import { setVelocityByVector, VelocityComponentID } from '../Components/Velocity';
 import { PlayerEntityID } from '../Entities/Player';
 import { GameHeap } from '../heap';
-import { newVector, setVector, Vector } from '../utils/shape';
+import { mulVector, TVector } from '../utils/shape';
+import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
-export function controlsSystem(heap: GameHeap): void {
+export function controlsSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
-    const playerVelocity = getComponentStruct(
-        playerEntity,
-        VelocityComponentID,
-    );
-    const playerDirection = getComponentStruct(
-        playerEntity,
-        DirectionComponentID,
-    );
-
-    const pressed = new Set();
+    const playerVelocity = getComponentStruct(playerEntity, VelocityComponentID);
+    const playerDirection = getComponentStruct(playerEntity, DirectionComponentID);
 
     fromEvent<KeyboardEvent>(document, 'keydown')
-        .pipe(
-            filter(isArrow),
-            filter((e) => !pressed.has(e.key)),
-            tap((e) => pressed.add(e.key)),
-            map(arrowDownToVector),
-        )
-        .subscribe((vector) => {
-            setVector(
-                playerDirection,
-                newVector(
-                    vector.x ?? playerDirection.x,
-                    vector.y ?? playerDirection.y,
-                ),
-            );
-
-            setVelocity(playerVelocity, 0.08);
+        .pipe(filter(isArrow))
+        .subscribe((e) => {
+            onArrowDown(e, playerDirection);
         });
 
     fromEvent<KeyboardEvent>(document, 'keyup')
         .pipe(filter(isArrow))
         .subscribe((e) => {
-            pressed.delete(e.key);
-
-            if (pressed.size === 0) {
-                setVelocity(playerVelocity, 0);
-            }
+            onArrowUp(e, playerDirection);
         });
+
+    ticker.addFrameInterval(() => {
+        setVelocityByVector(playerVelocity, mulVector(playerDirection, 0.005));
+    }, 1);
 }
 
 function isArrow({ key }: KeyboardEvent): boolean {
-    return (
-        key === 'ArrowLeft' ||
-        key === 'ArrowRight' ||
-        key === 'ArrowUp' ||
-        key === 'ArrowDown'
-    );
+    return key === 'ArrowLeft' || key === 'ArrowRight' || key === 'ArrowUp' || key === 'ArrowDown';
 }
 
-function arrowDownToVector({ key }: KeyboardEvent): Vector {
-    return {
-        x: key === 'ArrowLeft' ? -1 : key === 'ArrowRight' ? 1 : 0,
-        y: key === 'ArrowDown' ? -1 : key === 'ArrowUp' ? 1 : 0,
-    };
+function onArrowDown({ key }: KeyboardEvent, v: TVector) {
+    v.x = key === 'ArrowLeft' ? -1 : key === 'ArrowRight' ? 1 : v.x;
+    v.y = key === 'ArrowDown' ? -1 : key === 'ArrowUp' ? 1 : v.y;
+}
+
+function onArrowUp({ key }: KeyboardEvent, v: TVector) {
+    v.x = key === 'ArrowLeft' && v.x === -1 ? 0 : key === 'ArrowRight' && v.x === 1 ? 0 : v.x;
+    v.y = key === 'ArrowDown' && v.y === -1 ? 0 : key === 'ArrowUp' && v.y === 1 ? 0 : v.y;
 }

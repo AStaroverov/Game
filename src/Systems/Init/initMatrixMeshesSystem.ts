@@ -17,14 +17,8 @@ import { Matrix } from '../../utils/Matrix';
 
 export function initMatrixMeshesSystem(heap: GameHeap) {
     const cardEntity = getEntities(heap, CardEntityID)[0];
-    const reliefMeshesMatrix = getComponentStruct(
-        cardEntity,
-        ReliefMeshesMatrixID,
-    );
-    const surfaceMeshesMatrix = getComponentStruct(
-        cardEntity,
-        SurfaceMeshesMatrixID,
-    );
+    const reliefMeshesMatrix = getComponentStruct(cardEntity, ReliefMeshesMatrixID);
+    const surfaceMeshesMatrix = getComponentStruct(cardEntity, SurfaceMeshesMatrixID);
 
     initReliefMeshMatrix(reliefMeshesMatrix);
     initSurfaceMeshMatrix(surfaceMeshesMatrix);
@@ -47,10 +41,7 @@ function initReliefMeshMatrix(meshesMatrix: ReliefMeshesMatrix) {
 function initSurfaceMeshMatrix(meshesMatrix: SurfaceMeshesMatrix) {
     Matrix.fill(meshesMatrix.matrix, () => {
         return {
-            [$ref]: new Mesh(
-                new PlaneGeometry(TILE_SIZE, TILE_SIZE),
-                new MeshLambertMaterial(),
-            ),
+            [$ref]: new Mesh(new PlaneGeometry(TILE_SIZE, TILE_SIZE), new MeshLambertMaterial()),
         };
     });
 }

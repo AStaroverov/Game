@@ -1,26 +1,13 @@
 import { ExtractStruct } from '../../../lib/ECS/Component';
-import {
-    Entity,
-    getComponentStruct,
-    hasComponent,
-} from '../../../lib/ECS/Entity';
+import { Entity, getComponentStruct, hasComponent } from '../../../lib/ECS/Entity';
 import { filterEntities } from '../../../lib/ECS/Heap';
-import {
-    DirectionComponent,
-    DirectionComponentID,
-} from '../../Components/DirectionComponent';
-import {
-    BaseMeshComponent,
-    BaseMeshComponentID,
-} from '../../Components/Renders/BaseMeshComponent';
+import { DirectionComponent, DirectionComponentID } from '../../Components/DirectionComponent';
+import { BaseMeshComponent, BaseMeshComponentID } from '../../Components/Renders/BaseMeshComponent';
 import { $ref } from '../../CONST';
 import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
-export function rotateRenderSystem(
-    heap: GameHeap,
-    ticker: TasksScheduler,
-): void {
+export function rotateRenderSystem(heap: GameHeap, ticker: TasksScheduler): void {
     ticker.addFrameInterval(tick, 1);
 
     function tick() {
@@ -28,8 +15,7 @@ export function rotateRenderSystem(
             heap,
             (e): e is Entity<any, BaseMeshComponent | DirectionComponent> => {
                 return (
-                    hasComponent(e, BaseMeshComponentID) &&
-                    hasComponent(e, DirectionComponentID)
+                    hasComponent(e, BaseMeshComponentID) && hasComponent(e, DirectionComponentID)
                 );
             },
         );

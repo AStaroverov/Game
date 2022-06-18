@@ -1,10 +1,12 @@
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { addEntity, getEntities } from '../../../lib/ECS/Heap';
-import { tilesInit, TilesMatrixID } from '../../Components/Matrix/TilesMatrix';
+import { TilesMatrixID } from '../../Components/Matrix/TilesMatrix';
+import { updateEnvironment } from '../../Components/Matrix/TilesMatrix/fillers/environment';
+import { fillCrossroads, updateRoads } from '../../Components/Matrix/TilesMatrix/fillers/roads';
 import { CARD_SIZE, CENTER_CARD_POSITION, RENDER_CARD_SIZE } from '../../CONST';
 import { CardEntityID, createCardEntity } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
-import { newSize } from '../../utils/shape';
+import { newSize, zeroVector } from '../../utils/shape';
 
 export function initCardSystem(heap: GameHeap) {
     const cardEntity = getEntities(heap, CardEntityID);
@@ -17,6 +19,8 @@ export function initCardSystem(heap: GameHeap) {
         const cardTiles = getComponentStruct(cardEntity, TilesMatrixID);
 
         addEntity(heap, cardEntity);
-        tilesInit(cardTiles, CENTER_CARD_POSITION.x, CENTER_CARD_POSITION.y);
+        fillCrossroads(cardTiles.matrix, CENTER_CARD_POSITION);
+        updateRoads(cardTiles.matrix, zeroVector);
+        updateEnvironment(cardTiles.matrix, zeroVector);
     }
 }

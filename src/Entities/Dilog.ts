@@ -32,9 +32,7 @@ const HEIGHT = 200;
 const PADDING = 10;
 export const TEXT_MAX_WIDTH = WIDTH - 2 * PADDING;
 
-export function initDialogEntityMesh(
-    struct: ExtractStruct<MeshComponent>,
-): void {
+export function initDialogEntityMesh(struct: ExtractStruct<MeshComponent>): void {
     const group = new Group() as DialogGroup;
     const groupText = new Group();
     const background = new Mesh(

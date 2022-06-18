@@ -1,26 +1,15 @@
-import {
-    getComponentStruct,
-    hasComponent,
-    SomeEntity,
-} from '../../lib/ECS/Entity';
+import { getComponentStruct, hasComponent, SomeEntity } from '../../lib/ECS/Entity';
 import { filterEntities, getEntities } from '../../lib/ECS/Heap';
-import {
-    DirectionComponent,
-    DirectionComponentID,
-} from '../Components/DirectionComponent';
-import { TilesMatrixID, TileType } from '../Components/Matrix/TilesMatrix';
+import { DirectionComponent, DirectionComponentID } from '../Components/DirectionComponent';
+import { TilesMatrixID } from '../Components/Matrix/TilesMatrix';
+import { isPassableTileType } from '../Components/Matrix/TilesMatrix/def';
 import { PositionComponent, PositionComponentID } from '../Components/Position';
 import { VelocityComponent, VelocityComponentID } from '../Components/Velocity';
 import { CardEntityID } from '../Entities/Card';
 import { GameHeap } from '../heap';
-import { floor, ufloor } from '../utils/math';
+import { floor, round } from '../utils/math';
 import { Matrix } from '../utils/Matrix';
-import {
-    isEqualVectors,
-    mapVector,
-    mulVector,
-    sumVector,
-} from '../utils/shape';
+import { isEqualVectors, mapVector, mulVector, sumVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function colliderSystem(heap: GameHeap, ticker: TasksScheduler): void {
@@ -30,14 +19,10 @@ export function colliderSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
     ticker.addFrameInterval(tick, 1);
 
-    function tick() {
+    function tick(delta: number) {
         const entities = filterEntities(
             heap,
-            (
-                e,
-            ): e is SomeEntity<
-                PositionComponent | DirectionComponent | VelocityComponent
-            > =>
+            (e): e is SomeEntity<PositionComponent | DirectionComponent | VelocityComponent> =>
                 hasComponent(e, PositionComponentID) &&
                 hasComponent(e, DirectionComponentID) &&
                 hasComponent(e, VelocityComponentID),
@@ -50,15 +35,15 @@ export function colliderSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
             if (velocity.v === 0) return;
 
-            const shift = mulVector(direction, velocity.v);
-            const current = mapVector(position, floor);
-            const next = mapVector(sumVector(position, shift), floor);
+            const shift = mulVector(direction, velocity.v * delta);
+            const next = sumVector(position, shift);
+            const isNextTile = !isEqualVectors(mapVector(position, floor), mapVector(next, floor));
 
-            if (!isEqualVectors(current, next)) {
-                const coord = sumVector(next, mapVector(cardPosition, ufloor));
+            if (isNextTile) {
+                const coord = mapVector(sumVector(direction, next, cardPosition), round);
                 const tile = Matrix.get(tiles.matrix, coord.x, coord.y);
 
-                if (tile && tile.type !== TileType.passable) {
+                if (tile !== undefined && !isPassableTileType(tile.type)) {
                     velocity.v = 0;
                 }
             }

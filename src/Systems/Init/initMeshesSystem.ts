@@ -5,11 +5,7 @@ import {
     isComponent,
     isInheritedComponent,
 } from '../../../lib/ECS/Component';
-import {
-    filterComponents,
-    hasInheritedComponent,
-    SomeEntity,
-} from '../../../lib/ECS/Entity';
+import { filterComponents, hasInheritedComponent, SomeEntity } from '../../../lib/ECS/Entity';
 import { filterEntities } from '../../../lib/ECS/Heap';
 import {
     BaseMeshComponent,
@@ -21,10 +17,7 @@ import {
     HealBarMeshComponentID,
     initHealBarStruct,
 } from '../../Components/Renders/HealBarMeshComponent';
-import {
-    MeshComponent,
-    MeshComponentID,
-} from '../../Components/Renders/MeshComponent';
+import { MeshComponent, MeshComponentID } from '../../Components/Renders/MeshComponent';
 import { $ref } from '../../CONST';
 import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
@@ -33,21 +26,16 @@ export function initMeshesSystem(heap: GameHeap, ticker: TasksScheduler) {
     ticker.addFrameInterval(update, 10);
 
     function update() {
-        filterEntities(
-            heap,
-            (e): e is SomeEntity<InheritedComponent<MeshComponent>> => {
-                return hasInheritedComponent(e, MeshComponentID);
-            },
-        ).forEach((entity) => {
+        filterEntities(heap, (e): e is SomeEntity<InheritedComponent<MeshComponent>> => {
+            return hasInheritedComponent(e, MeshComponentID);
+        }).forEach((entity) => {
             initBasicMesh(entity);
             initHealBarMesh(entity);
         });
     }
 }
 
-function initBasicMesh(
-    entity: SomeEntity<AnyComponent | InheritedComponent<BaseMeshComponent>>,
-) {
+function initBasicMesh(entity: SomeEntity<AnyComponent | InheritedComponent<BaseMeshComponent>>) {
     filterComponents(entity, (c): c is BaseMeshComponent =>
         isInheritedComponent(c, BaseMeshComponentID),
     )
@@ -59,9 +47,7 @@ function initBasicMesh(
         });
 }
 
-function initHealBarMesh(
-    entity: SomeEntity<AnyComponent | HealBarMeshComponent>,
-) {
+function initHealBarMesh(entity: SomeEntity<AnyComponent | HealBarMeshComponent>) {
     filterComponents(entity, (c): c is HealBarMeshComponent =>
         isComponent(c, HealBarMeshComponentID),
     )

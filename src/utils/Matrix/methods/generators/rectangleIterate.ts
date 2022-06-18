@@ -1,5 +1,5 @@
-import { Point } from '../shape';
-import { Matrix, TMatrix } from './index';
+import { Point } from '../../../shape';
+import { Matrix, TMatrix } from '../../index';
 
 export type Item<T> = Point & {
     value: T;
@@ -12,7 +12,7 @@ export function* rectangleIterate<T>(
     sy: number,
     w: number,
     h: number,
-): Iterator<Item<T>> {
+): IterableIterator<undefined | Item<T>> {
     // top
     let shift = 0;
     while (shift < w) {

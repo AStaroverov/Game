@@ -1,21 +1,11 @@
-import {
-    getComponentStruct,
-    hasComponent,
-    SomeEntity,
-} from '../../../lib/ECS/Entity';
+import { getComponentStruct, hasComponent, SomeEntity } from '../../../lib/ECS/Entity';
 import { filterEntities, getEntities } from '../../../lib/ECS/Heap';
-import {
-    PositionComponent,
-    PositionComponentID,
-} from '../../Components/Position';
+import { PositionComponent, PositionComponentID } from '../../Components/Position';
 import {
     HealBarMeshComponent,
     HealBarMeshComponentID,
 } from '../../Components/Renders/HealBarMeshComponent';
-import {
-    VisualSizeComponent,
-    VisualSizeComponentID,
-} from '../../Components/VisualSize';
+import { VisualSizeComponent, VisualSizeComponentID } from '../../Components/VisualSize';
 import { $ref, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
@@ -23,10 +13,7 @@ import { mulVector, newVector, setVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 import { worldToRenderPosition } from '../../utils/worldToRenderPosition';
 
-export function healBarRenderSystem(
-    heap: GameHeap,
-    ticker: TasksScheduler,
-): void {
+export function healBarRenderSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const cardEntity = getEntities(heap, CardEntityID)[0];
     const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
 
@@ -35,11 +22,7 @@ export function healBarRenderSystem(
     function tick() {
         const entities = filterEntities(
             heap,
-            (
-                e,
-            ): e is SomeEntity<
-                HealBarMeshComponent | PositionComponent | VisualSizeComponent
-            > =>
+            (e): e is SomeEntity<HealBarMeshComponent | PositionComponent | VisualSizeComponent> =>
                 hasComponent(e, HealBarMeshComponentID) &&
                 hasComponent(e, PositionComponentID) &&
                 hasComponent(e, VisualSizeComponentID),

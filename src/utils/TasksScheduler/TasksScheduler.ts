@@ -12,11 +12,7 @@ export class TasksScheduler extends TasksManager {
         });
     }
 
-    addFrameInterval(
-        cb: Callback,
-        delay: number,
-        ctx: unknown = null,
-    ): VoidFunction {
+    addFrameInterval(cb: Callback, delay: number, ctx: unknown = null): VoidFunction {
         return this.addTask(cb, {
             ctx,
             delay,
@@ -25,11 +21,7 @@ export class TasksScheduler extends TasksManager {
         });
     }
 
-    addFrameOut(
-        cb: Callback,
-        delay: number,
-        ctx: unknown = null,
-    ): VoidFunction {
+    addFrameOut(cb: Callback, delay: number, ctx: unknown = null): VoidFunction {
         return this.addTask(cb, {
             ctx,
             delay,
@@ -38,11 +30,7 @@ export class TasksScheduler extends TasksManager {
         });
     }
 
-    addTimeInterval(
-        cb: Callback,
-        delay: number,
-        ctx: unknown = null,
-    ): VoidFunction {
+    addTimeInterval(cb: Callback, delay: number, ctx: unknown = null): VoidFunction {
         return this.addTask(cb, {
             ctx,
             delay,

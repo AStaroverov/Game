@@ -1,17 +1,15 @@
 import { getComponentStruct } from '../../lib/ECS/Entity';
 import { addEntity, getEntities } from '../../lib/ECS/Heap';
 import Enumerable from '../../lib/linq';
-import {
-    Tile,
-    TilesMatrixID,
-    TileType,
-} from '../Components/Matrix/TilesMatrix';
+import { TilesMatrixID } from '../Components/Matrix/TilesMatrix';
+import { isPassableTileType, Tile } from '../Components/Matrix/TilesMatrix/def';
 import { PositionComponentID } from '../Components/Position';
 import { CardEntityID } from '../Entities/Card';
 import { createEnemyEntity, EnemyEntityID } from '../Entities/Enemy';
 import { GameHeap } from '../heap';
 import { abs, floor } from '../utils/math';
-import { Item, radialIterate } from '../utils/Matrix/radialIterate';
+import { radialIterate } from '../utils/Matrix/methods/generators/radialIterate';
+import { ExistedItem } from '../utils/Matrix/methods/utils';
 import { random } from '../utils/random';
 import { mulVector, newVector, setVector, sumVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
@@ -36,33 +34,22 @@ export function EnemySpawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
             floor(cardTiles.matrix.w / 2), // Start must be relative to user
             floor(cardTiles.matrix.h / 2),
         );
-        const suitableItem = Enumerable.from(
-            radialIterate(cardTiles.matrix, start.x, start.y),
-        )
-            .where((tile): tile is Item<Tile> => tile !== undefined)
-            .first(({ x, y, value }) => {
+        const suitableItem = Enumerable.from(radialIterate(cardTiles.matrix, start.x, start.y))
+            .where((item): item is ExistedItem<Tile> => item.value !== undefined)
+            .firstOrDefault(({ x, y, value }) => {
                 const dist = abs(start.x + start.y - (x + y));
 
-                return (
-                    value.type === TileType.passable &&
-                    dist > 10 &&
-                    random() > 0.9
-                );
+                return isPassableTileType(value.type) && dist > 10 && random() > 0.9;
             });
 
         if (suitableItem) {
             const enemy = createEnemyEntity();
             const position = getComponentStruct(enemy, PositionComponentID);
-            const seedPosition = sumVector(
-                suitableItem,
-                mulVector(cardPosition, -1),
-            );
+            const seedPosition = sumVector(suitableItem, mulVector(cardPosition, -1));
 
             setVector(position, seedPosition);
 
             addEntity(heap, enemy);
-        } else {
-            debugger;
         }
     }
 }

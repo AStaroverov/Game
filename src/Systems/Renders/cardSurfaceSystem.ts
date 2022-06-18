@@ -6,31 +6,26 @@ import { getEntities } from '../../../lib/ECS/Heap';
 import { getMatrixCell, getMatrixSlice } from '../../Components/Matrix/Matrix';
 import { SurfaceMeshesMatrixID } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
 import { TilesMatrixID } from '../../Components/Matrix/TilesMatrix';
+import { TileType } from '../../Components/Matrix/TilesMatrix/def';
 import { PositionComponentID } from '../../Components/Position';
-import { $ref, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
+import { $ref, RENDER_CARD_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
-import { floor, round, ufloor } from '../../utils/math';
+import { floor, round } from '../../utils/math';
 import { Matrix } from '../../utils/Matrix';
-import { getRandomArbitrary } from '../../utils/random';
-import { mapVector, newVector, sumVector } from '../../utils/shape';
+import { randomArbitraryFloat } from '../../utils/random';
+import { mapVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 const RENDER_RADIUS = Math.floor(RENDER_CARD_SIZE / 2);
 const TEXTURE_GRASS = new TextureLoader().load(imageGrass);
 
-export function cardSurfaceSystem(
-    heap: GameHeap,
-    ticker: TasksScheduler,
-): void {
+export function cardSurfaceSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
     const cardEntity = getEntities(heap, CardEntityID)[0];
 
-    const playerPosition = getComponentStruct(
-        playerEntity,
-        PositionComponentID,
-    );
+    const playerPosition = getComponentStruct(playerEntity, PositionComponentID);
     const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
     const cardTiles = getComponentStruct(cardEntity, TilesMatrixID);
     const cardMeshes = getComponentStruct(cardEntity, SurfaceMeshesMatrixID);
@@ -41,7 +36,7 @@ export function cardSurfaceSystem(
 
     function getSalt(n: number): { color: Color } {
         if (!tileIndexToSalt.has(n)) {
-            const v = getRandomArbitrary(0.96, 1);
+            const v = randomArbitraryFloat(0.96, 1);
             tileIndexToSalt.set(n, { color: new Color(v, v, v) });
         }
 
@@ -49,45 +44,43 @@ export function cardSurfaceSystem(
     }
 
     function updateSurface() {
-        const abs = mapVector(sumVector(playerPosition, cardPosition), round);
-        const fractionPosition = newVector(
-            -cardPosition.x % 1,
-            -cardPosition.y % 1,
-        );
-        const uflooredPosition = mapVector(cardPosition, ufloor);
+        const absPosition = mapVector(sumVector(playerPosition, cardPosition), round);
+        const uflooredPosition = mapVector(cardPosition, floor);
 
         Matrix.forEach(
-            getMatrixSlice(cardTiles, abs.x, abs.y, RENDER_RADIUS),
+            getMatrixSlice(cardTiles, absPosition.x, absPosition.y, RENDER_RADIUS),
             (tile, x, y) => {
                 const cell = getMatrixCell(cardMeshes, x, y);
                 const mesh = cell?.[$ref];
 
-                if (tile && mesh) {
-                    mesh.visible = true;
-                    mesh.position.x = floor(
-                        (x - fractionPosition.x) * TILE_SIZE,
-                    );
-                    mesh.position.y = floor(
-                        (y - fractionPosition.y) * TILE_SIZE,
-                    );
-
+                if (tile && mesh && tile.type !== TileType.empty) {
                     const index =
                         x +
                         y * RENDER_CARD_SIZE -
-                        (uflooredPosition.x +
-                            uflooredPosition.y * RENDER_CARD_SIZE);
+                        (uflooredPosition.x + uflooredPosition.y * RENDER_CARD_SIZE);
                     const salt = getSalt(index);
 
                     if (mesh.material.color !== salt.color) {
                         mesh.material.color = salt.color;
                     }
 
-                    if (mesh.material.map !== TEXTURE_GRASS) {
+                    if (
+                        (tile.type === TileType.wood || tile.type === TileType.gross) &&
+                        mesh.material.map !== TEXTURE_GRASS
+                    ) {
                         mesh.material.map = TEXTURE_GRASS;
                         mesh.material.needsUpdate = true;
                     }
-                } else if (mesh) {
-                    mesh.visible = false;
+
+                    if (tile.type === TileType.road) {
+                        mesh.material.color =
+                            'last' in tile && tile.last
+                                ? new Color(0, 255, 0)
+                                : new Color(255, 255, 255);
+
+                        mesh.material.map = null;
+                        mesh.material.needsUpdate = true;
+                    }
                 }
             },
         );

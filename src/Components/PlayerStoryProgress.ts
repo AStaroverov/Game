@@ -6,9 +6,7 @@ export enum PlayerStoryStep {
 }
 
 export const PlayerStoryComponentID = 'MAIN_STORY' as const;
-export type PlayerStoryComponent = ReturnType<
-    typeof createPlayerStoryComponent
->;
+export type PlayerStoryComponent = ReturnType<typeof createPlayerStoryComponent>;
 export const createPlayerStoryComponent = () =>
     createComponent(PlayerStoryComponentID, {
         currentStep: PlayerStoryStep.NewGame,

@@ -1,30 +1,17 @@
 import { ExtractStruct } from '../../../lib/ECS/Component';
-import {
-    getComponentStruct,
-    hasComponent,
-    SomeEntity,
-} from '../../../lib/ECS/Entity';
+import { getComponentStruct, hasComponent, SomeEntity } from '../../../lib/ECS/Entity';
 import { filterEntities, getEntities } from '../../../lib/ECS/Heap';
-import {
-    PositionComponent,
-    PositionComponentID,
-} from '../../Components/Position';
-import {
-    BaseMeshComponent,
-    BaseMeshComponentID,
-} from '../../Components/Renders/BaseMeshComponent';
+import { PositionComponent, PositionComponentID } from '../../Components/Position';
+import { BaseMeshComponent, BaseMeshComponentID } from '../../Components/Renders/BaseMeshComponent';
 import { $ref, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
 import { worldYToPositionZ } from '../../utils/positionZ';
-import { Vector } from '../../utils/shape';
+import { TVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 import { worldToRenderPosition } from '../../utils/worldToRenderPosition';
 
-export function positionRenderSystem(
-    heap: GameHeap,
-    ticker: TasksScheduler,
-): void {
+export function positionRenderSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const cardEntity = getEntities(heap, CardEntityID)[0];
     const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
 
@@ -33,9 +20,7 @@ export function positionRenderSystem(
     function tick() {
         const entities = filterEntities(
             heap,
-            (
-                entity,
-            ): entity is SomeEntity<BaseMeshComponent | PositionComponent> =>
+            (entity): entity is SomeEntity<BaseMeshComponent | PositionComponent> =>
                 hasComponent(entity, BaseMeshComponentID) &&
                 hasComponent(entity, PositionComponentID),
         );
@@ -44,18 +29,12 @@ export function positionRenderSystem(
             const mesh = getComponentStruct(entity, BaseMeshComponentID);
             const position = getComponentStruct(entity, PositionComponentID);
 
-            setPositionMesh(
-                mesh,
-                worldToRenderPosition(position, cardPosition),
-            );
+            setPositionMesh(mesh, worldToRenderPosition(position, cardPosition));
         });
     }
 }
 
-function setPositionMesh(
-    struct: ExtractStruct<BaseMeshComponent>,
-    position: Vector,
-): void {
+function setPositionMesh(struct: ExtractStruct<BaseMeshComponent>, position: TVector): void {
     const mesh = struct[$ref];
 
     if (mesh !== undefined) {
