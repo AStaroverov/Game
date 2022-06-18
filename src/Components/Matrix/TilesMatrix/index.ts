@@ -11,6 +11,7 @@ const GET_EMPTY_TILE = (): Tile => ({
 
 export const TilesMatrixID = 'TILES_MATRIX' as const;
 export type TilesMatrix = ReturnStruct<typeof createTilesMatrixComponent>;
+export type TilesMatrixComponent = ReturnType<typeof createTilesMatrixComponent>;
 export const createTilesMatrixComponent = (props: TSize) =>
     createComponent(TilesMatrixID, createMatrixComponent({ ...props, seed: GET_EMPTY_TILE }));
 

@@ -2,7 +2,7 @@ import { GAME_VERSION } from '../CONST';
 import { createGameHeap } from '../heap';
 import { Renderer } from '../Renderer';
 import { runActionSystem } from '../Systems/ActionSystem';
-import { cardSystem } from '../Systems/cardSystem';
+import { runCardSystem } from '../Systems/CardSystem';
 import { colliderSystem } from '../Systems/colliderSystem';
 import { controlsSystem } from '../Systems/controlsSystem';
 import { runDialogSystem } from '../Systems/DialogSystem';
@@ -64,7 +64,7 @@ export function game(): void {
 
     positionBodySystem(heap, ticker);
 
-    cardSystem(heap, ticker);
+    runCardSystem(heap, ticker);
     playerSystem(heap, ticker);
     enemySystem(heap, ticker);
 

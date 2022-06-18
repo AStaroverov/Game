@@ -38,6 +38,10 @@ export const intersect = (a: TRect, b: TRect): boolean => {
     return !notIntersect(a, b);
 };
 
+export const getCenter = (r: TRect): TVector => {
+    return Vector.create(r.x + r.w / 2, r.y + r.h / 2);
+};
+
 export const getAllVertexes = (r: TRect): TVector[] => {
     return [
         Vector.create(r.x, r.y),
@@ -60,6 +64,8 @@ export const Rect = {
     pointInside,
     intersect,
     notIntersect,
+
+    getCenter,
     getAllVertexes,
 
     fromCenterAndSize,

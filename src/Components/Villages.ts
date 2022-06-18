@@ -1,40 +1,62 @@
+import { remove } from 'lodash';
+
 import { createComponent, ExtractStruct } from '../../lib/ECS/Component';
-import { TSize, TVector } from '../utils/shape';
+import { TMatrix } from '../utils/Matrix';
 import { TRect } from '../utils/shapes/rect';
 import { structuredClone } from '../utils/structuredClone';
+import { Tile } from './Matrix/TilesMatrix/def';
 
 export const VillagesComponentID = 'VILLAGES' as const;
 export type VillagesComponent = ReturnType<typeof createVillagesComponent>;
 
-export type Village = {
+export type TVillage = {
     name: string;
     area: TRect;
-    size: TSize;
-    position: TVector;
+    matrix: null | TMatrix<Tile>;
 };
 
 export const createVillagesComponent = () =>
     createComponent(VillagesComponentID, {
-        villages: [] as Village[],
+        villages: [] as TVillage[],
     });
 
-export function createVillageStruct(v: Village) {
+export function createVillage(v: TVillage) {
     return structuredClone(v);
 }
 
-export function setVillage({ villages }: ExtractStruct<VillagesComponent>, village: Village): void {
-    const index = villages.findIndex(({ name }) => name === village.name);
+export function updateVillage(t: TVillage, s: Partial<TVillage>) {
+    return Object.assign(t, s);
+}
 
-    if (index !== -1) {
-        Object.assign(villages[index], village);
-    } else {
-        villages.push(village);
-    }
+export function addVillage(
+    { villages }: ExtractStruct<VillagesComponent>,
+    village: TVillage,
+): void {
+    villages.push(village);
+}
+
+export function deleteVillage(
+    { villages }: ExtractStruct<VillagesComponent>,
+    name: TVillage['name'],
+): void {
+    remove(villages, (v) => v.name === name);
 }
 
 export function getVillage(
     { villages }: ExtractStruct<VillagesComponent>,
     name: string,
-): undefined | Village {
+): undefined | TVillage {
     return villages.find((v) => v.name === name);
 }
+
+export const VillagesComponent = {
+    create: createVillagesComponent,
+    get: getVillage,
+    add: addVillage,
+    delete: deleteVillage,
+};
+
+export const Village = {
+    create: createVillage,
+    update: updateVillage,
+};
