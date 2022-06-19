@@ -41,7 +41,9 @@ export function game(): void {
 
     const heap = createGameHeap(saveObject);
     const ticker = tasksScheduler;
-    const renderer = new Renderer(ticker);
+    const renderer = new Renderer();
+
+    ticker.addFrameInterval(renderer.render, 1, renderer);
 
     // Utils
     saveSystem(heap);

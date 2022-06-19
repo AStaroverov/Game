@@ -7,6 +7,7 @@ import { PositionComponent, PositionComponentID } from '../Components/Position';
 import { VelocityComponent, VelocityComponentID } from '../Components/Velocity';
 import { CardEntityID } from '../Entities/Card';
 import { GameHeap } from '../heap';
+import { TICK_TIME } from '../utils/fps';
 import { floor, round } from '../utils/math';
 import { Matrix } from '../utils/Matrix';
 import { isEqualVectors, mapVector, mulVector, sumVector } from '../utils/shape';
@@ -19,7 +20,7 @@ export function colliderSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
     ticker.addFrameInterval(tick, 1);
 
-    function tick(delta: number) {
+    function tick() {
         const entities = filterEntities(
             heap,
             (e): e is SomeEntity<PositionComponent | DirectionComponent | VelocityComponent> =>
@@ -35,7 +36,7 @@ export function colliderSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
             if (velocity.v === 0) return;
 
-            const shift = mulVector(direction, velocity.v * delta);
+            const shift = mulVector(direction, velocity.v * TICK_TIME);
             const next = sumVector(position, shift);
             const isNextTile = !isEqualVectors(mapVector(position, floor), mapVector(next, floor));
 

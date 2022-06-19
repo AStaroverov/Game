@@ -2,7 +2,6 @@ import { OrthographicCamera, Scene, WebGLRenderer } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import { CENTER_RENDER_POSITION, TILE_SIZE } from '../CONST';
-import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 const min = Math.min(window.innerWidth, window.innerHeight) * 1.4;
 const width = min;
@@ -44,7 +43,7 @@ export class Renderer {
         [Layer.Fixed]: new WebGLRenderer({ alpha: true }),
     };
 
-    constructor(ticker: TasksScheduler) {
+    constructor() {
         const width = window.innerWidth;
         const height = window.innerHeight;
 
@@ -64,11 +63,9 @@ export class Renderer {
 
         this.scenes[Layer.Main].position.x -= TILE_SIZE * CENTER_RENDER_POSITION.x;
         this.scenes[Layer.Main].position.y -= TILE_SIZE * CENTER_RENDER_POSITION.y;
-
-        ticker.addFrameInterval(this.render, 1, this);
     }
 
-    private render(): void {
+    render(): void {
         this.renderers[Layer.Main].render(this.scenes[Layer.Main], this.camera);
         this.renderers[Layer.Fixed].render(this.scenes[Layer.Fixed], this.camera);
     }

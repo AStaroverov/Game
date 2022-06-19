@@ -10,12 +10,13 @@ import { atlases } from '../../Components/AtlasAnimation/atlases';
 import { BaseMeshComponent, BaseMeshComponentID } from '../../Components/Renders/BaseMeshComponent';
 import { $ref } from '../../CONST';
 import { GameHeap } from '../../heap';
+import { TICK_TIME } from '../../utils/fps';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 export function atlasAnimationRenderSystem(heap: GameHeap, ticker: TasksScheduler): void {
     ticker.addFrameInterval(tick, 1);
 
-    function tick(delta: number) {
+    function tick() {
         const entities = filterEntities(
             heap,
             (e): e is SomeEntity<BaseMeshComponent | AtlasAnimationComponent> =>
@@ -26,7 +27,7 @@ export function atlasAnimationRenderSystem(heap: GameHeap, ticker: TasksSchedule
             const mesh = getComponentStruct(entity, BaseMeshComponentID);
             const animation = getComponentStruct(entity, AtlasAnimationComponentID);
 
-            animate(delta, mesh, animation);
+            animate(TICK_TIME, mesh, animation);
         });
     }
 }

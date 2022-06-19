@@ -4,13 +4,14 @@ import { DirectionComponent, DirectionComponentID } from '../Components/Directio
 import { PositionComponent, PositionComponentID } from '../Components/Position';
 import { VelocityComponent, VelocityComponentID } from '../Components/Velocity';
 import { GameHeap } from '../heap';
+import { TICK_TIME } from '../utils/fps';
 import { mulVector, setVector, sumVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function positionBodySystem(heap: GameHeap, ticker: TasksScheduler): void {
     ticker.addFrameInterval(tick, 1);
 
-    function tick(delta: number) {
+    function tick() {
         const entities = filterEntities(
             heap,
             (e): e is SomeEntity<VelocityComponent | DirectionComponent | PositionComponent> =>
@@ -24,7 +25,7 @@ export function positionBodySystem(heap: GameHeap, ticker: TasksScheduler): void
             const direction = getComponentStruct(entity, DirectionComponentID);
             const velocity = getComponentStruct(entity, VelocityComponentID);
 
-            setVector(position, sumVector(position, mulVector(direction, delta * velocity.v)));
+            setVector(position, sumVector(position, mulVector(direction, TICK_TIME * velocity.v)));
         });
     }
 }
