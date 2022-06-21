@@ -18,7 +18,7 @@ export function colliderSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
     const tiles = getComponentStruct(cardEntity, TilesMatrixID);
 
-    ticker.addFrameInterval(tick, 1);
+    // ticker.addFrameInterval(tick, 1);
 
     function tick() {
         const entities = filterEntities(

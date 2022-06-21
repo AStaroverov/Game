@@ -21,7 +21,7 @@ import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 const RENDER_RADIUS = Math.floor(RENDER_CARD_SIZE / 2);
 const TEXTURE_GRASS = new TextureLoader().load(imageGrass);
 
-export function cardSurfaceSystem(heap: GameHeap, ticker: TasksScheduler): void {
+export function CardSurfaceSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
     const cardEntity = getEntities(heap, CardEntityID)[0];
 
@@ -73,10 +73,9 @@ export function cardSurfaceSystem(heap: GameHeap, ticker: TasksScheduler): void 
                     }
 
                     if (tile.type === TileType.road) {
-                        mesh.material.color =
-                            'last' in tile && tile.last
-                                ? new Color(0, 255, 0)
-                                : new Color(255, 255, 255);
+                        mesh.material.color = tile.last
+                            ? new Color(0, 255, 0)
+                            : new Color(255, 255, 255);
 
                         mesh.material.map = null;
                         mesh.material.needsUpdate = true;

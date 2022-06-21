@@ -16,9 +16,7 @@ export type EntityTag<Tag extends unknown | string = string> = {
     [$entity]: Tag;
 };
 
-export type EntityComponents<
-    Comp extends Component<any, any, any> = Component<any, any, any>,
-> = {
+export type EntityComponents<Comp extends Component<any, any, any> = Component<any, any, any>> = {
     components: Comp; // Record<ExtractTag<Comp>, Comp>;
 };
 
@@ -27,28 +25,26 @@ export type Entity<
     Comp extends Component<any, any, any> = Component<any, any, any>,
 > = EntityTag<Tag> & EntityComponents<Comp>;
 
-export type SomeEntity<
-    Comp extends Component<any, any, any> = Component<any, any, any>,
-> = Entity<any, Comp>;
+export type SomeEntity<Comp extends Component<any, any, any> = Component<any, any, any>> = Entity<
+    any,
+    Comp
+>;
 
-export type ExtractComponents<E extends Entity> = E extends Entity<any, infer C>
-    ? C
-    : never;
+export type ExtractComponents<E extends Entity> = E extends Entity<any, infer C> ? C : never;
 
 export type ExtractComponentsByTag<
     C extends Component<any, any, any>,
     T extends ExtractTag<C>,
 > = Extract<C, ComponentTag<T>>;
 
-export type ExtractComponentsByTags<
-    C extends Component<any, any, any>,
-    T extends ExtractTags<C>,
-> = Extract<C, ComponentTag<T>> | Extract<C, ComponentInherited<T>>;
+export type ExtractComponentsByTags<C extends Component<any, any, any>, T extends ExtractTags<C>> =
+    | Extract<C, ComponentTag<T>>
+    | Extract<C, ComponentInherited<T>>;
 
-export function createEntity<
-    Tag extends string,
-    Comp extends Component<any, any, any>,
->(tag: Tag, components: Comp[]): Entity<Tag, Comp> {
+export function createEntity<Tag extends string, Comp extends Component<any, any, any>>(
+    tag: Tag,
+    components: Comp[],
+): Entity<Tag, Comp> {
     return {
         [$entity]: tag,
         components: components.reduce((acc, component) => {
@@ -59,10 +55,7 @@ export function createEntity<
     };
 }
 
-export function isEntity<E extends Entity, T extends ExtractTag<E>>(
-    e: E,
-    tag: T,
-): boolean {
+export function isEntity<E extends Entity, T extends ExtractTag<E>>(e: E, tag: T): boolean {
     return e[$entity] === tag;
 }
 
@@ -133,10 +126,7 @@ export function getComponentStruct<
     return getStruct(__getEntityComponent(e, tag)) as ExtractStruct<C>;
 }
 
-export function tryGetComponent<S extends object>(
-    e: Entity,
-    tag: string,
-): void | S {
+export function tryGetComponent<S extends object>(e: Entity, tag: string): void | S {
     return __getEntityComponents(e)[tag] as void | S;
 }
 

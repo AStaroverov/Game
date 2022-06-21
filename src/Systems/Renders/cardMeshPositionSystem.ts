@@ -18,7 +18,7 @@ import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 const RENDER_RADIUS = floor(HALF_RENDER_CARD_SIZE);
 
-export function cardMeshPositionSystem(heap: GameHeap, ticker: TasksScheduler): void {
+export function CardMeshPositionSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
     const cardEntity = getEntities(heap, CardEntityID)[0];
 

@@ -16,13 +16,15 @@ import { initMatrixMeshesSystem } from '../Systems/Init/initMatrixMeshesSystem';
 import { initMeshesSystem } from '../Systems/Init/initMeshesSystem';
 import { initPlayerSystem } from '../Systems/Init/initPlayerSystem';
 import { initWorldSystem } from '../Systems/Init/initWorldSystem';
+import { runMeshSystem } from '../Systems/MeshSystem';
 import { NpcSpawnSystem } from '../Systems/NpcSpawnSystem';
 import { playerSystem } from '../Systems/playerSystem';
 import { positionBodySystem } from '../Systems/positionBodySystem';
 import { atlasAnimationRenderSystem } from '../Systems/Renders/atlasAnimationRenderSystem';
-import { cardMeshPositionSystem } from '../Systems/Renders/cardMeshPositionSystem';
-import { cardReliefSystem } from '../Systems/Renders/cardReliefSystem';
-import { cardSurfaceSystem } from '../Systems/Renders/cardSurfaceSystem';
+import { CardMeshPositionSystem } from '../Systems/Renders/cardMeshPositionSystem';
+import { CardReliefSystem } from '../Systems/Renders/cardReliefSystem';
+import { CardSurfaceSystem } from '../Systems/Renders/cardSurfaceSystem';
+import { CardVillagesSystem } from '../Systems/Renders/cardVillagesSystem';
 import { runDialogRenderSystem } from '../Systems/Renders/DialogRenderSystem';
 import { enemyRenderSystem } from '../Systems/Renders/enemyRenderSystem';
 import { globalLightRenderSystem } from '../Systems/Renders/globalLightRenderSystem';
@@ -77,10 +79,12 @@ export function game(): void {
     // Render Systems
     globalLightRenderSystem(heap, ticker);
     meshesSystem(heap, ticker, renderer.scenes);
+    runMeshSystem(heap, ticker, renderer.scenes);
 
-    cardMeshPositionSystem(heap, ticker);
-    cardSurfaceSystem(heap, ticker);
-    cardReliefSystem(heap, ticker);
+    CardMeshPositionSystem(heap, ticker);
+    CardSurfaceSystem(heap, ticker);
+    CardReliefSystem(heap, ticker);
+    CardVillagesSystem(heap, ticker);
 
     positionRenderSystem(heap, ticker);
     rotateRenderSystem(heap, ticker);

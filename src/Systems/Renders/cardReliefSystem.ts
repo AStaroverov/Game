@@ -22,7 +22,7 @@ const TREES_MUL = 2;
 const TREES_COUNT = atlasTrees.list.length;
 const RENDER_RADIUS = floor(HALF_RENDER_CARD_SIZE);
 
-export function cardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
+export function CardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
     const cardEntity = getEntities(heap, CardEntityID)[0];
 

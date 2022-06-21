@@ -9,10 +9,10 @@ export type Heap<E extends Entity = Entity> = {
 
 export type ExtractEntities<H> = H extends Heap<infer E> ? E : never;
 
-export type ExtractEntitiesByTag<
-    E extends Entity,
-    T extends ExtractTag<E>,
-> = Extract<E, EntityTag<T>>;
+export type ExtractEntitiesByTag<E extends Entity, T extends ExtractTag<E>> = Extract<
+    E,
+    EntityTag<T>
+>;
 
 export function createHeap<H extends Heap = Heap>(seed: object = {}): H {
     const entities = seed;
@@ -20,10 +20,7 @@ export function createHeap<H extends Heap = Heap>(seed: object = {}): H {
     return { entities } as H;
 }
 
-export function addEntity<H extends Heap, E extends Entity>(
-    heap: H,
-    entity: E,
-): void {
+export function addEntity<H extends Heap, E extends Entity>(heap: H, entity: E): void {
     if (heap.entities[entity[$entity]] === undefined) {
         heap.entities[entity[$entity]] = [];
     }
@@ -31,10 +28,7 @@ export function addEntity<H extends Heap, E extends Entity>(
     heap.entities[entity[$entity]].push(entity);
 }
 
-export function deleteEntity<H extends Heap, E extends Entity>(
-    heap: H,
-    entity: E,
-): void {
+export function deleteEntity<H extends Heap, E extends Entity>(heap: H, entity: E): void {
     delete heap.entities[entity[$entity]];
 }
 
@@ -48,6 +42,12 @@ export function getEntities<
     T extends ExtractTag<E> = ExtractTag<E>,
 >(heap: H, tag: T): ExtractEntitiesByTag<E, T>[] {
     return (heap.entities[tag] ?? EMPTY_ARRAY) as ExtractEntitiesByTag<E, T>[];
+}
+
+export function getAllEntities<H extends Heap, E extends ExtractEntities<H> | SomeEntity>(
+    heap: H,
+): E[] {
+    return Object.values(heap.entities).flat() as E[];
 }
 
 export function filterEntities<

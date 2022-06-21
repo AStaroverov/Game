@@ -1,10 +1,13 @@
-export type Tile = RoadTile | BaseTile;
+import { Assign } from '../../../types';
+import { TVector } from '../../../utils/shape';
 
-export type RoadTile = BaseTile<{ last: boolean }>;
-export type BaseTile<Meta extends object = {}> = Meta & {
+export type Tile = UnknownTile | RoadTile;
+
+export type UnknownTile = TVector & {
     env: TileEnv;
-    type: TileType;
+    type: Exclude<TileType, TileType.road>;
 };
+export type RoadTile = Assign<UnknownTile, { type: TileType.road; last: boolean }>;
 
 export enum TileEnv {
     Empty = 'Empty',
@@ -21,20 +24,24 @@ export enum TileType {
     building = 'building',
 }
 
-export const getEmptyTile = () => ({
+export const getEmptyTile = (x: number, y: number): Tile => ({
+    x,
+    y,
     env: TileEnv.Empty,
     type: TileType.empty,
-    passable: false,
 });
-export const getLastRoadTile = () => ({
+export const getRoadTile = (x: number, y: number): RoadTile => ({
+    x,
+    y,
     env: TileEnv.Empty,
     type: TileType.road,
-    passable: true,
-    last: true,
-});
-export const getRoadTile = () => ({
-    ...getLastRoadTile(),
     last: false,
+});
+export const getLastRoadTile = (x: number, y: number): RoadTile => ({
+    ...getRoadTile(x, y),
+    env: TileEnv.Empty,
+    type: TileType.road,
+    last: true,
 });
 
 export function isPassableTileType(type: TileType) {

@@ -7,20 +7,13 @@ import { newVector } from '../../../../utils/shape';
 import { getEmptyTile, Tile, TileEnv, TileType } from '../def';
 import { fillEnvironment } from './environment';
 import { fillCrossroads, fillRoads } from './roads';
-import { isEmptyItem, isNotBuildingItem, isRoadItem } from './utils/is';
+import { isEmptyItem } from './utils/is';
+import { matchNotBuilding, matchRoad } from './utils/patterns';
 
 const replaceToBuilding = (value: Tile): Tile => {
     return Object.assign(value, {
         type: TileType.building,
     });
-};
-
-const matchRoad = {
-    match: isRoadItem,
-};
-
-const matchNotBuilding = {
-    match: isNotBuildingItem,
 };
 
 const matchEmptyToBuilding = {

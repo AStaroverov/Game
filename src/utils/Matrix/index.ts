@@ -4,6 +4,7 @@ import { fromNestedArray } from './methods/from';
 import { every, find, forEach, reduce, seed, slice, some } from './methods/iterators/base';
 import { fill } from './methods/iterators/base';
 import { map } from './methods/iterators/base';
+import { match, matchAll, matchShuffle, matchShuffleAll } from './methods/match';
 import {
     matchReplace,
     matchReplaceAll,
@@ -55,6 +56,11 @@ export const Matrix = {
     getSide,
 
     getAllVariants,
+
+    match,
+    matchAll,
+    matchShuffle,
+    matchShuffleAll,
 
     matchReplace,
     matchReplaceAll,

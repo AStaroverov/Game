@@ -142,11 +142,11 @@ export function updateRoads(matrix: TMatrix<Tile>, move: TVector): void {
 }
 
 export function fillCrossroads(matrix: TMatrix<Tile>, vec: TVector): TMatrix<Tile> {
-    Matrix.set(matrix, vec.x, vec.y, getRoadTile());
-    Matrix.set(matrix, vec.x + 1, vec.y, getLastRoadTile());
-    Matrix.set(matrix, vec.x - 1, vec.y, getLastRoadTile());
-    Matrix.set(matrix, vec.x, vec.y + 1, getLastRoadTile());
-    Matrix.set(matrix, vec.x, vec.y - 1, getLastRoadTile());
+    Matrix.set(matrix, vec.x, vec.y, getRoadTile(vec.x, vec.y));
+    Matrix.set(matrix, vec.x + 1, vec.y, getLastRoadTile(vec.x + 1, vec.y));
+    Matrix.set(matrix, vec.x - 1, vec.y, getLastRoadTile(vec.x - 1, vec.y));
+    Matrix.set(matrix, vec.x, vec.y + 1, getLastRoadTile(vec.x, vec.y + 1));
+    Matrix.set(matrix, vec.x, vec.y - 1, getLastRoadTile(vec.x, vec.y - 1));
 
     return matrix;
 }

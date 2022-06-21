@@ -13,6 +13,7 @@ import {
     RENDER_CARD_SIZE,
     RENDER_RECT,
 } from '../../CONST';
+import { getWorldRenderRect } from '../../utils/getWorldRenderRect';
 import { floor } from '../../utils/math';
 import { Matrix, TMatrix } from '../../utils/Matrix';
 import { random, randomArbitraryInt } from '../../utils/random';
@@ -170,16 +171,7 @@ function stepNormalize(v: number, min: number, zero: number, max: number = zero)
 
 function shouldMergeVillage(village: TVillage, cardPosition: TVector): boolean {
     return (
-        village.matrix !== null &&
-        Rect.intersect(
-            village.area,
-            Rect.create(
-                RENDER_RECT.x - cardPosition.x,
-                RENDER_RECT.y - cardPosition.y,
-                RENDER_RECT.w,
-                RENDER_RECT.h,
-            ),
-        )
+        village.matrix !== null && Rect.intersect(village.area, getWorldRenderRect(cardPosition))
     );
 }
 
@@ -193,9 +185,13 @@ function shouldForgetVillage(village: TVillage, cardPosition: TVector): boolean 
     );
 }
 
-function mergeVillage(cardMatrix: TMatrix<Tile>, village: TVillage, cardPosition: TVector): void {
-    const x = village.area.x + cardPosition.x;
-    const y = village.area.y + cardPosition.y;
+function mergeVillage(
+    cardMatrix: TMatrix<Tile>,
+    village: TVillage,
+    flooredCardPosition: TVector,
+): void {
+    const x = village.area.x + flooredCardPosition.x;
+    const y = village.area.y + flooredCardPosition.y;
 
     mergeMatrix(cardMatrix, village.matrix!, x, y);
 }
