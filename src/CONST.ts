@@ -1,5 +1,5 @@
 import { floor } from './utils/math';
-import { newVector, sumVector } from './utils/shape';
+import { negateVector, newVector, sumVector } from './utils/shape';
 import { Rect } from './utils/shapes/rect';
 
 export const GAME_VERSION = 0;
@@ -29,7 +29,8 @@ export const RENDER_RECT = Rect.create(
     RENDER_CARD_SIZE,
 );
 
-export const PLAYER_START_DELTA = newVector(0.5, 0.5);
+export const CARD_START_DELTA = newVector(-0.5, -0.5);
+export const PLAYER_START_DELTA = negateVector(CARD_START_DELTA);
 export const PLAYER_START_POSITION = sumVector(CENTER_CARD_POSITION, PLAYER_START_DELTA);
 export const PLAYER_RENDER_START_POSITION = sumVector(CENTER_RENDER_POSITION, PLAYER_START_DELTA);
 

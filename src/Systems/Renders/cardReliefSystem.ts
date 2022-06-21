@@ -71,6 +71,7 @@ export function CardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
                 const tree = atlasTrees.list[salt.index];
                 const treeSize = newVector(tree.w * TREES_MUL, tree.h * TREES_MUL);
 
+                mesh.visible = true;
                 mesh.position.x += floor(salt.x * TILE_SIZE);
                 mesh.position.y += floor(
                     (treeSize.y > TILE_SIZE ? tree.h / 2 : 0) + salt.y * TILE_SIZE,
@@ -82,17 +83,21 @@ export function CardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
                     mesh.material.map = tree.texture;
                     mesh.material.needsUpdate = true;
                 }
+            } else {
+                mesh.visible = false;
+                mesh.material.map = null;
+                mesh.material.needsUpdate = true;
             }
 
-            if (tile.type === TileType.building) {
-                mesh.position.z = tileYToPositionZ(y + x / RENDER_CARD_SIZE);
-
-                if (mesh.geometry !== asd) {
-                    mesh.geometry = asd;
-                    mesh.material.map = null;
-                    mesh.material.needsUpdate = true;
-                }
-            }
+            // if (tile.type === TileType.building) {
+            //     mesh.position.z = tileYToPositionZ(y + x / RENDER_CARD_SIZE);
+            //
+            //     if (mesh.geometry !== asd) {
+            //         mesh.geometry = asd;
+            //         mesh.material.map = null;
+            //         mesh.material.needsUpdate = true;
+            //     }
+            // }
         });
     }
 }

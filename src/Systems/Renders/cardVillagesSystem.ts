@@ -10,13 +10,14 @@ import {
 } from '../../Components/Matrix/TilesMatrix/fillers/utils/patterns';
 import { PositionComponentID } from '../../Components/Position';
 import { TVillage, VillagesComponentID } from '../../Components/Villages';
-import { TILE_SIZE } from '../../CONST';
+import { CARD_START_DELTA, RENDER_RECT, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
 import { getWorldRenderRect } from '../../utils/getWorldRenderRect';
 import { Matrix } from '../../utils/Matrix';
-import { TVector } from '../../utils/shape';
+import { worldYToPositionZ } from '../../utils/positionZ';
+import { TVector, Vector } from '../../utils/shape';
 import { Rect } from '../../utils/shapes/rect';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 import { createMeshStore } from '../MeshSystem';
@@ -46,6 +47,8 @@ export function CardVillagesSystem(heap: GameHeap, ticker: TasksScheduler): void
     ticker.addFrameInterval(updateVillages, 1);
 
     function updateVillages() {
+        if (TEX_HOUSE_1.image === undefined) return;
+
         const village = cardVillages.villages.find((v) => isCurrentVillage(v, cardPosition));
 
         if (village === undefined || village.matrix === null) {
@@ -54,13 +57,24 @@ export function CardVillagesSystem(heap: GameHeap, ticker: TasksScheduler): void
             const places = Matrix.matchAll(village.matrix, building2x2Pattern);
 
             for (const place of places) {
-                const tile = Matrix.get(place, 1, 2)!;
+                const tile = Matrix.get(place, 1, 1)!;
                 const mesh = cardMeshes.getset(getKey(tile.x, tile.y), createHouseMesh);
+                const tileWorldPosition = Vector.create(
+                    village.area.x + tile.x,
+                    village.area.y + tile.y,
+                );
+                const renderDelta = Vector.create(
+                    cardPosition.x + CARD_START_DELTA.x - RENDER_RECT.x - 1, // wtf 1?
+                    cardPosition.y + CARD_START_DELTA.y - RENDER_RECT.y - 1,
+                );
+                const imageDelta = Vector.create(
+                    TEX_HOUSE_1.image.width / 2,
+                    TEX_HOUSE_1.image.height / 2,
+                );
 
-                debugger;
-                mesh.position.x = (village.area.w / 4 + tile.x + cardPosition.x) * TILE_SIZE;
-                mesh.position.y = (village.area.h / 2 + tile.y + cardPosition.y) * TILE_SIZE;
-                mesh.position.z = 10; //tileYToPositionZ(tile.y + floor(cardPosition.y)) + 1;
+                mesh.position.x = (tileWorldPosition.x + renderDelta.x) * TILE_SIZE + imageDelta.x;
+                mesh.position.y = (tileWorldPosition.y + renderDelta.y) * TILE_SIZE + imageDelta.y;
+                mesh.position.z = worldYToPositionZ(mesh.position.y);
             }
         }
     }
@@ -76,11 +90,11 @@ function getKey(x: number, y: number): string {
 
 function createHouseMesh() {
     return new Mesh(
-        new PlaneGeometry(128, 192),
+        new PlaneGeometry(TEX_HOUSE_1.image.width, TEX_HOUSE_1.image.height),
         new MeshLambertMaterial({
+            map: TEX_HOUSE_1,
             alphaTest: 0.5,
             transparent: true,
-            map: TEX_HOUSE_1,
         }),
     );
 }

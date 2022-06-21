@@ -65,7 +65,9 @@ export function CardSurfaceSystem(heap: GameHeap, ticker: TasksScheduler): void 
                     }
 
                     if (
-                        (tile.type === TileType.wood || tile.type === TileType.gross) &&
+                        (tile.type === TileType.building ||
+                            tile.type === TileType.wood ||
+                            tile.type === TileType.gross) &&
                         mesh.material.map !== TEXTURE_GRASS
                     ) {
                         mesh.material.map = TEXTURE_GRASS;

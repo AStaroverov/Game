@@ -3,7 +3,7 @@ import { getComponentStruct, hasComponent, SomeEntity } from '../../../lib/ECS/E
 import { filterEntities, getEntities } from '../../../lib/ECS/Heap';
 import { PositionComponent, PositionComponentID } from '../../Components/Position';
 import { BaseMeshComponent, BaseMeshComponentID } from '../../Components/Renders/BaseMeshComponent';
-import { $ref, TILE_SIZE } from '../../CONST';
+import { $ref, CARD_START_DELTA, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
 import { worldYToPositionZ } from '../../utils/positionZ';
@@ -38,8 +38,8 @@ function setPositionMesh(struct: ExtractStruct<BaseMeshComponent>, position: TVe
     const mesh = struct[$ref];
 
     if (mesh !== undefined) {
-        mesh.position.x = (position.x - 0.5) * TILE_SIZE;
-        mesh.position.y = (position.y - 0.5) * TILE_SIZE;
+        mesh.position.x = (position.x + CARD_START_DELTA.x) * TILE_SIZE;
+        mesh.position.y = (position.y + CARD_START_DELTA.y) * TILE_SIZE;
         mesh.position.z = worldYToPositionZ(mesh.position.y);
     }
 }
