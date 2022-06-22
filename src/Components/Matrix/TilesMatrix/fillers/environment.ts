@@ -5,7 +5,7 @@ import { isEqualVectors, toOneWayVectors, TVector, zeroVector } from '../../../.
 import { isPassableTileType, Tile, TileType } from '../def';
 import { getRenderMatrixSide } from './utils/getRenderMatrixSide';
 import { getRenderMatrixSlice } from './utils/getRenderMatrixSlice';
-import { isEmptyItem, isNotEmptyItem } from './utils/is';
+import { isEmptyTile, isNotEmptyTile } from './utils/is';
 import {
     getProbabilityRecord,
     getRandomProbability,
@@ -14,10 +14,10 @@ import {
 } from './utils/probabilities';
 
 const matchNotEmpty = {
-    match: isNotEmptyItem,
+    match: isNotEmptyTile,
 };
 const matchEmptyReplaceToSome = {
-    match: isEmptyItem,
+    match: isEmptyTile,
     replace: updateTile,
 };
 

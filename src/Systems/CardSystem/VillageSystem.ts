@@ -2,7 +2,7 @@ import { ExtractStruct } from '../../../lib/ECS/Component';
 import { TilesMatrixComponent } from '../../Components/Matrix/TilesMatrix';
 import { Tile, TileEnv, TileType } from '../../Components/Matrix/TilesMatrix/def';
 import { getRenderMatrixSide } from '../../Components/Matrix/TilesMatrix/fillers/utils/getRenderMatrixSide';
-import { isLastRoadItem } from '../../Components/Matrix/TilesMatrix/fillers/utils/is';
+import { isLastRoadTile } from '../../Components/Matrix/TilesMatrix/fillers/utils/is';
 import { mergeMatrix } from '../../Components/Matrix/TilesMatrix/fillers/utils/mergeMatrix';
 import { createVillage } from '../../Components/Matrix/TilesMatrix/fillers/village';
 import { TVillage, Village, VillagesComponent } from '../../Components/Villages';
@@ -106,7 +106,7 @@ export function spawnVillage(
         side,
         [] as { tile: Tile; x: number; y: number }[],
         (acc, tile, x, y) => {
-            if (isLastRoadItem(tile)) acc.push({ tile, x, y });
+            if (isLastRoadTile(tile)) acc.push({ tile, x, y });
             return acc;
         },
     );
@@ -124,7 +124,7 @@ export function spawnVillage(
         villageSide,
         [] as { tile: Tile; x: number; y: number }[],
         (acc, tile, x, y) => {
-            if (isLastRoadItem(tile)) acc.push({ tile, x, y });
+            if (isLastRoadTile(tile)) acc.push({ tile, x, y });
             return acc;
         },
     );

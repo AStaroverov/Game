@@ -1,13 +1,13 @@
-import { isBuildingItem, isNotBuildingItem, isRoadItem } from './is';
+import { isBuildingTile, isNotBuildingTile, isRoadTile } from './is';
 
 export const matchRoad = {
-    match: isRoadItem,
+    match: isRoadTile,
 };
 
 export const matchBuilding = {
-    match: isBuildingItem,
+    match: isBuildingTile,
 };
 
 export const matchNotBuilding = {
-    match: isNotBuildingItem,
+    match: isNotBuildingTile,
 };

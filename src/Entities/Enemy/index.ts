@@ -3,10 +3,8 @@ import { createAtlasAnimationComponent } from '../../Components/AtlasAnimation';
 import { atlases, AtlasName } from '../../Components/AtlasAnimation/atlases';
 import { createAutoUnspawnableComponent, UnspawnReason } from '../../Components/AutoRemovable';
 import { createDirectionComponent } from '../../Components/DirectionComponent';
-import { createHealComponent } from '../../Components/Heal';
 import { createPositionComponent } from '../../Components/Position';
 import { createBaseMeshComponent } from '../../Components/Renders/BaseMeshComponent';
-import { createHealBarMeshComponent } from '../../Components/Renders/HealBarMeshComponent';
 import { createVelocityComponent } from '../../Components/Velocity';
 import { createVisualSizeComponent } from '../../Components/VisualSize';
 import { TILE_SIZE } from '../../CONST';
@@ -16,7 +14,7 @@ const enemyAtlas = atlases[AtlasName.Skeleton];
 
 export const EnemyEntityID = 'ENEMY_ENTITY' as const;
 export type EnemyEntity = ReturnType<typeof createEnemyEntity>;
-export const createEnemyEntity = (maxHP = 1) => {
+export const createEnemyEntity = () => {
     return createEntity(EnemyEntityID, [
         createAutoUnspawnableComponent([UnspawnReason.OutOfCard]),
         createVisualSizeComponent(newSize(TILE_SIZE)),
@@ -24,8 +22,8 @@ export const createEnemyEntity = (maxHP = 1) => {
         createDirectionComponent(),
         createVelocityComponent(),
         createBaseMeshComponent({
-            w: enemyAtlas.w * 2.2,
-            h: enemyAtlas.h * 2.2,
+            w: enemyAtlas.w * 1.2,
+            h: enemyAtlas.h * 1.2,
             transparent: true,
             alphaTest: 0.5,
         }),
@@ -34,7 +32,7 @@ export const createEnemyEntity = (maxHP = 1) => {
             duration: 100,
             atlasName: AtlasName.Skeleton,
         }),
-        createHealComponent(maxHP),
-        createHealBarMeshComponent(),
+        // createHealComponent(1),
+        // createHealBarMeshComponent(),
     ]);
 };

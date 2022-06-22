@@ -28,10 +28,9 @@ export const createNpcEntity = (props: { type: NPCType; action: ActionableCompon
         createPositionComponent(),
         createDirectionComponent(),
         createVelocityComponent(),
-
         createBaseMeshComponent({
-            w: enemyAtlas.w * 2.2,
-            h: enemyAtlas.h * 2.2,
+            w: enemyAtlas.w * 1.2,
+            h: enemyAtlas.h * 1.2,
             transparent: true,
             alphaTest: 0.5,
         }),

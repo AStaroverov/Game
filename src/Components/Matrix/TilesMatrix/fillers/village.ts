@@ -3,11 +3,14 @@ import { pipe } from 'lodash/fp';
 
 import { floor } from '../../../../utils/math';
 import { Matrix, TMatrix } from '../../../../utils/Matrix';
+import { ItemMatchReplace } from '../../../../utils/Matrix/methods/matchReplace';
+import { flipX } from '../../../../utils/Matrix/methods/transform';
+import { range } from '../../../../utils/range';
 import { newVector } from '../../../../utils/shape';
 import { getEmptyTile, Tile, TileEnv, TileType } from '../def';
 import { fillEnvironment } from './environment';
 import { fillCrossroads, fillRoads } from './roads';
-import { isEmptyItem } from './utils/is';
+import { isEmptyTile } from './utils/is';
 import { matchNotBuilding, matchRoad } from './utils/patterns';
 
 const replaceToBuilding = (value: Tile): Tile => {
@@ -17,61 +20,34 @@ const replaceToBuilding = (value: Tile): Tile => {
 };
 
 const matchEmptyToBuilding = {
-    match: isEmptyItem,
+    match: isEmptyTile,
     replace: replaceToBuilding,
 };
 
-const building2x2Pattern = Matrix.getAllVariants(
-    Matrix.fromNestedArray([
-        /* eslint-disable */
-        [matchNotBuilding, matchNotBuilding, matchNotBuilding],
-        [matchRoad, matchEmptyToBuilding, matchEmptyToBuilding],
-        [matchRoad, matchEmptyToBuilding, matchEmptyToBuilding],
-        [matchNotBuilding, matchNotBuilding, matchNotBuilding],
-        /* eslint-enable */
-    ]),
-);
+const createBuildingPattern = (
+    s1: number,
+    s2: number,
+    getAllVariants = Matrix.getAllVariants,
+): TMatrix<ItemMatchReplace<Tile>>[] => {
+    const topBottomRow = range(s1 + 2).map(() => matchNotBuilding);
+    const centerRow = [matchRoad, ...range(s1).map(() => matchEmptyToBuilding), matchNotBuilding];
 
-const building2x3Pattern = Matrix.getAllVariants(
-    Matrix.fromNestedArray([
-        /* eslint-disable */
-        [matchNotBuilding, matchNotBuilding, matchNotBuilding, matchNotBuilding],
-        [matchRoad, matchEmptyToBuilding, matchEmptyToBuilding, matchEmptyToBuilding],
-        [matchRoad, matchEmptyToBuilding, matchEmptyToBuilding, matchEmptyToBuilding],
-        [matchNotBuilding, matchNotBuilding, matchNotBuilding, matchNotBuilding],
-        /* eslint-enable */
-    ]),
-);
-
-const building3x2Pattern = Matrix.getAllVariants(
-    Matrix.fromNestedArray([
-        /* eslint-disable */
-        [matchNotBuilding, matchNotBuilding, matchNotBuilding],
-        [matchRoad, matchEmptyToBuilding, matchEmptyToBuilding],
-        [matchRoad, matchEmptyToBuilding, matchEmptyToBuilding],
-        [matchRoad, matchEmptyToBuilding, matchEmptyToBuilding],
-        [matchNotBuilding, matchNotBuilding, matchNotBuilding],
-        /* eslint-enable */
-    ]),
-);
-
-const building3x3Pattern = Matrix.getAllVariants(
-    Matrix.fromNestedArray([
-        /* eslint-disable */
-        [matchNotBuilding, matchNotBuilding, matchNotBuilding, matchNotBuilding],
-        [matchRoad, matchEmptyToBuilding, matchEmptyToBuilding, matchEmptyToBuilding],
-        [matchRoad, matchEmptyToBuilding, matchEmptyToBuilding, matchEmptyToBuilding],
-        [matchRoad, matchEmptyToBuilding, matchEmptyToBuilding, matchEmptyToBuilding],
-        [matchNotBuilding, matchNotBuilding, matchNotBuilding, matchNotBuilding],
-        /* eslint-enable */
-    ]),
-);
+    return getAllVariants(
+        Matrix.fromNestedArray([
+            /* eslint-disable */
+            topBottomRow,
+            ...range(s2).map(() => centerRow),
+            topBottomRow
+            /* eslint-enable */
+        ]),
+    );
+};
 
 const buildingPatterns = [
-    ...building2x2Pattern,
-    ...building2x3Pattern,
-    ...building3x2Pattern,
-    ...building3x3Pattern,
+    ...createBuildingPattern(4, 3, (m) => [m, flipX(m)]),
+    ...createBuildingPattern(4, 4),
+    ...createBuildingPattern(4, 5),
+    ...createBuildingPattern(5, 5),
 ];
 
 export function fillBuildings(matrix: TMatrix<Tile>): void {
@@ -95,6 +71,7 @@ export function fillVillage<T extends TMatrix<Tile>>(matrix: T): T {
 }
 
 export function createVillage(w: number, h: number): TMatrix<Tile> {
+    console.log('>>', w, h);
     return pipe(
         (matrix) => fillCrossroads(matrix, newVector(floor(w / 2), floor(h / 2))),
         fillVillage,

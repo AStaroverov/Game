@@ -1,4 +1,4 @@
-import { floor, trunc } from './math';
+import { round, trunc } from './math';
 
 export const random = Math.random;
 
@@ -7,7 +7,7 @@ export function randomArbitraryFloat(min: number, max: number): number {
 }
 
 export function randomArbitraryInt(min: number, max: number): number {
-    return floor(randomArbitraryFloat(min, max));
+    return round(randomArbitraryFloat(min, max));
 }
 
 export function randomSign(): number {

@@ -18,7 +18,7 @@ import { randomSign } from '../../utils/random';
 import { mapVector, newVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
-const TREES_MUL = 2;
+const TREES_MUL = 1;
 const TREES_COUNT = atlasTrees.list.length;
 const RENDER_RADIUS = floor(HALF_RENDER_CARD_SIZE);
 
@@ -85,21 +85,7 @@ export function CardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
                 }
             } else {
                 mesh.visible = false;
-                mesh.material.map = null;
-                mesh.material.needsUpdate = true;
             }
-
-            // if (tile.type === TileType.building) {
-            //     mesh.position.z = tileYToPositionZ(y + x / RENDER_CARD_SIZE);
-            //
-            //     if (mesh.geometry !== asd) {
-            //         mesh.geometry = asd;
-            //         mesh.material.map = null;
-            //         mesh.material.needsUpdate = true;
-            //     }
-            // }
         });
     }
 }
-
-const asd = new PlaneGeometry(TILE_SIZE, TILE_SIZE);

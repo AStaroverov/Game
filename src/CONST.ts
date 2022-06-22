@@ -4,7 +4,7 @@ import { Rect } from './utils/shapes/rect';
 
 export const GAME_VERSION = 0;
 
-export const TILE_SIZE = 64;
+export const TILE_SIZE = 32;
 
 export const CARD_SIZE = 51;
 export const HALF_CARD_SIZE = CARD_SIZE / 2;

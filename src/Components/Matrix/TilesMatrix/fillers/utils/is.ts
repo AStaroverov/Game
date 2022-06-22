@@ -7,15 +7,13 @@ export const creteTypeDetector =
 
 export const isExisted = (item: undefined | Tile): item is Tile => item !== undefined;
 
-export const isEmptyItem = creteTypeDetector(TileType.empty, true);
-export const isNotEmptyItem = creteTypeDetector(TileType.empty, false);
+export const isEmptyTile = creteTypeDetector(TileType.empty, true);
+export const isNotEmptyTile = creteTypeDetector(TileType.empty, false);
 
-export const isRoadItem = creteTypeDetector(TileType.road, true);
-export const isNotRoadItem = creteTypeDetector(TileType.road, false);
-export const isLastRoadItem = (item: Tile) =>
-    isRoadItem(item) && 'last' in item && item.last === true;
-export const isNotLastRoadItem = (item: Tile) =>
-    isRoadItem(item) && 'last' in item && item.last === false;
+export const isRoadTile = creteTypeDetector(TileType.road, true);
+export const isNotRoadTile = creteTypeDetector(TileType.road, false);
+export const isLastRoadTile = (item: Tile) => isRoadTile(item) && 'last' in item && item.last;
+export const isNotLastRoadTile = (item: Tile) => isRoadTile(item) && 'last' in item && !item.last;
 
-export const isBuildingItem = creteTypeDetector(TileType.building, true);
-export const isNotBuildingItem = creteTypeDetector(TileType.building, false);
+export const isBuildingTile = creteTypeDetector(TileType.building, true);
+export const isNotBuildingTile = creteTypeDetector(TileType.building, false);

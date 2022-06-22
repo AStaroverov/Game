@@ -7,11 +7,11 @@ import { getLastRoadTile, getRoadTile, Tile, TileType } from '../def';
 import { getRenderMatrixSide } from './utils/getRenderMatrixSide';
 import { getRenderMatrixSlice } from './utils/getRenderMatrixSlice';
 import {
-    isEmptyItem,
-    isLastRoadItem,
-    isNotLastRoadItem,
-    isNotRoadItem,
-    isRoadItem,
+    isEmptyTile,
+    isLastRoadTile,
+    isNotLastRoadTile,
+    isNotRoadTile,
+    isRoadTile,
 } from './utils/is';
 
 const replaceToNotLastRoad = (tile: Tile) => {
@@ -36,32 +36,32 @@ const replaceToSomeRoad = (tile: Tile) => {
 };
 
 const matchEmpty = {
-    match: isEmptyItem,
+    match: isEmptyTile,
 };
 const matchRoad = {
-    match: isRoadItem,
+    match: isRoadTile,
 };
 const matchNotRoad = {
-    match: isNotRoadItem,
+    match: isNotRoadTile,
 };
 const matchLastRoadReplaceSomeRoad = {
-    match: isLastRoadItem,
+    match: isLastRoadTile,
     replace: replaceToSomeRoad,
 };
 const matchLastRoadReplaceToNotLastRoad = {
-    match: isLastRoadItem,
+    match: isLastRoadTile,
     replace: replaceToNotLastRoad,
 };
 const matchNotLastRoadReplaceToLastRoad = {
-    match: isNotLastRoadItem,
+    match: isNotLastRoadTile,
     replace: replaceToLastRoad,
 };
 const matchEmptyReplaceToSomeRoad = {
-    match: isEmptyItem,
+    match: isEmptyTile,
     replace: replaceToSomeRoad,
 };
 const matchEmptyReplaceToLastRoad = {
-    match: isEmptyItem,
+    match: isEmptyTile,
     replace: replaceToLastRoad,
 };
 
