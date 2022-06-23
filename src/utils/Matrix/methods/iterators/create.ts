@@ -27,14 +27,14 @@ export function createFind(iterate: typeof forEach | typeof shuffleForEach) {
     ): undefined | Item<T> {
         let item;
 
-        function _forEach(v: any, x: number, y: number, i: number) {
+        function _find(v: any, x: number, y: number, i: number) {
             if (callback(v, x, y, i)) {
                 item = getItem(matrix, x, y, matrix.buffer[i]);
                 return STOP_ITERATE;
             }
         }
 
-        iterate(matrix, _forEach);
+        iterate(matrix, _find);
 
         return item;
     };
@@ -56,10 +56,12 @@ export function createMany(iterate: typeof forEach | typeof shuffleForEach) {
     ): boolean {
         let result = false;
 
-        iterate(matrix, (v: any, x: number, y: number, i: number) => {
+        function _many(v: any, x: number, y: number, i: number) {
             const r = callback(v, x, y, i);
             result = result || r;
-        });
+        }
+
+        iterate(matrix, _many);
 
         return result;
     };

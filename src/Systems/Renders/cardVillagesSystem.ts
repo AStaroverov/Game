@@ -94,13 +94,16 @@ export async function CardVillagesSystem(heap: GameHeap, ticker: TasksScheduler)
 
     ticker.addFrameInterval(updateVillages, 1);
 
+    let places: undefined | TMatrix<Tile>[] = undefined;
+
     function updateVillages() {
         const village = cardVillages.villages.find((v) => isCurrentVillage(v, cardPosition));
 
         if (village === undefined || village.matrix === null) {
             cardMeshes.clear();
+            places = undefined;
         } else {
-            const places = Matrix.matchAll(village.matrix, buildingPatterns);
+            places = places ?? Matrix.matchAll(village.matrix, buildingPatterns);
 
             for (const place of places) {
                 const tile = Matrix.get(place, 1, 1)!;

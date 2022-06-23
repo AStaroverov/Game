@@ -1,28 +1,36 @@
-import { shuffle } from 'lodash';
-
+import { shuffle } from '../../../shuffle';
 import { TMatrix } from '../../index';
 import { get } from '../base';
 import { STOP_ITERATE } from '../utils';
 import { createEvery, createFind, createMany, createMap, createReduce, createSome } from './create';
 
-const NUMBERS = new Int32Array(1_000_000).map((_, i) => i);
+const NUMBERS = new Int16Array(1e3).map((_, i) => i);
+const SHUFFLED_NUMBERS_1 = new Int16Array(1e3).map((_, i) => i);
+const SHUFFLED_NUMBERS_2 = new Int16Array(1e3).map((_, i) => i);
 
 export function shuffleForEach<T>(
     matrix: TMatrix<T>,
     callback: (item: T, x: number, y: number, i: number) => unknown,
 ): boolean {
+    SHUFFLED_NUMBERS_1.set(NUMBERS);
+    SHUFFLED_NUMBERS_2.set(NUMBERS);
+
+    const w = matrix.w;
+    const h = matrix.h;
+    const xs = shuffle(SHUFFLED_NUMBERS_1.subarray(0, w));
+    const ys = shuffle(SHUFFLED_NUMBERS_2.subarray(0, h));
+
     let index = 0;
-    const xs = shuffle(NUMBERS.subarray(0, matrix.w));
+    let x = 0;
+    let y = 0;
 
-    for (let i = 0; i < xs.length; i++) {
-        const x = xs[i];
-        const ys = shuffle(NUMBERS.subarray(0, matrix.h));
+    for (let i = 0; i < w; i++) {
+        x = xs[i];
 
-        for (let i = 0; i < ys.length; i++) {
-            const y = ys[i];
-            const item = get(matrix, x, y)!;
+        for (let j = 0; j < h; j++) {
+            y = ys[j];
 
-            if (callback(item, x, y, index++) === STOP_ITERATE) {
+            if (callback(get(matrix, x, y)!, x, y, index++) === STOP_ITERATE) {
                 return true;
             }
         }

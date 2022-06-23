@@ -1,12 +1,14 @@
+import { isFunction } from 'lodash';
+
 import { TMatrix, TMatrixSeed } from '../index';
 import { seed } from './iterators/base';
 
-export function create<T>(w: number, h: number, filler?: TMatrixSeed<T>): TMatrix<T> {
-    const buffer = new Array(w * h).fill(null);
+export function create<T>(w: number, h: number, fillerOrBuffer?: TMatrixSeed<T> | T[]): TMatrix<T> {
+    const buffer = Array.isArray(fillerOrBuffer) ? fillerOrBuffer : new Array(w * h).fill(null);
     const instance = { w, h, buffer };
 
-    if (filler) {
-        seed(instance, filler);
+    if (isFunction(fillerOrBuffer)) {
+        seed(instance, fillerOrBuffer);
     }
 
     return instance;

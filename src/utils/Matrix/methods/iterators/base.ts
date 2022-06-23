@@ -19,7 +19,9 @@ export function forEach<T>(
     matrix: TMatrix<T>,
     callback: (item: T, x: number, y: number, i: number) => unknown,
 ): boolean {
-    for (let i = 0; i < matrix.buffer.length; i++) {
+    const length = matrix.w * matrix.h;
+
+    for (let i = 0; i < length; i++) {
         const x = i % matrix.w;
         const y = (i / matrix.w) | 0;
 

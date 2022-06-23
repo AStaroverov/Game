@@ -1,7 +1,5 @@
-import { some as arraySome } from 'lodash';
-
 import { TMatrix } from '../index';
-import { create, get } from './base';
+import { create, get, set } from './base';
 import { every, many, some } from './iterators/base';
 import { shuffleMany, shuffleSome } from './iterators/shuffle';
 
@@ -25,7 +23,7 @@ export const matchShuffleAll: <T>(
     matches: TMatrix<ItemMatch<T>>[],
 ) => TMatrix<T>[] = createMatch(shuffleMany);
 
-export function createMatch(matrixIterator = some, matchIterator = arraySome) {
+export function createMatch(matrixIterator = some) {
     return function match<T>(
         matrix: TMatrix<T>,
         targetMatrices: TMatrix<ItemMatch<T>>[],
@@ -34,7 +32,7 @@ export function createMatch(matrixIterator = some, matchIterator = arraySome) {
 
         matrixIterator(matrix, (item, x, y) => {
             const matcher = createMatcher(matrix, x, y);
-            return matchIterator(targetMatrices, (target) => {
+            return targetMatrices.some((target) => {
                 const peace = matcher(target);
                 return peace !== undefined ? (peaces.push(peace), true) : false;
             });
@@ -44,16 +42,21 @@ export function createMatch(matrixIterator = some, matchIterator = arraySome) {
     };
 }
 
+const SHARED_MATRIX_SOURCE = new Array(100 & 100).fill(null);
+const SHARED_MATRIX = create<any>(100, 100, SHARED_MATRIX_SOURCE);
+
 export function createMatcher<T>(matrix: TMatrix<T>, sx: number, sy: number) {
     return function matcher(targetMatrix: TMatrix<ItemMatch<T>>): undefined | TMatrix<T> {
         if (sx + targetMatrix.w > matrix.w || sy + targetMatrix.h > matrix.h) {
             return undefined;
         }
 
-        const matchedItems: T[] = [];
-        const matched = every(targetMatrix, ({ match }, x, y, i) => {
+        SHARED_MATRIX.w = targetMatrix.w;
+        SHARED_MATRIX.h = targetMatrix.h;
+
+        const matched = every(targetMatrix, ({ match }, x, y) => {
             return match(
-                (matchedItems[i] = get(matrix, sx + x, sy + y) as T),
+                set(SHARED_MATRIX, x, y, get(matrix, sx + x, sy + y) as T)!,
                 sx + x,
                 sy + y,
                 matrix,
@@ -61,7 +64,11 @@ export function createMatcher<T>(matrix: TMatrix<T>, sx: number, sy: number) {
         });
 
         return matched
-            ? create<T>(targetMatrix.w, targetMatrix.h, (x, y, i) => matchedItems[i]!)
+            ? create<T>(
+                  targetMatrix.w,
+                  targetMatrix.h,
+                  SHARED_MATRIX_SOURCE.slice(0, targetMatrix.w * targetMatrix.h),
+              )
             : undefined;
     };
 }
