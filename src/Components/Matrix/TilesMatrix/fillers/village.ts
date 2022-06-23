@@ -46,8 +46,8 @@ const createBuildingPattern = (
 const buildingPatterns = [
     ...createBuildingPattern(4, 3, (m) => [m, flipX(m)]),
     ...createBuildingPattern(4, 4),
-    ...createBuildingPattern(4, 5),
-    ...createBuildingPattern(5, 5),
+    ...createBuildingPattern(5, 4, (m) => [m, flipX(m)]),
+    // ...createBuildingPattern(5, 5),
 ];
 
 export function fillBuildings(matrix: TMatrix<Tile>): void {
@@ -71,7 +71,6 @@ export function fillVillage<T extends TMatrix<Tile>>(matrix: T): T {
 }
 
 export function createVillage(w: number, h: number): TMatrix<Tile> {
-    console.log('>>', w, h);
     return pipe(
         (matrix) => fillCrossroads(matrix, newVector(floor(w / 2), floor(h / 2))),
         fillVillage,

@@ -3,6 +3,9 @@ import { Mesh, MeshLambertMaterial, PlaneGeometry, Texture, TextureLoader } from
 import house_4x3_1 from '../../../assets/sprites/houses/houses_128x144_1.png';
 import house_4x3_2 from '../../../assets/sprites/houses/houses_128x144_2.png';
 import house_4x4_1 from '../../../assets/sprites/houses/houses_128x184_1.png';
+import house_4x4_2 from '../../../assets/sprites/houses/houses_128x192_2.png';
+import house_5x4_1 from '../../../assets/sprites/houses/houses_160x192_2.png';
+import house_5x4_2 from '../../../assets/sprites/houses/houses_160x192_2.png';
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { getEntities } from '../../../lib/ECS/Heap';
 import { Tile } from '../../Components/Matrix/TilesMatrix/def';
@@ -32,6 +35,9 @@ import { createMeshStore } from '../MeshSystem';
 const PROMISE_TEX_HOUSE_4x4_1 = new TextureLoader().loadAsync(house_4x4_1);
 const PROMISE_TEX_HOUSE_4x3_1 = new TextureLoader().loadAsync(house_4x3_1);
 const PROMISE_TEX_HOUSE_4x3_2 = new TextureLoader().loadAsync(house_4x3_2);
+const PROMISE_TEX_HOUSE_4x4_2 = new TextureLoader().loadAsync(house_4x4_2);
+const PROMISE_TEX_HOUSE_5x4_1 = new TextureLoader().loadAsync(house_5x4_1);
+const PROMISE_TEX_HOUSE_5x4_2 = new TextureLoader().loadAsync(house_5x4_2);
 
 const createBuildingPattern = (
     s1: number,
@@ -55,18 +61,30 @@ const buildingPatterns = [
     /* eslint-disable */
     ...createBuildingPattern(4, 3, (m) => [m, flipX(m)]),
     ...createBuildingPattern(4, 4),
+    ...createBuildingPattern(5, 4, (m) => [m, flipX(m)]),
     /* eslint-enable */
 ];
 
 export async function CardVillagesSystem(heap: GameHeap, ticker: TasksScheduler) {
-    const [TEX_HOUSE_4x3_1, TEX_HOUSE_4x3_2, TEX_HOUSE_4x4_1] = await Promise.all([
+    const [
+        TEX_HOUSE_4x3_1,
+        TEX_HOUSE_4x3_2,
+        TEX_HOUSE_4x4_1,
+        TEX_HOUSE_4x4_2,
+        TEX_HOUSE_5x4_1,
+        TEX_HOUSE_5x4_2,
+    ] = await Promise.all([
         PROMISE_TEX_HOUSE_4x3_1,
         PROMISE_TEX_HOUSE_4x3_2,
         PROMISE_TEX_HOUSE_4x4_1,
+        PROMISE_TEX_HOUSE_4x4_2,
+        PROMISE_TEX_HOUSE_5x4_1,
+        PROMISE_TEX_HOUSE_5x4_2,
     ]);
     const texturesMap = {
         [getImageKey(4, 3)]: [TEX_HOUSE_4x3_1, TEX_HOUSE_4x3_2],
-        [getImageKey(4, 4)]: [TEX_HOUSE_4x4_1],
+        [getImageKey(4, 4)]: [TEX_HOUSE_4x4_1, TEX_HOUSE_4x4_2],
+        [getImageKey(5, 4)]: [TEX_HOUSE_5x4_1, TEX_HOUSE_5x4_2],
     };
 
     const cardEntity = getEntities(heap, CardEntityID)[0];
@@ -87,8 +105,6 @@ export async function CardVillagesSystem(heap: GameHeap, ticker: TasksScheduler)
             for (const place of places) {
                 const tile = Matrix.get(place, 1, 1)!;
                 const size = getBuildingAreaSize(place);
-
-                if (size.x === 3) continue;
 
                 const mesh = cardMeshes.getset(
                     getTileKey(tile.x, tile.y),
