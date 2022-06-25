@@ -1,8 +1,13 @@
-import { ExtractStruct } from '../../../lib/ECS/Component';
-import { getComponentStruct, hasComponent, SomeEntity } from '../../../lib/ECS/Entity';
+import { ExtractStruct, InheritedComponent } from '../../../lib/ECS/Component';
+import {
+    getComponentStruct,
+    getInheritedComponentStructs,
+    hasInheritedComponent,
+    SomeEntity,
+} from '../../../lib/ECS/Entity';
 import { filterEntities, getEntities } from '../../../lib/ECS/Heap';
 import { PositionComponent, PositionComponentID } from '../../Components/Position';
-import { BaseMeshComponent, BaseMeshComponentID } from '../../Components/Renders/BaseMeshComponent';
+import { MeshComponent, MeshComponentID } from '../../Components/Renders/MeshComponent';
 import { $ref, CARD_START_DELTA, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
@@ -20,21 +25,30 @@ export function positionRenderSystem(heap: GameHeap, ticker: TasksScheduler): vo
     function tick() {
         const entities = filterEntities(
             heap,
-            (entity): entity is SomeEntity<BaseMeshComponent | PositionComponent> =>
-                hasComponent(entity, BaseMeshComponentID) &&
-                hasComponent(entity, PositionComponentID),
+            (
+                entity,
+            ): entity is SomeEntity<
+                InheritedComponent<MeshComponent> | InheritedComponent<PositionComponent>
+            > => {
+                return (
+                    hasInheritedComponent(entity, MeshComponentID) &&
+                    hasInheritedComponent(entity, PositionComponentID)
+                );
+            },
         );
 
         entities.forEach((entity) => {
-            const mesh = getComponentStruct(entity, BaseMeshComponentID);
+            const meshes = getInheritedComponentStructs(entity, MeshComponentID);
             const position = getComponentStruct(entity, PositionComponentID);
 
-            setPositionMesh(mesh, worldToRenderPosition(position, cardPosition));
+            for (const mesh of meshes) {
+                setPositionMesh(mesh, worldToRenderPosition(position, cardPosition));
+            }
         });
     }
 }
 
-function setPositionMesh(struct: ExtractStruct<BaseMeshComponent>, position: TVector): void {
+function setPositionMesh(struct: ExtractStruct<MeshComponent>, position: TVector): void {
     const mesh = struct[$ref];
 
     if (mesh !== undefined) {

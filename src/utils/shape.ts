@@ -6,6 +6,7 @@ export const newSize = (w: number, h?: number): TSize => ({ w, h: h ?? w });
 export const Size = {
     create: newSize,
     toVector: (s: TSize) => Vector.create(s.w, s.h),
+    fromVector: (v: TVector) => Size.create(v.x, v.y),
 };
 
 export type Point = { x: number; y: number };

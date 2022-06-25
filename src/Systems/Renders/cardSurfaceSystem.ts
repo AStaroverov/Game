@@ -83,11 +83,11 @@ export function CardSurfaceSystem(heap: GameHeap, ticker: TasksScheduler): void 
                         mesh.material.needsUpdate = true;
                     }
 
-                    // if (tile.type === TileType.building) {
-                    //     mesh.material.color = new Color(255, 255, 255);
-                    //     mesh.material.map = null;
-                    //     mesh.material.needsUpdate = true;
-                    // }
+                    if (tile.type === TileType.building) {
+                        mesh.material.color = new Color(255, 255, 255);
+                        mesh.material.map = null;
+                        mesh.material.needsUpdate = true;
+                    }
                 }
             },
         );

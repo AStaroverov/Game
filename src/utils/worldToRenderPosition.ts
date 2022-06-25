@@ -1,9 +1,9 @@
 import { CARD_SIZE, RENDER_CARD_SIZE } from '../CONST';
-import { newVector, sumVector, TVector } from './shape';
+import { TVector, Vector } from './shape';
 
 const OFFSET = -(CARD_SIZE - RENDER_CARD_SIZE) / 2;
-const OFFSET_VECTOR = newVector(OFFSET, OFFSET);
+const OFFSET_VECTOR = Vector.create(OFFSET, OFFSET);
 
 export function worldToRenderPosition(world: TVector, card: TVector): TVector {
-    return sumVector(world, card, OFFSET_VECTOR);
+    return Vector.sum(world, card, OFFSET_VECTOR);
 }

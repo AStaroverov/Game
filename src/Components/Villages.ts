@@ -15,6 +15,12 @@ export type TVillage = {
     matrix: null | TMatrix<Tile>;
 };
 
+export type TVillageActive = {
+    name: string;
+    area: TRect;
+    matrix: TMatrix<Tile>;
+};
+
 export const createVillagesComponent = () =>
     createComponent(VillagesComponentID, {
         villages: [] as TVillage[],
@@ -49,6 +55,10 @@ export function getVillage(
     return villages.find((v) => v.name === name);
 }
 
+export function isVillageActive(v: TVillage): v is TVillageActive {
+    return v.matrix !== null;
+}
+
 export const VillagesComponent = {
     create: createVillagesComponent,
     get: getVillage,
@@ -59,4 +69,5 @@ export const VillagesComponent = {
 export const Village = {
     create: createVillage,
     update: updateVillage,
+    isActive: isVillageActive,
 };

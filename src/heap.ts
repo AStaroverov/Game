@@ -4,6 +4,7 @@ import { DialogEntity } from './Entities/Dilog';
 import { EnemyEntity } from './Entities/Enemy';
 import { GameStoryEntity } from './Entities/GameStory';
 import { GlobalLightEntity } from './Entities/GlobalLight';
+import { HouseEntity } from './Entities/House';
 import { NpcEntity } from './Entities/NPC';
 import { PlayerEntity } from './Entities/Player';
 import { WorldEntity } from './Entities/World';
@@ -13,6 +14,7 @@ export type GameHeap = Heap<
     | WorldEntity
     | GameStoryEntity
     | CardEntity
+    | HouseEntity
     | PlayerEntity
     | EnemyEntity
     | NpcEntity

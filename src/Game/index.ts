@@ -9,6 +9,7 @@ import { runDialogSystem } from '../Systems/DialogSystem';
 import { EnemySpawnSystem } from '../Systems/enemySpawnSystem';
 import { enemySystem } from '../Systems/enemySystem';
 import { gameTimeSystem } from '../Systems/gameTimeSystem';
+import { HouseSpawnSystem } from '../Systems/HouseSpawnSystem';
 import { initCardSystem } from '../Systems/Init/initCardSystem';
 import { initGameStorySystem } from '../Systems/Init/initGameStorySystem';
 import { initLightSystem } from '../Systems/Init/initLightSystem';
@@ -24,11 +25,11 @@ import { atlasAnimationRenderSystem } from '../Systems/Renders/atlasAnimationRen
 import { CardMeshPositionSystem } from '../Systems/Renders/cardMeshPositionSystem';
 import { CardReliefSystem } from '../Systems/Renders/cardReliefSystem';
 import { CardSurfaceSystem } from '../Systems/Renders/cardSurfaceSystem';
-import { CardVillagesSystem } from '../Systems/Renders/cardVillagesSystem';
 import { runDialogRenderSystem } from '../Systems/Renders/DialogRenderSystem';
 import { enemyRenderSystem } from '../Systems/Renders/enemyRenderSystem';
 import { globalLightRenderSystem } from '../Systems/Renders/globalLightRenderSystem';
 import { healBarRenderSystem } from '../Systems/Renders/healBarRenderSystem';
+import { HouseRenderSystem } from '../Systems/Renders/HouseRenderSystem';
 import { meshesSystem } from '../Systems/Renders/meshesSystem';
 import { playerRenderSystem } from '../Systems/Renders/playerRenderSystem';
 import { positionRenderSystem } from '../Systems/Renders/positionRenderSystem';
@@ -72,6 +73,7 @@ export function game(): void {
     playerSystem(heap, ticker);
     enemySystem(heap, ticker);
 
+    HouseSpawnSystem(heap, ticker);
     EnemySpawnSystem(heap, ticker);
     NpcSpawnSystem(heap, ticker);
     UnspawnSystem(heap, ticker);
@@ -84,7 +86,6 @@ export function game(): void {
     CardMeshPositionSystem(heap, ticker);
     CardSurfaceSystem(heap, ticker);
     CardReliefSystem(heap, ticker);
-    CardVillagesSystem(heap, ticker);
 
     positionRenderSystem(heap, ticker);
     rotateRenderSystem(heap, ticker);
@@ -92,6 +93,7 @@ export function game(): void {
 
     playerRenderSystem(heap, ticker);
     enemyRenderSystem(heap, ticker);
+    HouseRenderSystem(heap, ticker);
 
     healBarRenderSystem(heap, ticker);
 

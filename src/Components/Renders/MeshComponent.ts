@@ -1,3 +1,4 @@
+import { Mesh } from 'three';
 import { Object3D } from 'three/src/core/Object3D';
 
 import { createComponent, ExtractStruct } from '../../../lib/ECS/Component';
@@ -14,4 +15,11 @@ export const createMeshComponent = <T extends Object3D>(layer: Layer) =>
 
 export function shouldInitMesh(struct: ExtractStruct<MeshComponent>) {
     return struct[$ref] === undefined;
+}
+
+export function initMeshStruct<M extends Object3D = Object3D>(
+    struct: ExtractStruct<MeshComponent>,
+    mesh: Mesh,
+): void {
+    struct[$ref] = mesh;
 }

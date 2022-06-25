@@ -1,3 +1,5 @@
+import { pull } from 'lodash';
+
 import { $entity as $entity, Entity, EntityTag, SomeEntity } from './Entity';
 import { ExtractTag } from './types';
 
@@ -29,7 +31,11 @@ export function addEntity<H extends Heap, E extends Entity>(heap: H, entity: E):
 }
 
 export function deleteEntity<H extends Heap, E extends Entity>(heap: H, entity: E): void {
-    delete heap.entities[entity[$entity]];
+    pull(heap.entities[entity[$entity]], entity);
+}
+
+export function deleteEntities<H extends Heap, T extends string>(heap: H, tag: T): void {
+    heap.entities[tag] = [];
 }
 
 export function getSnapshot(heap: Heap): object {
