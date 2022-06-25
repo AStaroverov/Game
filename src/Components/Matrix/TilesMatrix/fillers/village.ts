@@ -45,6 +45,7 @@ const createBuildingPattern = (
 
 const buildingPatterns = [
     ...createBuildingPattern(4, 3, (m) => [m, flipX(m)]),
+    ...createBuildingPattern(5, 3, (m) => [m, flipX(m)]),
     ...createBuildingPattern(4, 4),
     ...createBuildingPattern(5, 4, (m) => [m, flipX(m)]),
     // ...createBuildingPattern(5, 5),

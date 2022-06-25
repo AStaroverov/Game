@@ -2,11 +2,19 @@ import { Color, Mesh, MeshLambertMaterial, PlaneGeometry, Texture, TextureLoader
 
 import house_4x3_1 from '../../../assets/sprites/houses/houses_128x144_1.png';
 import house_4x3_2 from '../../../assets/sprites/houses/houses_128x144_2.png';
+import house_4x3_3 from '../../../assets/sprites/houses/houses_128x160_3.png';
+import house_4x3_4 from '../../../assets/sprites/houses/houses_128x160_4.png';
 import house_4x4_1 from '../../../assets/sprites/houses/houses_128x184_1.png';
 import house_4x4_2 from '../../../assets/sprites/houses/houses_128x192_2.png';
-// import house_5x3_1 from '../../../assets/sprites/houses/houses_160x144_1.png';
+import house_4x4_3 from '../../../assets/sprites/houses/houses_128x192_3.png';
+import house_4x4_4 from '../../../assets/sprites/houses/houses_128x192_4.png';
+import house_5x3_1 from '../../../assets/sprites/houses/houses_160x144_1.png';
+import house_5x3_2 from '../../../assets/sprites/houses/houses_160x160_2.png';
+import house_5x3_3 from '../../../assets/sprites/houses/houses_160x160_3.png';
 import house_5x4_1 from '../../../assets/sprites/houses/houses_160x192_1.png';
 import house_5x4_2 from '../../../assets/sprites/houses/houses_160x192_2.png';
+import house_5x4_3 from '../../../assets/sprites/houses/houses_160x192_3.png';
+import house_5x4_4 from '../../../assets/sprites/houses/houses_160x192_4.png';
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { getEntities } from '../../../lib/ECS/Heap';
 import { PositionComponentID } from '../../Components/Position';
@@ -23,36 +31,37 @@ import { randomArbitraryFloat, randomArbitraryInt, randomSign } from '../../util
 import { Vector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
-const PROMISE_TEX_HOUSE_4x4_1 = new TextureLoader().loadAsync(house_4x4_1);
-const PROMISE_TEX_HOUSE_4x3_1 = new TextureLoader().loadAsync(house_4x3_1);
-const PROMISE_TEX_HOUSE_4x3_2 = new TextureLoader().loadAsync(house_4x3_2);
-const PROMISE_TEX_HOUSE_4x4_2 = new TextureLoader().loadAsync(house_4x4_2);
-const PROMISE_TEX_HOUSE_5x4_1 = new TextureLoader().loadAsync(house_5x4_1);
-const PROMISE_TEX_HOUSE_5x4_2 = new TextureLoader().loadAsync(house_5x4_2);
+const PROMISES_TEX_HOUSE_4x3 = Promise.all(
+    [house_4x3_1, house_4x3_2, house_4x3_3, house_4x3_4].map((url) =>
+        new TextureLoader().loadAsync(url),
+    ),
+);
+
+const PROMISES_TEX_HOUSE_5x3 = Promise.all(
+    [house_5x3_1, house_5x3_2, house_5x3_3].map((url) => new TextureLoader().loadAsync(url)),
+);
+
+const PROMISES_TEX_HOUSE_4x4 = Promise.all(
+    [house_4x4_1, house_4x4_2, house_4x4_3, house_4x4_4].map((url) =>
+        new TextureLoader().loadAsync(url),
+    ),
+);
+
+const PROMISES_TEX_HOUSE_5x4 = Promise.all(
+    [house_5x4_1, house_5x4_2, house_5x4_3, house_5x4_4].map((url) =>
+        new TextureLoader().loadAsync(url),
+    ),
+);
 
 export async function HouseRenderSystem(heap: GameHeap, ticker: TasksScheduler) {
-    const [
-        TEX_HOUSE_4x3_1,
-        TEX_HOUSE_4x3_2,
-        TEX_HOUSE_4x4_1,
-        TEX_HOUSE_4x4_2,
-        TEX_HOUSE_5x4_1,
-        TEX_HOUSE_5x4_2,
-    ] = await Promise.all([
-        PROMISE_TEX_HOUSE_4x3_1,
-        PROMISE_TEX_HOUSE_4x3_2,
-        PROMISE_TEX_HOUSE_4x4_1,
-        PROMISE_TEX_HOUSE_4x4_2,
-        PROMISE_TEX_HOUSE_5x4_1,
-        PROMISE_TEX_HOUSE_5x4_2,
-    ]);
     const texturesMap = {
-        [getImageKey(4, 3)]: [TEX_HOUSE_4x3_1, TEX_HOUSE_4x3_2],
-        [getImageKey(4, 4)]: [TEX_HOUSE_4x4_1, TEX_HOUSE_4x4_2],
-        [getImageKey(5, 4)]: [TEX_HOUSE_5x4_1, TEX_HOUSE_5x4_2],
+        [getImageKey(4, 3)]: await PROMISES_TEX_HOUSE_4x3,
+        [getImageKey(5, 3)]: await PROMISES_TEX_HOUSE_5x3,
+        [getImageKey(4, 4)]: await PROMISES_TEX_HOUSE_4x4,
+        [getImageKey(5, 4)]: await PROMISES_TEX_HOUSE_5x4,
     };
 
-    ticker.addFrameInterval(updateHouses, 2);
+    ticker.addFrameInterval(updateHouses, 10);
 
     function updateHouses() {
         getEntities(heap, HouseEntityID).forEach((houseEntity) => {
@@ -62,7 +71,7 @@ export async function HouseRenderSystem(heap: GameHeap, ticker: TasksScheduler) 
 
             if (!shouldInitMesh(meshStruct)) return;
 
-            const mesh = createRandomHouseMesh(texturesMap, size.w, size.h);
+            const mesh = createRandomHouseMesh(texturesMap, getImageKey(size.w, size.h));
             const image = mesh.material.map?.image;
             const imageDelta = Vector.create((image.width ?? 0) / 2, (image.height ?? 0) / 2);
 
@@ -80,10 +89,9 @@ function getImageKey(x: number, y: number): string {
 
 function createRandomHouseMesh(
     texturesMap: Record<string, Texture[]>,
-    w: number,
-    h: number,
+    key: string,
 ): Mesh<PlaneGeometry, MeshLambertMaterial> {
-    const list = texturesMap[getImageKey(w, h)];
+    const list = texturesMap[key];
 
     return createHouseMesh(list[randomArbitraryInt(0, list.length - 1)]);
 }
