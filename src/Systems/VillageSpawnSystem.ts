@@ -8,17 +8,16 @@ import {
     matchRoad,
 } from '../Components/Matrix/TilesMatrix/fillers/utils/patterns';
 import { PositionComponentID } from '../Components/Position';
-import { TVillage, TVillageActive, Village, VillagesComponentID } from '../Components/Villages';
+import { TVillageActive, Village, VillagesComponentID } from '../Components/Villages';
 import { CardEntityID } from '../Entities/Card';
 import { createHouseEntity, HouseEntityID } from '../Entities/House';
 import { GameHeap } from '../heap';
-import { getWorldRenderRect } from '../utils/getWorldRenderRect';
+import { isInsideWorldRenderRect } from '../utils/isInsideWorldRenderRect';
 import { Matrix, TMatrix } from '../utils/Matrix';
 import { ItemMatchReplace } from '../utils/Matrix/methods/matchReplace';
 import { flipX } from '../utils/Matrix/methods/transform';
 import { range } from '../utils/range';
 import { Size, TSize, TVector, Vector } from '../utils/shape';
-import { Rect } from '../utils/shapes/rect';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 const createBuildingPattern = (
@@ -48,7 +47,7 @@ const buildingPatterns = [
     /* eslint-enable */
 ];
 
-export function HouseSpawnSystem(heap: GameHeap, ticker: TasksScheduler) {
+export function VillageSpawnSystem(heap: GameHeap, ticker: TasksScheduler) {
     const cardEntity = getEntities(heap, CardEntityID)[0];
     const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
     const cardVillages = getComponentStruct(cardEntity, VillagesComponentID);
@@ -56,39 +55,36 @@ export function HouseSpawnSystem(heap: GameHeap, ticker: TasksScheduler) {
     ticker.addFrameInterval(update, 1);
 
     function update() {
-        const village = cardVillages.villages.find((v) => isCurrentVillage(v, cardPosition));
+        const village = cardVillages.villages.find((v) =>
+            isInsideWorldRenderRect(v.area, cardPosition),
+        );
 
-        if (places !== undefined && (village === undefined || village.matrix === null)) {
+        if (cardVillages.currentVillageName !== village?.name) {
+            cardVillages.currentVillageName = village?.name;
             unspawn();
-        }
 
-        if (places === undefined && village !== undefined && Village.isActive(village)) {
-            spawn(village);
+            if (village !== undefined && Village.isActive(village)) {
+                spawn(village);
+            }
         }
     }
 
-    let places: undefined | TMatrix<Tile>[] = undefined;
-
     function unspawn() {
-        places = undefined;
         deleteEntities(heap, HouseEntityID);
     }
 
     function spawn(village: TVillageActive) {
-        places = Matrix.matchAll(village.matrix, buildingPatterns);
+        const housePlaces = Matrix.matchAll(village.matrix, buildingPatterns);
 
-        for (const place of places) {
-            const tile = Matrix.get(place, 1, 1)!;
+        for (const place of housePlaces) {
+            const tile = Matrix.get(place, 0, 0)!;
             const size = getBuildingAreaSize(place);
-            const houseEntity = createHouseEntity(Vector.sum(village.area, tile), size);
+            const position = Vector.sum(village.area, tile, Vector.create(size.w / 2, size.h / 2));
+            const houseEntity = createHouseEntity(position, size);
 
             addEntity(heap, houseEntity);
         }
     }
-}
-
-function isCurrentVillage(village: TVillage, cardPosition: TVector): boolean {
-    return Rect.intersect(village.area, getWorldRenderRect(cardPosition));
 }
 
 function getBuildingAreaSize(matrix: TMatrix<Tile>): TSize {

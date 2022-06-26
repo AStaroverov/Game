@@ -17,18 +17,18 @@ import house_5x4_3 from '../../../assets/sprites/houses/houses_160x192_3.png';
 import house_5x4_4 from '../../../assets/sprites/houses/houses_160x192_4.png';
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { getEntities } from '../../../lib/ECS/Heap';
-import { PositionComponentID } from '../../Components/Position';
 import {
     initMeshStruct,
     MeshComponentID,
     shouldInitMesh,
 } from '../../Components/Renders/MeshComponent';
 import { SizeComponentID } from '../../Components/Size';
+import { VisualSizeComponentID } from '../../Components/VisualSize';
 import { TILE_SIZE } from '../../CONST';
 import { HouseEntityID } from '../../Entities/House';
 import { GameHeap } from '../../heap';
 import { randomArbitraryFloat, randomArbitraryInt, randomSign } from '../../utils/random';
-import { Vector } from '../../utils/shape';
+import { Size, Vector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 const PROMISES_TEX_HOUSE_4x3 = Promise.all(
@@ -66,19 +66,20 @@ export async function HouseRenderSystem(heap: GameHeap, ticker: TasksScheduler) 
     function updateHouses() {
         getEntities(heap, HouseEntityID).forEach((houseEntity) => {
             const meshStruct = getComponentStruct(houseEntity, MeshComponentID);
-            const position = getComponentStruct(houseEntity, PositionComponentID);
+            const visualSize = getComponentStruct(houseEntity, VisualSizeComponentID);
             const size = getComponentStruct(houseEntity, SizeComponentID);
 
             if (!shouldInitMesh(meshStruct)) return;
 
-            const mesh = createRandomHouseMesh(texturesMap, getImageKey(size.w, size.h));
-            const image = mesh.material.map?.image;
-            const imageDelta = Vector.create((image.width ?? 0) / 2, (image.height ?? 0) / 2);
+            const texture = getRandomTexture(texturesMap, getImageKey(size.w, size.h));
+            const image = texture.image as HTMLImageElement;
+            const mesh = createHouseMesh(texture);
+            const meshSize = Size.create(image.width / TILE_SIZE, image.height / TILE_SIZE);
+            const meshPosition = Vector.create(0, (meshSize.h - size.h) / 2);
 
-            position.x += imageDelta.x / 2 / TILE_SIZE;
-            position.y += imageDelta.y / 2 / TILE_SIZE;
+            Size.set(visualSize, meshSize);
 
-            initMeshStruct(meshStruct, mesh);
+            initMeshStruct(meshStruct, { mesh, position: meshPosition });
         });
     }
 }
@@ -87,13 +88,9 @@ function getImageKey(x: number, y: number): string {
     return 'IMAGE:' + x + '-' + y;
 }
 
-function createRandomHouseMesh(
-    texturesMap: Record<string, Texture[]>,
-    key: string,
-): Mesh<PlaneGeometry, MeshLambertMaterial> {
+function getRandomTexture(texturesMap: Record<string, Texture[]>, key: string): Texture {
     const list = texturesMap[key];
-
-    return createHouseMesh(list[randomArbitraryInt(0, list.length - 1)]);
+    return list[randomArbitraryInt(0, list.length - 1)];
 }
 
 function createHouseMesh(texture: Texture): Mesh<PlaneGeometry, MeshLambertMaterial> {
@@ -105,8 +102,8 @@ function createHouseMesh(texture: Texture): Mesh<PlaneGeometry, MeshLambertMater
             transparent: true,
         }),
     );
-    const v = randomArbitraryFloat(0.8, 1);
-    const color = new Color(v, v, v);
+    const grey = randomArbitraryFloat(0.8, 1);
+    const color = new Color(grey, grey, grey);
 
     mesh.scale.x = randomSign();
     mesh.material.color = color;

@@ -16,7 +16,7 @@ import { TVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 import { worldToRenderPosition } from '../../utils/worldToRenderPosition';
 
-export function positionRenderSystem(heap: GameHeap, ticker: TasksScheduler): void {
+export function MeshesPositionSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const cardEntity = getEntities(heap, CardEntityID)[0];
     const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
 
@@ -50,10 +50,11 @@ export function positionRenderSystem(heap: GameHeap, ticker: TasksScheduler): vo
 
 function setPositionMesh(struct: ExtractStruct<MeshComponent>, position: TVector): void {
     const mesh = struct[$ref];
+    const delta = struct.position;
 
     if (mesh !== undefined) {
-        mesh.position.x = (position.x + CARD_START_DELTA.x) * TILE_SIZE;
-        mesh.position.y = (position.y + CARD_START_DELTA.y) * TILE_SIZE;
+        mesh.position.x = (position.x + delta.x + CARD_START_DELTA.x) * TILE_SIZE;
+        mesh.position.y = (position.y + delta.y + CARD_START_DELTA.y) * TILE_SIZE;
         mesh.position.z = worldYToPositionZ(mesh.position.y);
     }
 }

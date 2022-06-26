@@ -23,6 +23,7 @@ export type TVillageActive = {
 
 export const createVillagesComponent = () =>
     createComponent(VillagesComponentID, {
+        currentVillageName: undefined as undefined | string,
         villages: [] as TVillage[],
     });
 

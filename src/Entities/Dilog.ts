@@ -23,7 +23,7 @@ export type DialogEntity = ReturnType<typeof createDialogEntity>;
 export const createDialogEntity = (props: { id: DialogID }) => {
     return createEntity(DialogEntityID, [
         createDialogComponent(props),
-        createMeshComponent<DialogGroup>(Layer.Fixed),
+        createMeshComponent<DialogGroup>({ layer: Layer.Fixed }),
     ]);
 };
 

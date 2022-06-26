@@ -12,17 +12,19 @@ import { SurfaceMeshesMatrixID } from '../../Components/Matrix/SurfaceMeshesMatr
 import { PositionComponent, PositionComponentID } from '../../Components/Position';
 import { SpotLightMeshComponentID } from '../../Components/Renders/LightComponent';
 import { MeshComponent, MeshComponentID } from '../../Components/Renders/MeshComponent';
-import { $ref, CENTER_CARD_POSITION, HALF_RENDER_CARD_SIZE } from '../../CONST';
+import { VisualSizeComponent, VisualSizeComponentID } from '../../Components/VisualSize';
+import { $ref } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GlobalLightEntityID } from '../../Entities/GlobalLight';
 import { GameHeap } from '../../heap';
 import { Layer, Scenes } from '../../Renderer';
-import { abs } from '../../utils/math';
+import { isInsideWorldRenderRect } from '../../utils/isInsideWorldRenderRect';
 import { Matrix } from '../../utils/Matrix';
-import { mulVector, sumVector } from '../../utils/shape';
+import { Size } from '../../utils/shape';
+import { Rect } from '../../utils/shapes/rect';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
-export function meshesSystem(heap: GameHeap, ticker: TasksScheduler, scenes: Scenes): void {
+export function MeshesResetSystem(heap: GameHeap, ticker: TasksScheduler, scenes: Scenes): void {
     const globalLightEntity = getEntities(heap, GlobalLightEntityID)[0];
     const spotLight = getComponentStruct(globalLightEntity, SpotLightMeshComponentID);
 
@@ -54,25 +56,28 @@ export function meshesSystem(heap: GameHeap, ticker: TasksScheduler, scenes: Sce
         }).forEach((entity) => {
             const mesh = getInheritedComponentStructs(entity, MeshComponentID);
             const position = tryGetComponentStruct<PositionComponent>(entity, PositionComponentID);
+            let isVisible = true;
 
-            const diff =
-                position && sumVector(position, mulVector(CENTER_CARD_POSITION, -1), cardPosition);
-            const isVisible =
-                diff &&
-                !(
-                    abs(diff.x) > HALF_RENDER_CARD_SIZE + 5 ||
-                    abs(diff.y) > HALF_RENDER_CARD_SIZE + 5
+            if (position) {
+                const visualSize =
+                    tryGetComponentStruct<VisualSizeComponent>(entity, VisualSizeComponentID) ??
+                    Size.ZERO;
+                const visualRect = Rect.create(
+                    position.x - visualSize.w / 2,
+                    position.y - visualSize.h / 2,
+                    visualSize.w,
+                    visualSize.h,
                 );
+
+                isVisible = isInsideWorldRenderRect(visualRect, cardPosition);
+            }
 
             mesh.forEach((struct) => {
                 const object = struct[$ref];
 
                 if (object) {
                     scenes[struct.layer].add(object);
-
-                    if (isVisible !== undefined) {
-                        object.visible = isVisible;
-                    }
+                    object.visible = isVisible;
                 }
             });
         });

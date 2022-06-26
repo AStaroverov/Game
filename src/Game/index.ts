@@ -9,7 +9,6 @@ import { runDialogSystem } from '../Systems/DialogSystem';
 import { EnemySpawnSystem } from '../Systems/enemySpawnSystem';
 import { enemySystem } from '../Systems/enemySystem';
 import { gameTimeSystem } from '../Systems/gameTimeSystem';
-import { HouseSpawnSystem } from '../Systems/HouseSpawnSystem';
 import { initCardSystem } from '../Systems/Init/initCardSystem';
 import { initGameStorySystem } from '../Systems/Init/initGameStorySystem';
 import { initLightSystem } from '../Systems/Init/initLightSystem';
@@ -17,7 +16,6 @@ import { initMatrixMeshesSystem } from '../Systems/Init/initMatrixMeshesSystem';
 import { initMeshesSystem } from '../Systems/Init/initMeshesSystem';
 import { initPlayerSystem } from '../Systems/Init/initPlayerSystem';
 import { initWorldSystem } from '../Systems/Init/initWorldSystem';
-import { runMeshSystem } from '../Systems/MeshSystem';
 import { NpcSpawnSystem } from '../Systems/NpcSpawnSystem';
 import { playerSystem } from '../Systems/playerSystem';
 import { positionBodySystem } from '../Systems/positionBodySystem';
@@ -30,12 +28,13 @@ import { enemyRenderSystem } from '../Systems/Renders/enemyRenderSystem';
 import { globalLightRenderSystem } from '../Systems/Renders/globalLightRenderSystem';
 import { healBarRenderSystem } from '../Systems/Renders/healBarRenderSystem';
 import { HouseRenderSystem } from '../Systems/Renders/HouseRenderSystem';
-import { meshesSystem } from '../Systems/Renders/meshesSystem';
+import { MeshesPositionSystem } from '../Systems/Renders/MeshesPositionSystem';
+import { MeshesResetSystem } from '../Systems/Renders/MeshesResetSystem';
 import { playerRenderSystem } from '../Systems/Renders/playerRenderSystem';
-import { positionRenderSystem } from '../Systems/Renders/positionRenderSystem';
 import { rotateRenderSystem } from '../Systems/Renders/rotateRenderSystem';
 import { UnspawnSystem } from '../Systems/unspawnSystem';
 import { saveSystem } from '../Systems/Utils/saveSystem';
+import { VillageSpawnSystem } from '../Systems/VillageSpawnSystem';
 import { tasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
 export function game(): void {
@@ -73,21 +72,20 @@ export function game(): void {
     playerSystem(heap, ticker);
     enemySystem(heap, ticker);
 
-    HouseSpawnSystem(heap, ticker);
+    VillageSpawnSystem(heap, ticker);
     EnemySpawnSystem(heap, ticker);
     NpcSpawnSystem(heap, ticker);
     UnspawnSystem(heap, ticker);
 
     // Render Systems
     globalLightRenderSystem(heap, ticker);
-    meshesSystem(heap, ticker, renderer.scenes);
-    runMeshSystem(heap, ticker, renderer.scenes);
+    MeshesResetSystem(heap, ticker, renderer.scenes);
 
     CardMeshPositionSystem(heap, ticker);
     CardSurfaceSystem(heap, ticker);
     CardReliefSystem(heap, ticker);
 
-    positionRenderSystem(heap, ticker);
+    MeshesPositionSystem(heap, ticker);
     rotateRenderSystem(heap, ticker);
     atlasAnimationRenderSystem(heap, ticker);
 

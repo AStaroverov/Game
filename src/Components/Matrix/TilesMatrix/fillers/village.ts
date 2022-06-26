@@ -48,7 +48,6 @@ const buildingPatterns = [
     ...createBuildingPattern(5, 3, (m) => [m, flipX(m)]),
     ...createBuildingPattern(4, 4),
     ...createBuildingPattern(5, 4, (m) => [m, flipX(m)]),
-    // ...createBuildingPattern(5, 5),
 ];
 
 export function fillBuildings(matrix: TMatrix<Tile>): void {

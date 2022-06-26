@@ -3,16 +3,18 @@ import { createColliderComponent } from '../../Components/Collider';
 import { createPositionComponent } from '../../Components/Position';
 import { createMeshComponent } from '../../Components/Renders/MeshComponent';
 import { createSizeComponent } from '../../Components/Size';
+import { createVisualSizeComponent } from '../../Components/VisualSize';
 import { Layer } from '../../Renderer';
-import { TSize, TVector } from '../../utils/shape';
+import { Size, TSize, TVector } from '../../utils/shape';
 
 export const HouseEntityID = 'HOUSE_ENTITY' as const;
 export type HouseEntity = ReturnType<typeof createHouseEntity>;
 export const createHouseEntity = (position: TVector, size: TSize) => {
     return createEntity(HouseEntityID, [
-        createMeshComponent(Layer.Main),
+        createMeshComponent({ layer: Layer.Main }),
         createPositionComponent(position),
         createSizeComponent(size),
+        createVisualSizeComponent(Size.create(0, 0)),
         createColliderComponent(size),
         // createAutoUnspawnableComponent([UnspawnReason.OutOfCard]),
     ]);

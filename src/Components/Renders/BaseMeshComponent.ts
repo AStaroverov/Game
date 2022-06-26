@@ -13,7 +13,12 @@ export const BaseMeshComponentID = 'BASE_MESH' as const;
 export type BaseMeshComponent = ReturnType<typeof createBaseMeshComponent>;
 export const createBaseMeshComponent = (
     props: Partial<TSize & Pick<MeshLambertMaterialParameters, 'transparent' | 'alphaTest'>>,
-) => createComponent(BaseMeshComponentID, props, createMeshComponent<BaseMesh>(Layer.Main));
+) =>
+    createComponent(
+        BaseMeshComponentID,
+        props,
+        createMeshComponent<BaseMesh>({ layer: Layer.Main }),
+    );
 
 export function initBaseMeshStruct<M extends BaseMesh = BaseMesh>(
     struct: ExtractStruct<BaseMeshComponent>,

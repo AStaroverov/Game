@@ -8,7 +8,7 @@ import { createMeshComponent } from './MeshComponent';
 export const HealBarMeshComponentID = 'HEAL_BAR_MESH' as const;
 export type HealBarMeshComponent = ReturnType<typeof createHealBarMeshComponent>;
 export const createHealBarMeshComponent = () => {
-    return createComponent(HealBarMeshComponentID, createMeshComponent(Layer.Main));
+    return createComponent(HealBarMeshComponentID, createMeshComponent({ layer: Layer.Main }));
 };
 
 export function initHealBarStruct(struct: ExtractStruct<HealBarMeshComponent>): void {

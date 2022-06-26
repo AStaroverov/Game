@@ -2,7 +2,7 @@ import { pipe } from 'lodash/fp';
 
 import { Matrix, TMatrix } from '../../../../utils/Matrix';
 import { isEqualVectors, toOneWayVectors, TVector, zeroVector } from '../../../../utils/shape';
-import { isPassableTileType, Tile, TileType } from '../def';
+import { Tile, TileType } from '../def';
 import { getRenderMatrixSide } from './utils/getRenderMatrixSide';
 import { getRenderMatrixSlice } from './utils/getRenderMatrixSlice';
 import { isEmptyTile, isNotEmptyTile } from './utils/is';
@@ -59,7 +59,6 @@ function updateTile(tile: Tile, x: number, y: number, matrix: TMatrix<Tile>): Ti
 
     return Object.assign(tile, {
         type,
-        passable: isPassableTileType(type),
     });
 }
 

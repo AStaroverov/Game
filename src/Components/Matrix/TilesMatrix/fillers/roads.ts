@@ -112,7 +112,6 @@ export function fillRoads(matrix: TMatrix<Tile>, rotateChance = 0.1): void {
     while (true) {
         const step1 =
             random() < rotateChance && Matrix.matchReplace(matrix, getRoadRotatePattern());
-
         const step2 = Matrix.matchReplace(matrix, shuffle(roadGrowPatterns));
 
         if (!(step1 || step2)) {
@@ -126,6 +125,7 @@ export function updateRoads(matrix: TMatrix<Tile>, move: TVector): void {
         const sliceMatrix = isEqualVectors(move, zeroVector)
             ? getRenderMatrixSlice(matrix)
             : getRenderMatrixSide(matrix, move, 3);
+
         const shouldSpawnNewRoad =
             random() > 0.9 &&
             Matrix.every(getRenderMatrixSlice(matrix), (tile) => tile.type !== TileType.road);

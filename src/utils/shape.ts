@@ -5,8 +5,15 @@ export const newSize = (w: number, h?: number): TSize => ({ w, h: h ?? w });
 
 export const Size = {
     create: newSize,
+    set: (t: TSize, s: TSize): TSize => {
+        t.w = s.w;
+        t.h = s.h;
+        return t;
+    },
     toVector: (s: TSize) => Vector.create(s.w, s.h),
     fromVector: (v: TVector) => Size.create(v.x, v.y),
+
+    ZERO: newSize(0, 0),
 };
 
 export type Point = { x: number; y: number };

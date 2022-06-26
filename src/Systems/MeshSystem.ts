@@ -53,6 +53,7 @@ export function runMeshSystem(heap: GameHeap, ticker: TasksScheduler, scenes: Sc
 
         getAllEntities(heap).forEach((entity) => {
             getEntityMeshes(entity).forEach((mesh) => {
+                debugger;
                 scenes[Layer.Main].add(mesh);
             });
         });

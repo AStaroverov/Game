@@ -194,8 +194,9 @@ function mergeVillage(
     const y = village.area.y + flooredCardPosition.y;
 
     mergeMatrix(cardMatrix, village.matrix!, x, y, (target, source) => {
-        target.env = source.env;
-        target.type = source.type;
-        return target;
+        return Object.assign(target, source, {
+            x: target.x,
+            y: target.y,
+        });
     });
 }
