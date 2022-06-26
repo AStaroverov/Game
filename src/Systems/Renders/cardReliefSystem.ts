@@ -33,20 +33,6 @@ export function CardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
 
     ticker.addFrameInterval(tick, 1);
 
-    const tileIndexToSalt = new Map<number, { index: number; x: number; y: number }>();
-
-    function getSalt(n: number): { index: number; x: number; y: number } {
-        if (!tileIndexToSalt.has(n)) {
-            tileIndexToSalt.set(n, {
-                index: Math.round(Math.random() * (TREES_COUNT - 1)),
-                x: randomSign() * Math.random() * 0.05,
-                y: Math.random() * 0.1,
-            });
-        }
-
-        return tileIndexToSalt.get(n)!;
-    }
-
     function tick() {
         const abs = mapVector(sumVector(playerPosition, cardPosition), round);
         const uflooredPosition = mapVector(cardPosition, floor);
@@ -67,14 +53,14 @@ export function CardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
                     x +
                     y * RENDER_CARD_SIZE -
                     (uflooredPosition.x + uflooredPosition.y * RENDER_CARD_SIZE);
-                const salt = getSalt(index);
-                const tree = atlasTrees.list[salt.index];
+                const meta = getMeta(index);
+                const tree = atlasTrees.list[meta.index];
                 const treeSize = newVector(tree.w * TREES_MUL, tree.h * TREES_MUL);
 
                 mesh.visible = true;
-                mesh.position.x += floor(salt.x * TILE_SIZE);
+                mesh.position.x += floor(meta.x * TILE_SIZE);
                 mesh.position.y += floor(
-                    (treeSize.y > TILE_SIZE ? tree.h / 2 : 0) + salt.y * TILE_SIZE,
+                    (treeSize.y > TILE_SIZE ? tree.h / 2 : 0) + meta.y * TILE_SIZE,
                 );
                 mesh.position.z = tileYToPositionZ(y + x / RENDER_CARD_SIZE);
 
@@ -88,4 +74,18 @@ export function CardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
             }
         });
     }
+}
+
+const tileIndexToMeta = new Map<number, { index: number; x: number; y: number }>();
+
+function getMeta(n: number): { index: number; x: number; y: number } {
+    if (!tileIndexToMeta.has(n)) {
+        tileIndexToMeta.set(n, {
+            index: Math.round(Math.random() * (TREES_COUNT - 1)),
+            x: randomSign() * Math.random() * 0.05,
+            y: Math.random() * 0.1,
+        });
+    }
+
+    return tileIndexToMeta.get(n)!;
 }
