@@ -11,7 +11,31 @@ import { getEmptyTile, Tile, TileEnv, TileType } from '../def';
 import { fillEnvironment } from './environment';
 import { fillCrossroads, fillRoads } from './roads';
 import { isEmptyTile } from './utils/is';
-import { matchNotBuilding, matchRoad } from './utils/patterns';
+import { matchNotBuilding, matchNotLastRoad, matchRoad } from './utils/patterns';
+import { replaceToNotLastRoad } from './utils/replace';
+
+const matchEmptyReplaceToRoad = {
+    match: isEmptyTile,
+    replace: replaceToNotLastRoad,
+};
+
+const roadPattern = Matrix.getAllVariants(
+    Matrix.fromNestedArray([
+        /* eslint-disable */
+        [matchEmptyReplaceToRoad, matchNotLastRoad, matchEmptyReplaceToRoad]
+        /* eslint-enable */
+    ]),
+);
+
+export function fillWideRoads(matrix: TMatrix<Tile>): void {
+    while (true) {
+        const step1 = Matrix.matchReplace(matrix, roadPattern);
+
+        if (!step1) {
+            break;
+        }
+    }
+}
 
 const replaceToBuilding = (value: Tile): Tile => {
     return Object.assign(value, {
@@ -62,6 +86,7 @@ export function fillBuildings(matrix: TMatrix<Tile>): void {
 
 export function fillVillage<T extends TMatrix<Tile>>(matrix: T): T {
     fillRoads(matrix, 0);
+    fillWideRoads(matrix);
     fillBuildings(matrix);
     fillEnvironment(matrix);
 

@@ -20,11 +20,7 @@ type AtlasData = {
     frames: { [key: SpriteName]: SpriteData };
 };
 
-export type AtlasFrame = {
-    w: number;
-    h: number;
-    texture: Texture;
-};
+export type AtlasFrame = { x: number; y: number; w: number; h: number; texture: Texture };
 
 export class Atlas<
     D extends AtlasData = AtlasData,
@@ -41,14 +37,9 @@ export class Atlas<
         this.w = getMax(spriteData, 'w');
         this.h = getMax(spriteData, 'h');
         this.list = createFramesList(spriteData, data.meta);
-        this.map = createFramesMap(spriteData, this.list) as Record<
-            K,
-            AtlasFrame
-        >;
+        this.map = createFramesMap(spriteData, this.list) as Record<K, AtlasFrame>;
 
-        new ImageLoader().load(url, (image) =>
-            updateFramesImage(this.list, image),
-        );
+        new ImageLoader().load(url, (image) => updateFramesImage(this.list, image));
     }
 }
 
@@ -56,10 +47,7 @@ function getMax<K>(entities: [K, SpriteData][], key: 'w' | 'h') {
     return maxBy(entities, ([, { frame }]) => frame[key])?.[1].frame[key] ?? 0;
 }
 
-function createFramesList<K>(
-    entities: [K, SpriteData][],
-    meta: AtlasData['meta'],
-): AtlasFrame[] {
+function createFramesList<K>(entities: [K, SpriteData][], meta: AtlasData['meta']): AtlasFrame[] {
     return entities.map(([name, { frame }]) => {
         const texture = new Texture();
 
@@ -68,7 +56,7 @@ function createFramesList<K>(
         texture.offset.x = frame.x / meta.size.w;
         texture.offset.y = 1 - texture.repeat.y - frame.y / meta.size.h;
 
-        return { name, w: frame.w, h: frame.h, texture };
+        return { name, texture, ...frame };
     });
 }
 
