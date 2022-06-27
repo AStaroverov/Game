@@ -1,5 +1,5 @@
 import { maxBy } from 'lodash';
-import { ImageLoader, Texture } from 'three';
+import { ImageLoader, Source, Texture } from 'three';
 
 type SpriteName = string;
 type SpriteData = {
@@ -39,7 +39,9 @@ export class Atlas<
         this.list = createFramesList(spriteData, data.meta);
         this.map = createFramesMap(spriteData, this.list) as Record<K, AtlasFrame>;
 
-        new ImageLoader().load(url, (image) => updateFramesImage(this.list, image));
+        new ImageLoader().load(url, (image) => {
+            updateFramesImage(this.list, new Source(image));
+        });
     }
 }
 
@@ -70,9 +72,9 @@ function createFramesMap(
     }, {} as Record<string, AtlasFrame>);
 }
 
-function updateFramesImage(frames: AtlasFrame[], image: HTMLImageElement) {
+function updateFramesImage(frames: AtlasFrame[], source: Source) {
     frames.forEach((f) => {
-        f.texture.image = image;
+        f.texture.source = source;
         f.texture.needsUpdate = true;
     });
 }
