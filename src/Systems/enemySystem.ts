@@ -39,7 +39,7 @@ export function enemySystem(heap: GameHeap, ticker: TasksScheduler): void {
         diagonalMovement: DiagonalMovement.OnlyWhenNoObstacles,
     });
 
-    ticker.addFrameInterval(tick, 1);
+    ticker.addFrameInterval(tick, 3);
 
     function tick() {
         getEntities(heap, EnemyEntityID).forEach(setEnemyDirection);
@@ -73,6 +73,7 @@ export function enemySystem(heap: GameHeap, ticker: TasksScheduler): void {
         }
     }
 
+    // We should memoize it on some short time
     const findPath = memoize(
         (from: TVector, to: TVector, card: TVector) => {
             return pathFinder.findPath(from.x, from.y, to.x, to.y, new Grid(getMatrix(card)));
@@ -84,6 +85,7 @@ export function enemySystem(heap: GameHeap, ticker: TasksScheduler): void {
         },
     );
 
+    // We should memoize it on some short time
     const getMatrix = memoize((_: TVector) => matrixToNestedArray(cardTiles.matrix), {
         max: 100,
         normalizer: ([p]: [TVector]) => toStringVector(p),
