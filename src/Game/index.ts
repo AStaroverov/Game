@@ -12,6 +12,7 @@ import { initMatrixMeshesSystem } from '../Systems/Init/initMatrixMeshesSystem';
 import { initMeshesSystem } from '../Systems/Init/initMeshesSystem';
 import { initPlayerSystem } from '../Systems/Init/initPlayerSystem';
 import { initWorldSystem } from '../Systems/Init/initWorldSystem';
+import { NpcSpawnSystem } from '../Systems/NpcSpawnSystem';
 import { positionBodySystem } from '../Systems/positionBodySystem';
 import { AtlasAnimationRenderSystem } from '../Systems/Renders/atlasAnimationRenderSystem';
 import { CardMeshPositionSystem } from '../Systems/Renders/cardMeshPositionSystem';
@@ -24,6 +25,7 @@ import { MeshesResetSystem } from '../Systems/Renders/MeshesResetSystem';
 import { PlayerRenderSystem } from '../Systems/Renders/playerRenderSystem';
 import { RenderSystem } from '../Systems/Renders/RenderSystem';
 import { RotateRenderSystem } from '../Systems/Renders/rotateRenderSystem';
+import { UnspawnSystem } from '../Systems/unspawnSystem';
 import { saveSystem } from '../Systems/Utils/saveSystem';
 import { VillageSpawnSystem } from '../Systems/VillageSpawnSystem';
 import { tasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
@@ -63,8 +65,8 @@ export function game(): void {
 
     VillageSpawnSystem(heap, ticker);
     // EnemySpawnSystem(heap, ticker);
-    // NpcSpawnSystem(heap, ticker);
-    // UnspawnSystem(heap, ticker);
+    NpcSpawnSystem(heap, ticker);
+    UnspawnSystem(heap, ticker);
 
     // Render Systems
     GlobalLightRenderSystem(heap, ticker);

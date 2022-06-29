@@ -1,21 +1,28 @@
 import { getComponentStruct } from '../../lib/ECS/Entity';
-import { addEntity, deleteEntities, getEntities } from '../../lib/ECS/Heap';
-import { Tile } from '../Components/Matrix/TilesMatrix/def';
+import { addEntity, deleteEntities, deleteEntity, getEntities } from '../../lib/ECS/Heap';
+import Enumerable from '../../lib/linq';
+import { RoadTile, Tile, TileType } from '../Components/Matrix/TilesMatrix/def';
 import { isBuildingTile } from '../Components/Matrix/TilesMatrix/fillers/utils/is';
 import {
     matchBuilding,
     matchNotBuilding,
     matchRoad,
 } from '../Components/Matrix/TilesMatrix/fillers/utils/patterns';
+import { PersonComponentID } from '../Components/Person';
 import { PositionComponentID } from '../Components/Position';
-import { TVillageActive, Village, VillagesComponentID } from '../Components/Villages';
+import { TVillage, TVillageActive, Village, VillagesComponentID } from '../Components/Villages';
 import { CardEntityID } from '../Entities/Card';
 import { createHouseEntity, HouseEntityID } from '../Entities/House';
+import { createNpcEntity, NPCEntityID } from '../Entities/NPC';
 import { GameHeap } from '../heap';
 import { isInsideWorldRenderRect } from '../utils/isInsideWorldRenderRect';
+import { floor } from '../utils/math';
 import { Matrix, TMatrix } from '../utils/Matrix';
+import { radialIterate } from '../utils/Matrix/methods/generators/radialIterate';
 import { ItemMatchReplace } from '../utils/Matrix/methods/matchReplace';
 import { flipX } from '../utils/Matrix/methods/transform';
+import { Item } from '../utils/Matrix/methods/utils';
+import { random } from '../utils/random';
 import { range } from '../utils/range';
 import { Size, TSize, TVector, Vector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
@@ -61,19 +68,28 @@ export function VillageSpawnSystem(heap: GameHeap, ticker: TasksScheduler) {
 
         if (cardVillages.currentVillageName !== village?.name) {
             cardVillages.currentVillageName = village?.name;
-            unspawn();
+
+            const prevVillage = cardVillages.villages.find(
+                (v) => v.name === cardVillages.currentVillageName,
+            );
+
+            if (prevVillage !== undefined) {
+                unspawn(prevVillage);
+            }
 
             if (village !== undefined && Village.isActive(village)) {
-                spawn(village);
+                spawnNpc(village);
+                spawnHouses(village);
             }
         }
     }
 
-    function unspawn() {
+    function unspawn(village: TVillage) {
         deleteEntities(heap, HouseEntityID);
+        unspawnNpc(village);
     }
 
-    function spawn(village: TVillageActive) {
+    function spawnHouses(village: TVillageActive) {
         const housePlaces = Matrix.matchAll(village.matrix, buildingPatterns);
 
         for (const place of housePlaces) {
@@ -83,6 +99,38 @@ export function VillageSpawnSystem(heap: GameHeap, ticker: TasksScheduler) {
             const houseEntity = createHouseEntity(position, size);
 
             addEntity(heap, houseEntity);
+        }
+    }
+
+    function spawnNpc(village: TVillageActive) {
+        const { area, matrix, people } = village;
+        let i = 0;
+
+        Enumerable.from(radialIterate(matrix, floor(matrix.w / 2), floor(matrix.h / 2)))
+            .takeWhile(() => i < people.length)
+            .where((item): item is Item<RoadTile> => {
+                return item.value?.type === TileType.road && random() > 0.85;
+            })
+            .forEach((item) => {
+                addEntity(
+                    heap,
+                    createNpcEntity({
+                        ...people[i++],
+                        position: Vector.sum(area, Vector.extract(item)),
+                    }),
+                );
+            });
+    }
+
+    function unspawnNpc(village: TVillage) {
+        const names = village.people.map((p) => p.name);
+
+        for (const npc of getEntities(heap, NPCEntityID)) {
+            const person = getComponentStruct(npc, PersonComponentID);
+
+            if (names.includes(person.name)) {
+                deleteEntity(heap, npc);
+            }
         }
     }
 }

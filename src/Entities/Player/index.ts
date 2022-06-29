@@ -6,14 +6,14 @@ import { createPositionComponent } from '../../Components/Position';
 import { createBaseMeshComponent } from '../../Components/Renders/BaseMeshComponent';
 import { createVelocityComponent } from '../../Components/Velocity';
 import { createVisualSizeComponent } from '../../Components/VisualSize';
-import { PLAYER_START_POSITION, TILE_SIZE } from '../../CONST';
-import { newSize } from '../../utils/shape';
+import { PLAYER_START_POSITION } from '../../CONST';
+import { Size } from '../../utils/shape';
 
 export const PlayerEntityID = 'PLAYER_ENTITY' as const;
 export type PlayerEntity = ReturnType<typeof createPlayerEntity>;
 export const createPlayerEntity = () => {
     return createEntity(PlayerEntityID, [
-        createVisualSizeComponent(newSize(TILE_SIZE)),
+        createVisualSizeComponent(Size.create(1)),
         createPositionComponent(PLAYER_START_POSITION),
         createDirectionComponent(),
         createVelocityComponent(),

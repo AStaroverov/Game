@@ -25,7 +25,7 @@ import {
     shouldInitMesh,
 } from '../../Components/Renders/MeshComponent';
 import { SizeComponentID } from '../../Components/Size';
-import { VisualSizeComponentID } from '../../Components/VisualSize';
+import { setVisualSize, VisualSizeComponentID } from '../../Components/VisualSize';
 import { TILE_SIZE } from '../../CONST';
 import { HouseEntityID } from '../../Entities/House';
 import { GameHeap } from '../../heap';
@@ -74,8 +74,7 @@ export function HouseRenderSystem(heap: GameHeap, ticker: TasksScheduler) {
             const meshSize = Size.create(base.width / TILE_SIZE, base.height / TILE_SIZE);
             const meshPosition = Vector.create(0, -(meshSize.h - size.h) / 2);
 
-            Size.set(visualSize, meshSize);
-
+            setVisualSize(visualSize, meshSize);
             setMeshStruct(meshStruct, { mesh, position: meshPosition });
         });
     }

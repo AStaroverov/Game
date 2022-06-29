@@ -11,6 +11,7 @@ import { GameHeap } from '../../heap';
 import { negateVector, sumVector, widthVector } from '../../utils/shape';
 
 export enum CommonAction {
+    None = 'None',
     Open = 'Open',
     Dialog = 'Dialog',
 }

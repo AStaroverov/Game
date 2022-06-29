@@ -24,6 +24,8 @@ export type TVector = { x: number; y: number };
 
 export const newVector = (x: number, y: number): TVector => ({ x, y });
 
+export const extractVector = (o: object & TVector): TVector => newVector(o.x, o.y);
+
 export const setVector = (t: TVector, s: TVector): TVector => {
     t.x = s.x;
     t.y = s.y;
@@ -83,6 +85,7 @@ export const zeroVector = newVector(0, 0);
 
 export const Vector = {
     create: newVector,
+    extract: extractVector,
     set: setVector,
     copy: copyVector,
     map: mapVector,

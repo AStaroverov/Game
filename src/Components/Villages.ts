@@ -1,10 +1,12 @@
 import { remove } from 'lodash';
 
 import { createComponent, ExtractStruct } from '../../lib/ECS/Component';
+import { Assign } from '../types';
 import { TMatrix } from '../utils/Matrix';
 import { TRect } from '../utils/shapes/rect';
 import { structuredClone } from '../utils/structuredClone';
 import { Tile } from './Matrix/TilesMatrix/def';
+import { TPerson } from './Person';
 
 export const VillagesComponentID = 'VILLAGES' as const;
 export type VillagesComponent = ReturnType<typeof createVillagesComponent>;
@@ -13,13 +15,15 @@ export type TVillage = {
     name: string;
     area: TRect;
     matrix: null | TMatrix<Tile>;
+    people: TPerson[];
 };
 
-export type TVillageActive = {
-    name: string;
-    area: TRect;
-    matrix: TMatrix<Tile>;
-};
+export type TVillageActive = Assign<
+    TVillage,
+    {
+        matrix: TMatrix<Tile>;
+    }
+>;
 
 export const createVillagesComponent = () =>
     createComponent(VillagesComponentID, {

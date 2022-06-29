@@ -1,6 +1,4 @@
-import { Container } from 'pixi.js';
-// @ts-ignore
-import { Text } from 'troika-three-text';
+import { Container, Text } from 'pixi.js';
 
 import { ExtractStruct } from '../../lib/ECS/Component';
 import { createEntity, getComponentStruct } from '../../lib/ECS/Entity';
@@ -64,13 +62,12 @@ export function setDialogText(entity: DialogEntity, text: string): void {
 
     if (groupText === undefined) return;
 
-    const object = new Text();
-
-    object.text = text;
-    object.fontSize = 18;
-    object.color = 0xffffff;
-    object.maxWidth = TEXT_MAX_WIDTH;
-    object.sync();
+    const object = new Text(text, {
+        fontSize: 18,
+        fill: 0xffffff,
+        wordWrap: true,
+        wordWrapWidth: TEXT_MAX_WIDTH,
+    });
 
     groupText.removeChildren();
     groupText.addChild(object);

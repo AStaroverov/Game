@@ -7,5 +7,5 @@ export enum UnspawnReason {
 
 export const AutoUnspawnableComponentID = 'AUTO_UNSPAWNABLE' as const;
 export type AutoUnspawnableComponent = ReturnType<typeof createAutoUnspawnableComponent>;
-export const createAutoUnspawnableComponent = (reasons: UnspawnReason[]) =>
+export const createAutoUnspawnableComponent = (reasons?: UnspawnReason[]) =>
     createComponent(AutoUnspawnableComponentID, { reasons });

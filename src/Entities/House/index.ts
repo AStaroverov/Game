@@ -14,7 +14,7 @@ export const createHouseEntity = (position: TVector, size: TSize) => {
         createMeshComponent({ layer: StageName.Main }),
         createPositionComponent(position),
         createSizeComponent(size),
-        createVisualSizeComponent(Size.create(0, 0)),
+        createVisualSizeComponent(Size.ZERO),
         createColliderComponent(size),
         // createAutoUnspawnableComponent([UnspawnReason.OutOfCard]),
     ]);

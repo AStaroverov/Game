@@ -1,6 +1,7 @@
 import { round, trunc } from './math';
 
 export const random = Math.random;
+export const randomInt = (random() * Number.MAX_SAFE_INTEGER) | 0;
 
 export function randomArbitraryFloat(min: number, max: number): number {
     return random() * (max - min) + min;

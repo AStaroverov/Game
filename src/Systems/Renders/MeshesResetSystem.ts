@@ -5,6 +5,7 @@ import {
     getComponentStruct,
     getInheritedComponentStructs,
     hasInheritedComponent,
+    isEntity,
     SomeEntity,
     tryGetComponentStruct,
 } from '../../../lib/ECS/Entity';
@@ -18,6 +19,7 @@ import { VisualSizeComponent, VisualSizeComponentID } from '../../Components/Vis
 import { $ref } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GlobalLightEntityID } from '../../Entities/GlobalLight';
+import { NPCEntityID } from '../../Entities/NPC';
 import { GameHeap } from '../../heap';
 import { StageName, Stages } from '../../Renderer';
 import { isInsideWorldRenderRect } from '../../utils/isInsideWorldRenderRect';
@@ -71,6 +73,9 @@ export function MeshesResetSystem(heap: GameHeap, ticker: TasksScheduler, stages
                 );
 
                 isVisible = isInsideWorldRenderRect(visualRect, cardPosition);
+                if (isEntity(entity, NPCEntityID)) {
+                    console.log('>> isVisible', entity, isVisible);
+                }
             }
 
             mesh.forEach((struct) => {
