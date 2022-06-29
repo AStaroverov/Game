@@ -1,4 +1,4 @@
-import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
+import { Sprite } from 'pixi.js';
 
 import { createComponent, ReturnStruct } from '../../../lib/ECS/Component';
 import { $ref } from '../../CONST';
@@ -7,7 +7,7 @@ import { createMatrixComponent } from './Matrix';
 
 export const SurfaceMeshesMatrixID = 'SURFACE_MESHES_MATRIX' as const;
 export type SurfaceMeshesMatrixCell = {
-    [$ref]: undefined | Mesh<PlaneGeometry, MeshLambertMaterial>;
+    [$ref]: undefined | Sprite;
 };
 export type SurfaceMeshesMatrix = ReturnStruct<typeof createSurfaceMeshesMatrix>;
 

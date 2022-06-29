@@ -11,7 +11,8 @@ import { MeshComponent, MeshComponentID } from '../../Components/Renders/MeshCom
 import { $ref, CARD_START_DELTA, TILE_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
-import { worldYToPositionZ } from '../../utils/positionZ';
+import { trunc } from '../../utils/math';
+import { worldPositionToZIndex } from '../../utils/positionZ';
 import { TVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 import { worldToRenderPosition } from '../../utils/worldToRenderPosition';
@@ -53,8 +54,8 @@ function setPositionMesh(struct: ExtractStruct<MeshComponent>, position: TVector
     const delta = struct.position;
 
     if (mesh !== undefined) {
-        mesh.position.x = (position.x + delta.x + CARD_START_DELTA.x) * TILE_SIZE;
-        mesh.position.y = (position.y + delta.y + CARD_START_DELTA.y) * TILE_SIZE;
-        mesh.position.z = worldYToPositionZ(mesh.position.y);
+        mesh.position.x = trunc((position.x + delta.x + CARD_START_DELTA.x) * TILE_SIZE);
+        mesh.position.y = trunc((position.y + delta.y + CARD_START_DELTA.y) * TILE_SIZE);
+        mesh.zIndex = worldPositionToZIndex(mesh.position);
     }
 }

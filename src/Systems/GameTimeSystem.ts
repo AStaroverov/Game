@@ -3,16 +3,15 @@ import { getEntities } from '../../lib/ECS/Heap';
 import { GameTimeComponentID } from '../Components/GameTime';
 import { WorldEntityID } from '../Entities/World';
 import { GameHeap } from '../heap';
-import { TICK_TIME } from '../utils/fps';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
-export function gameTimeSystem(heap: GameHeap, ticker: TasksScheduler): void {
+export function GameTimeSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const world = getEntities(heap, WorldEntityID)[0];
     const gameTime = getComponentStruct(world, GameTimeComponentID);
 
-    ticker.addTimeInterval(update, 1_000);
+    ticker.addTimeInterval(update, 100);
 
     function update() {
-        gameTime.time += TICK_TIME;
+        gameTime.time += 100;
     }
 }

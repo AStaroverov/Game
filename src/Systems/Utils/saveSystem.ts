@@ -19,4 +19,9 @@ export function saveSystem(heap: GameHeap) {
         const save = localStorage.getItem(`SAVE_${GAME_VERSION}`);
         console.log('>>', save);
     });
+
+    press$.pipe(filter((e) => e.code === 'KeyF')).subscribe((e) => {
+        e.preventDefault();
+        localStorage.removeItem(`SAVE_${GAME_VERSION}`);
+    });
 }

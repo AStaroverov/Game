@@ -18,6 +18,7 @@ const PROD_NAME = 'production';
 const isProd = env === PROD_NAME;
 
 module.exports = {
+    cache: false,
     devtool: isProd ? undefined : 'eval',
     mode: env || DEV_NAME,
     entry: path.join(__dirname, `/src/index.ts`),

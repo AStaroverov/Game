@@ -1,12 +1,8 @@
-import { Color, NearestFilter, Texture } from 'three';
+import { Texture } from 'pixi.js';
 
-import dataAtlasGross from '../../../assets/atlases/gross_1.json';
-import imageAtlasGross from '../../../assets/atlases/gross_1.png';
-import dataAtlasRoad from '../../../assets/atlases/road_1.json';
-import imageAtlasRoad from '../../../assets/atlases/road_1.png';
-import { Atlas } from '../../../lib/Atlas';
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { getEntities } from '../../../lib/ECS/Heap';
+import { atlases, AtlasName } from '../../Components/AtlasAnimation/atlases';
 import { getMatrixCell, getMatrixSlice } from '../../Components/Matrix/Matrix';
 import { SurfaceMeshesMatrixID } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
 import { TilesMatrixID } from '../../Components/Matrix/TilesMatrix';
@@ -16,23 +12,20 @@ import { $ref, RENDER_CARD_SIZE } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
+import { getRandomGreyColor } from '../../utils/getRandomGreyColor';
 import { floor, round } from '../../utils/math';
 import { Matrix } from '../../utils/Matrix';
-import { randomArbitraryFloat, randomArbitraryInt } from '../../utils/random';
+import { randomArbitraryInt } from '../../utils/random';
 import { mapVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 const RENDER_RADIUS = Math.floor(RENDER_CARD_SIZE / 2);
 
-const atlasGross = new Atlas(imageAtlasGross, dataAtlasGross);
-const grossTextures = atlasGross.list.map((f) => f.texture);
-atlasGross.list.forEach((frame) => (frame.texture.magFilter = NearestFilter));
-
-const atlasRoad = new Atlas(imageAtlasRoad, dataAtlasRoad);
-const roadTextures = (() => {
+const GROSS_TEXTURES = atlases[AtlasName.Gross].list.map((f) => f.texture);
+const ROAD_TEXTURES = (() => {
     const max = 224;
     const offset = 64;
-    return atlasRoad.list
+    return atlases[AtlasName.Road].list
         .filter((frame) => {
             return (
                 frame.x >= offset &&
@@ -41,9 +34,8 @@ const roadTextures = (() => {
                 frame.y <= max - offset
             );
         })
-        .map((f) => f.texture);
+        .map(({ texture }) => texture);
 })();
-atlasRoad.list.forEach((frame) => (frame.texture.magFilter = NearestFilter));
 
 export function CardSurfaceSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
@@ -74,26 +66,22 @@ export function CardSurfaceSystem(heap: GameHeap, ticker: TasksScheduler): void 
 
                     const meta = getMeta(
                         index + tile.type,
-                        tile.type === TileType.road ? roadTextures : grossTextures,
+                        tile.type === TileType.road ? ROAD_TEXTURES : GROSS_TEXTURES,
                     );
 
-                    if (mesh.material.map !== meta.texture) {
-                        mesh.material.map = meta.texture;
-                        mesh.material.needsUpdate = true;
+                    if (mesh.texture !== meta.texture) {
+                        mesh.texture = meta.texture;
                     }
 
-                    // // Debug render
+                    // Debug render
                     // if (isRoadTile(tile)) {
-                    //     mesh.material.color = tile.last
-                    //         ? new Color(0, 255, 0)
-                    //         : new Color(255, 255, 255);
+                    //     mesh.tint = tile.last ? 0x00ff00 : 0xffffff;
                     // } else {
-                    //     mesh.material.color = new Color(1, 1, 1);
+                    //     mesh.tint = undefined;
                     // }
+
                     // if (tile.type === TileType.building) {
-                    //     mesh.material.color = new Color(255, 255, 255);
-                    //     mesh.material.map = null;
-                    //     mesh.material.needsUpdate = true;
+                    //     mesh.tint = 0xffffff;
                     // }
                 }
             },
@@ -101,16 +89,14 @@ export function CardSurfaceSystem(heap: GameHeap, ticker: TasksScheduler): void 
     }
 }
 
-type TSurfaceMeta = { color: Color; texture: Texture };
+type TSurfaceMeta = { color: number; texture: Texture };
 
 const tileIndexToMeta = new Map<string, TSurfaceMeta>();
 
 function getMeta(n: string, textures: Texture[]): TSurfaceMeta {
     if (!tileIndexToMeta.has(n)) {
-        const v = randomArbitraryFloat(0.96, 1);
-
         tileIndexToMeta.set(n, {
-            color: new Color(v, v, v),
+            color: getRandomGreyColor(),
             texture: textures[randomArbitraryInt(0, textures.length - 1)],
         });
     }

@@ -1,7 +1,6 @@
-import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
-
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { getEntities } from '../../../lib/ECS/Heap';
+import { Sprite } from '../../Classes/Sprite';
 import {
     ReliefMeshesMatrix,
     ReliefMeshesMatrixID,
@@ -10,7 +9,7 @@ import {
     SurfaceMeshesMatrix,
     SurfaceMeshesMatrixID,
 } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
-import { $ref, TILE_SIZE } from '../../CONST';
+import { $ref } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
 import { Matrix } from '../../utils/Matrix';
@@ -20,20 +19,14 @@ export function initMatrixMeshesSystem(heap: GameHeap) {
     const reliefMeshesMatrix = getComponentStruct(cardEntity, ReliefMeshesMatrixID);
     const surfaceMeshesMatrix = getComponentStruct(cardEntity, SurfaceMeshesMatrixID);
 
-    initReliefMeshMatrix(reliefMeshesMatrix);
     initSurfaceMeshMatrix(surfaceMeshesMatrix);
+    initReliefMeshMatrix(reliefMeshesMatrix);
 }
 
 function initReliefMeshMatrix(meshesMatrix: ReliefMeshesMatrix) {
     Matrix.fill(meshesMatrix.matrix, () => {
         return {
-            [$ref]: new Mesh(
-                new PlaneGeometry(),
-                new MeshLambertMaterial({
-                    transparent: true,
-                    alphaTest: 0.5,
-                }),
-            ),
+            [$ref]: new Sprite(),
         };
     });
 }
@@ -41,7 +34,7 @@ function initReliefMeshMatrix(meshesMatrix: ReliefMeshesMatrix) {
 function initSurfaceMeshMatrix(meshesMatrix: SurfaceMeshesMatrix) {
     Matrix.fill(meshesMatrix.matrix, () => {
         return {
-            [$ref]: new Mesh(new PlaneGeometry(TILE_SIZE, TILE_SIZE), new MeshLambertMaterial()),
+            [$ref]: new Sprite(),
         };
     });
 }

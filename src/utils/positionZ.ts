@@ -1,9 +1,12 @@
-import { RENDER_CARD_SIZE, TILE_SIZE } from '../CONST';
+import { CARD_SIZE, TILE_SIZE } from '../CONST';
+import { TVector } from './shape';
 
-export function tileYToPositionZ(y: number): number {
-    return RENDER_CARD_SIZE - y;
-}
+const minZ = 1e5;
 
 export function worldYToPositionZ(y: number): number {
-    return RENDER_CARD_SIZE - y / TILE_SIZE;
+    return minZ + y / TILE_SIZE;
+}
+
+export function worldPositionToZIndex(p: TVector): number {
+    return minZ + p.y / TILE_SIZE + p.x / (TILE_SIZE * CARD_SIZE);
 }

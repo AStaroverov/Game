@@ -1,72 +1,59 @@
-import { OrthographicCamera, Scene, WebGLRenderer } from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { Renderer as PixiRenderer } from '@pixi/core';
+import { Container, SCALE_MODES, settings } from 'pixi.js';
 
-import { CENTER_RENDER_POSITION, TILE_SIZE } from '../CONST';
+import { RENDER_RECT, TILE_SIZE } from '../CONST';
+import { trunc } from '../utils/math';
 
-const min = Math.min(window.innerWidth, window.innerHeight) * 1.4;
-const width = min;
-const height = min;
-const aspect = window.innerWidth / window.innerHeight;
+settings.SCALE_MODE = SCALE_MODES.NEAREST;
 
-export enum Layer {
+export enum StageName {
     Main = 'Main',
     Fixed = 'Fixed',
 }
 
-export type Scenes = {
-    [Layer.Main]: Scene;
-    [Layer.Fixed]: Scene;
+export type Stages = {
+    [StageName.Main]: Container;
+    [StageName.Fixed]: Container;
 };
 
 export type Renderers = {
-    [Layer.Main]: WebGLRenderer;
-    [Layer.Fixed]: WebGLRenderer;
+    [StageName.Main]: PixiRenderer;
+    [StageName.Fixed]: PixiRenderer;
 };
 
 export class Renderer {
-    camera = new OrthographicCamera(
-        (width * aspect) / -2,
-        (width * aspect) / 2,
-        height / 2,
-        height / -2,
-        0.1,
-        1000,
-    );
-
-    scenes: Scenes = {
-        [Layer.Main]: new Scene(),
-        [Layer.Fixed]: new Scene(),
+    scenes: Stages = {
+        [StageName.Main]: new Container(),
+        [StageName.Fixed]: new Container(),
     };
 
     renderers: Renderers = {
-        [Layer.Main]: new WebGLRenderer(),
-        [Layer.Fixed]: new WebGLRenderer({ alpha: true }),
+        [StageName.Main]: new PixiRenderer({ resolution: window.devicePixelRatio }),
+        [StageName.Fixed]: new PixiRenderer({
+            resolution: window.devicePixelRatio,
+            backgroundAlpha: 0,
+        }),
     };
 
-    constructor() {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
+    render(): void {
+        this.resize(this.renderers[StageName.Main]);
+        this.resize(this.renderers[StageName.Fixed]);
 
-        const controls = new OrbitControls(this.camera, this.renderers[Layer.Fixed].domElement);
-        controls.minDistance = 20;
-        controls.maxDistance = 500;
-        controls.enablePan = false;
+        this.setAtCenter(StageName.Main);
 
-        this.renderers[Layer.Main].setSize(width, height);
-        this.renderers[Layer.Main].setPixelRatio(window.devicePixelRatio ?? 1);
-        this.renderers[Layer.Fixed].setSize(width, height);
-        this.renderers[Layer.Fixed].setPixelRatio(window.devicePixelRatio ?? 1);
-
-        this.camera.zoom = 1.5;
-        this.camera.position.z = 1000;
-        this.camera.updateProjectionMatrix();
-
-        this.scenes[Layer.Main].position.x -= TILE_SIZE * CENTER_RENDER_POSITION.x;
-        this.scenes[Layer.Main].position.y -= TILE_SIZE * CENTER_RENDER_POSITION.y;
+        this.renderers[StageName.Main].render(this.scenes[StageName.Main]);
+        this.renderers[StageName.Fixed].render(this.scenes[StageName.Fixed]);
     }
 
-    render(): void {
-        this.renderers[Layer.Main].render(this.scenes[Layer.Main], this.camera);
-        this.renderers[Layer.Fixed].render(this.scenes[Layer.Fixed], this.camera);
+    resize(renderer: PixiRenderer) {
+        renderer.resize(renderer.view.offsetWidth, renderer.view.offsetHeight);
+    }
+
+    setAtCenter(layer: StageName) {
+        const renderer = this.renderers[layer];
+        const scene = this.scenes[layer];
+
+        scene.position.x = trunc(renderer.screen.width / 2 - (TILE_SIZE * RENDER_RECT.w) / 2);
+        scene.position.y = trunc(renderer.screen.height / 2 - (TILE_SIZE * RENDER_RECT.h) / 2);
     }
 }

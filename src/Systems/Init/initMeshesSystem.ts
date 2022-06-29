@@ -2,7 +2,6 @@ import {
     AnyComponent,
     getStruct,
     InheritedComponent,
-    isComponent,
     isInheritedComponent,
 } from '../../../lib/ECS/Component';
 import { filterComponents, hasInheritedComponent, SomeEntity } from '../../../lib/ECS/Entity';
@@ -12,11 +11,7 @@ import {
     BaseMeshComponentID,
     initBaseMeshStruct,
 } from '../../Components/Renders/BaseMeshComponent';
-import {
-    HealBarMeshComponent,
-    HealBarMeshComponentID,
-    initHealBarStruct,
-} from '../../Components/Renders/HealBarMeshComponent';
+import { HealBarMeshComponent } from '../../Components/Renders/HealBarMeshComponent';
 import { MeshComponent, MeshComponentID } from '../../Components/Renders/MeshComponent';
 import { $ref } from '../../CONST';
 import { GameHeap } from '../../heap';
@@ -48,13 +43,13 @@ function initBasicMesh(entity: SomeEntity<AnyComponent | InheritedComponent<Base
 }
 
 function initHealBarMesh(entity: SomeEntity<AnyComponent | HealBarMeshComponent>) {
-    filterComponents(entity, (c): c is HealBarMeshComponent =>
-        isComponent(c, HealBarMeshComponentID),
-    )
-        .map(getStruct)
-        .forEach((healBarMesh) => {
-            if (healBarMesh && healBarMesh[$ref] === undefined) {
-                initHealBarStruct(healBarMesh);
-            }
-        });
+    // filterComponents(entity, (c): c is HealBarMeshComponent =>
+    //     isComponent(c, HealBarMeshComponentID),
+    // )
+    //     .map(getStruct)
+    //     .forEach((healBarMesh) => {
+    //         if (healBarMesh && healBarMesh[$ref] === undefined) {
+    //             initHealBarStruct(healBarMesh);
+    //         }
+    //     });
 }

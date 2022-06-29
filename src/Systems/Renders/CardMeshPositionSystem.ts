@@ -1,4 +1,4 @@
-import { Mesh } from 'three';
+import { DisplayObject } from '@pixi/display';
 
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { getEntities } from '../../../lib/ECS/Heap';
@@ -31,14 +31,6 @@ export function CardMeshPositionSystem(heap: GameHeap, ticker: TasksScheduler): 
 
     ticker.addFrameInterval(tick, 1);
 
-    function setPosition(mesh: undefined | Mesh, visible: boolean, x: number, y: number): void {
-        if (mesh === undefined) return;
-
-        mesh.visible = visible;
-        mesh.position.x = x;
-        mesh.position.y = y;
-    }
-
     function tick() {
         const abs = mapVector(sumVector(playerPosition, cardPosition), round);
         const fractionPosition = newVector(
@@ -57,4 +49,16 @@ export function CardMeshPositionSystem(heap: GameHeap, ticker: TasksScheduler): 
             );
         });
     }
+}
+function setPosition(
+    mesh: undefined | DisplayObject,
+    visible: boolean,
+    x: number,
+    y: number,
+): void {
+    if (mesh === undefined) return;
+
+    mesh.visible = visible;
+    mesh.position.x = x | 0;
+    mesh.position.y = y | 0;
 }

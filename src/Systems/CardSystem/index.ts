@@ -14,7 +14,7 @@ import { mapVector, mulVector, setVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 import { villageSystemTick } from './VillageSystem';
 
-export function runCardSystem(heap: GameHeap, ticker: TasksScheduler): void {
+export function RunCardSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const cardEntity = getEntities(heap, CardEntityID)[0];
     const cardTiles = getComponentStruct(cardEntity, TilesMatrixID);
     const cardPosition = getComponentStruct(cardEntity, PositionComponentID);

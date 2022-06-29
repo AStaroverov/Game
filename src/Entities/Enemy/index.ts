@@ -21,12 +21,7 @@ export const createEnemyEntity = () => {
         createPositionComponent(),
         createDirectionComponent(),
         createVelocityComponent(),
-        createBaseMeshComponent({
-            w: enemyAtlas.w * 1.2,
-            h: enemyAtlas.h * 1.2,
-            transparent: true,
-            alphaTest: 0.5,
-        }),
+        createBaseMeshComponent(),
         createAtlasAnimationComponent({
             time: 0,
             duration: 100,
