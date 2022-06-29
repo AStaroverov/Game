@@ -9,7 +9,7 @@ import { GameHeap } from '../heap';
 import { mulVector, TVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
-export function controlsSystem(heap: GameHeap, ticker: TasksScheduler): void {
+export function ControlsSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
     const playerVelocity = getComponentStruct(playerEntity, VelocityComponentID);
     const playerDirection = getComponentStruct(playerEntity, DirectionComponentID);
@@ -37,10 +37,10 @@ function isArrow({ key }: KeyboardEvent): boolean {
 
 function onArrowDown({ key }: KeyboardEvent, v: TVector) {
     v.x = key === 'ArrowLeft' ? -1 : key === 'ArrowRight' ? 1 : v.x;
-    v.y = key === 'ArrowDown' ? -1 : key === 'ArrowUp' ? 1 : v.y;
+    v.y = key === 'ArrowUp' ? -1 : key === 'ArrowDown' ? 1 : v.y;
 }
 
 function onArrowUp({ key }: KeyboardEvent, v: TVector) {
     v.x = key === 'ArrowLeft' && v.x === -1 ? 0 : key === 'ArrowRight' && v.x === 1 ? 0 : v.x;
-    v.y = key === 'ArrowDown' && v.y === -1 ? 0 : key === 'ArrowUp' && v.y === 1 ? 0 : v.y;
+    v.y = key === 'ArrowUp' && v.y === -1 ? 0 : key === 'ArrowDown' && v.y === 1 ? 0 : v.y;
 }

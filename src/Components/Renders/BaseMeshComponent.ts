@@ -1,33 +1,19 @@
-import { Mesh, MeshLambertMaterial, PlaneGeometry } from 'three';
-import { MeshLambertMaterialParameters } from 'three/src/materials/MeshLambertMaterial';
-
 import { createComponent, ExtractStruct } from '../../../lib/ECS/Component';
+import { Sprite } from '../../Classes/Sprite';
 import { $ref } from '../../CONST';
-import { Layer } from '../../Renderer';
-import { TSize } from '../../utils/shape';
+import { StageName } from '../../Renderer';
 import { createMeshComponent } from './MeshComponent';
 
-type BaseMesh = Mesh<PlaneGeometry, MeshLambertMaterial>;
+type BaseMesh = Sprite;
 
+// TODO: Rename to SpriteComponent?
 export const BaseMeshComponentID = 'BASE_MESH' as const;
 export type BaseMeshComponent = ReturnType<typeof createBaseMeshComponent>;
-export const createBaseMeshComponent = (
-    props: Partial<TSize & Pick<MeshLambertMaterialParameters, 'transparent' | 'alphaTest'>>,
-) =>
-    createComponent(
-        BaseMeshComponentID,
-        props,
-        createMeshComponent<BaseMesh>({ layer: Layer.Main }),
-    );
+export const createBaseMeshComponent = () =>
+    createComponent(BaseMeshComponentID, createMeshComponent<BaseMesh>({ layer: StageName.Main }));
 
 export function initBaseMeshStruct<M extends BaseMesh = BaseMesh>(
     struct: ExtractStruct<BaseMeshComponent>,
 ): void {
-    struct[$ref] = new Mesh(
-        new PlaneGeometry(struct.w, struct.h),
-        new MeshLambertMaterial({
-            transparent: struct.transparent,
-            alphaTest: struct.alphaTest,
-        }),
-    );
+    struct[$ref] = new Sprite();
 }

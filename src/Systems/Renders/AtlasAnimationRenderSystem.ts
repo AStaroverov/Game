@@ -13,7 +13,7 @@ import { GameHeap } from '../../heap';
 import { TICK_TIME } from '../../utils/fps';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
-export function atlasAnimationRenderSystem(heap: GameHeap, ticker: TasksScheduler): void {
+export function AtlasAnimationRenderSystem(heap: GameHeap, ticker: TasksScheduler): void {
     ticker.addFrameInterval(tick, 1);
 
     function tick() {
@@ -43,8 +43,7 @@ function animate(
     const atlas = atlases[animation.atlasName];
     const texture = atlas.list[animation.atlasFrame].texture;
 
-    if (mesh && mesh.material.map !== texture) {
-        mesh.material.map = texture;
-        mesh.material.needsUpdate = true;
+    if (mesh && mesh.texture !== texture) {
+        mesh.texture = texture;
     }
 }

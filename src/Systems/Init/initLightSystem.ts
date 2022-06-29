@@ -1,21 +1,25 @@
-import { SpotLight } from 'three';
+import { Texture } from '@pixi/core';
+import { BaseTexture, BLEND_MODES, BufferResource, Container } from 'pixi.js';
 
+import ambientImage from '../../../assets/sprites/ambient_light.png';
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { addEntity, getEntities } from '../../../lib/ECS/Heap';
-import { initLightStruct, SpotLightMeshComponentID } from '../../Components/Renders/LightComponent';
-import { CENTER_RENDER_POSITION, TILE_SIZE } from '../../CONST';
+import { Sprite } from '../../Classes/Sprite';
+import {
+    AmbientLightMeshComponentID,
+    setLightStruct,
+} from '../../Components/Renders/LightComponent';
+import { RENDER_RECT, TILE_SIZE } from '../../CONST';
 import { createGlobalLightEntity, GlobalLightEntityID } from '../../Entities/GlobalLight';
 import { GameHeap } from '../../heap';
-import { newVector, sumVector } from '../../utils/shape';
+import { isLoaded } from '../../utils/Pixi/isLoaded';
 
-const LIGHT_POSITION = sumVector(CENTER_RENDER_POSITION, newVector(-0.5, -0.5));
-
-export function initLightSystem(heap: GameHeap) {
+export function InitLightSystem(heap: GameHeap) {
     initGlobalLightEntity(heap);
-    initSpotLightMeshComponent(heap);
+    initAmbientLight(heap);
 }
 
-function initGlobalLightEntity(heap: GameHeap): void {
+function initGlobalLightEntity(heap: GameHeap) {
     const globalLight = getEntities(heap, GlobalLightEntityID);
 
     if (globalLight.length === 0) {
@@ -23,18 +27,33 @@ function initGlobalLightEntity(heap: GameHeap): void {
     }
 }
 
-function initSpotLightMeshComponent(heap: GameHeap): void {
+async function initAmbientLight(heap: GameHeap) {
     const globalLight = getEntities(heap, GlobalLightEntityID);
-    const lightStruct = getComponentStruct(globalLight[0], SpotLightMeshComponentID);
+    const lightStruct = getComponentStruct(globalLight[0], AmbientLightMeshComponentID);
 
-    const light = new SpotLight(0xffffff);
+    const container = new Container();
+    const background = new Sprite(
+        new Texture(
+            new BaseTexture(
+                new BufferResource(new Float32Array([0, 0, 0, 0]), { width: 1, height: 1 }),
+            ),
+        ),
+    );
+    const ambient = new Sprite(new Texture(await isLoaded(new BaseTexture(ambientImage))));
 
-    light.angle = 0.6;
-    light.intensity = 2;
-    light.distance = 2000;
-    light.penumbra = 0.4;
-    light.position.set(LIGHT_POSITION.x * TILE_SIZE, LIGHT_POSITION.y * TILE_SIZE, 1000);
-    light.target.position.set(LIGHT_POSITION.x * TILE_SIZE, LIGHT_POSITION.y * TILE_SIZE, 0);
+    container.addChild(background, ambient);
+    container.zIndex = 1e10;
+    container.position.x = (RENDER_RECT.w / 2) * TILE_SIZE;
+    container.position.y = (RENDER_RECT.h / 2) * TILE_SIZE;
+    container.alpha = 0.5;
 
-    initLightStruct(lightStruct, light);
+    background.width = 1000;
+    background.height = 1000;
+    background.alpha = 0.7;
+
+    ambient.width = 1000;
+    ambient.height = 1000;
+    ambient.blendMode = BLEND_MODES.MULTIPLY;
+
+    setLightStruct(lightStruct, container);
 }

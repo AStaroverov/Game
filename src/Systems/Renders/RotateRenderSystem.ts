@@ -7,7 +7,7 @@ import { $ref } from '../../CONST';
 import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
-export function rotateRenderSystem(heap: GameHeap, ticker: TasksScheduler): void {
+export function RotateRenderSystem(heap: GameHeap, ticker: TasksScheduler): void {
     ticker.addFrameInterval(tick, 1);
 
     function tick() {

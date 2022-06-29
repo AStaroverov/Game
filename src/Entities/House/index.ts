@@ -4,14 +4,14 @@ import { createPositionComponent } from '../../Components/Position';
 import { createMeshComponent } from '../../Components/Renders/MeshComponent';
 import { createSizeComponent } from '../../Components/Size';
 import { createVisualSizeComponent } from '../../Components/VisualSize';
-import { Layer } from '../../Renderer';
+import { StageName } from '../../Renderer';
 import { Size, TSize, TVector } from '../../utils/shape';
 
 export const HouseEntityID = 'HOUSE_ENTITY' as const;
 export type HouseEntity = ReturnType<typeof createHouseEntity>;
 export const createHouseEntity = (position: TVector, size: TSize) => {
     return createEntity(HouseEntityID, [
-        createMeshComponent({ layer: Layer.Main }),
+        createMeshComponent({ layer: StageName.Main }),
         createPositionComponent(position),
         createSizeComponent(size),
         createVisualSizeComponent(Size.create(0, 0)),

@@ -1,3 +1,5 @@
+// import { Layer } from '@pixi/layers';
+
 import { InheritedComponent } from '../../../lib/ECS/Component';
 import {
     getComponentStruct,
@@ -10,23 +12,23 @@ import { filterEntities, getEntities } from '../../../lib/ECS/Heap';
 import { ReliefMeshesMatrixID } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
 import { SurfaceMeshesMatrixID } from '../../Components/Matrix/SurfaceMeshesMatrixComponent';
 import { PositionComponent, PositionComponentID } from '../../Components/Position';
-import { SpotLightMeshComponentID } from '../../Components/Renders/LightComponent';
+import { AmbientLightMeshComponentID } from '../../Components/Renders/LightComponent';
 import { MeshComponent, MeshComponentID } from '../../Components/Renders/MeshComponent';
 import { VisualSizeComponent, VisualSizeComponentID } from '../../Components/VisualSize';
 import { $ref } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GlobalLightEntityID } from '../../Entities/GlobalLight';
 import { GameHeap } from '../../heap';
-import { Layer, Scenes } from '../../Renderer';
+import { StageName, Stages } from '../../Renderer';
 import { isInsideWorldRenderRect } from '../../utils/isInsideWorldRenderRect';
 import { Matrix } from '../../utils/Matrix';
 import { Size } from '../../utils/shape';
 import { Rect } from '../../utils/shapes/rect';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
-export function MeshesResetSystem(heap: GameHeap, ticker: TasksScheduler, scenes: Scenes): void {
+export function MeshesResetSystem(heap: GameHeap, ticker: TasksScheduler, stages: Stages): void {
     const globalLightEntity = getEntities(heap, GlobalLightEntityID)[0];
-    const spotLight = getComponentStruct(globalLightEntity, SpotLightMeshComponentID);
+    const ambientLight = getComponentStruct(globalLightEntity, AmbientLightMeshComponentID);
 
     const cardEntity = getEntities(heap, CardEntityID)[0];
     const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
@@ -37,18 +39,17 @@ export function MeshesResetSystem(heap: GameHeap, ticker: TasksScheduler, scenes
     ticker.addFrameInterval(tick, 1);
 
     function tick() {
-        const staticMeshes = [
-            spotLight[$ref],
-            spotLight[$ref]?.target,
+        const sortableMeshes = [
+            ambientLight[$ref],
             ...Matrix.toArray(surfaceMeshes.matrix).map((v) => v[$ref]),
             ...Matrix.toArray(reliefMeshes.matrix).map((v) => v[$ref]),
-        ].filter(<T>(object: undefined | T): object is T => object !== undefined);
+        ].filter(isNotEmpty);
 
-        scenes[Layer.Main].clear();
-        scenes[Layer.Fixed].clear();
+        stages[StageName.Main].removeChildren();
+        stages[StageName.Fixed].removeChildren();
 
-        if (staticMeshes.length > 0) {
-            scenes[Layer.Main].add(...staticMeshes);
+        if (sortableMeshes.length > 0) {
+            stages[StageName.Main].addChild(...sortableMeshes);
         }
 
         filterEntities(heap, (e): e is SomeEntity<InheritedComponent<MeshComponent>> => {
@@ -75,11 +76,18 @@ export function MeshesResetSystem(heap: GameHeap, ticker: TasksScheduler, scenes
             mesh.forEach((struct) => {
                 const object = struct[$ref];
 
-                if (object) {
-                    scenes[struct.layer].add(object);
+                if (object && isVisible) {
                     object.visible = isVisible;
+                    stages[struct.layer].addChild(object);
                 }
             });
         });
+
+        stages[StageName.Main].sortChildren();
+        stages[StageName.Fixed].sortChildren();
     }
+}
+
+function isNotEmpty<T>(object: undefined | T): object is T {
+    return object !== undefined;
 }

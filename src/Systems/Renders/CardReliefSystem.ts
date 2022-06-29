@@ -1,25 +1,25 @@
-import { PlaneGeometry } from 'three';
-
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { getEntities } from '../../../lib/ECS/Heap';
+import { atlases, AtlasName } from '../../Components/AtlasAnimation/atlases';
 import { getMatrixCell, getMatrixSlice } from '../../Components/Matrix/Matrix';
 import { ReliefMeshesMatrixID } from '../../Components/Matrix/ReliefMeshesMatrixComponent';
 import { TilesMatrixID } from '../../Components/Matrix/TilesMatrix';
 import { isPassableTileType, TileType } from '../../Components/Matrix/TilesMatrix/def';
 import { PositionComponentID } from '../../Components/Position';
 import { $ref, HALF_RENDER_CARD_SIZE, RENDER_CARD_SIZE, TILE_SIZE } from '../../CONST';
-import { atlasTrees, CardEntityID } from '../../Entities/Card';
+import { CardEntityID } from '../../Entities/Card';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
 import { floor, round } from '../../utils/math';
 import { Matrix } from '../../utils/Matrix';
-import { tileYToPositionZ } from '../../utils/positionZ';
-import { randomSign } from '../../utils/random';
-import { mapVector, newVector, sumVector } from '../../utils/shape';
+import { worldPositionToZIndex } from '../../utils/positionZ';
+import { random, randomArbitraryFloat, randomSign } from '../../utils/random';
+import { mapVector, sumVector } from '../../utils/shape';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 const TREES_MUL = 1;
-const TREES_COUNT = atlasTrees.list.length;
+const TREES_FRAMES = atlases[AtlasName.Tree].list;
+const TREES_COUNT = TREES_FRAMES.length;
 const RENDER_RADIUS = floor(HALF_RENDER_CARD_SIZE);
 
 export function CardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
@@ -54,20 +54,15 @@ export function CardReliefSystem(heap: GameHeap, ticker: TasksScheduler): void {
                     y * RENDER_CARD_SIZE -
                     (uflooredPosition.x + uflooredPosition.y * RENDER_CARD_SIZE);
                 const meta = getMeta(index);
-                const tree = atlasTrees.list[meta.index];
-                const treeSize = newVector(tree.w * TREES_MUL, tree.h * TREES_MUL);
+                const tree = TREES_FRAMES[meta.index];
 
                 mesh.visible = true;
-                mesh.position.x += floor(meta.x * TILE_SIZE);
-                mesh.position.y += floor(
-                    (treeSize.y > TILE_SIZE ? tree.h / 2 : 0) + meta.y * TILE_SIZE,
-                );
-                mesh.position.z = tileYToPositionZ(y + x / RENDER_CARD_SIZE);
+                mesh.position.x = (mesh.position.x + floor(meta.x * TILE_SIZE)) | 0;
+                mesh.position.y = (mesh.position.y - floor(tree.h * 0.4 + meta.y * TILE_SIZE)) | 0;
+                mesh.zIndex = worldPositionToZIndex(mesh.position);
 
-                if (mesh.material.map !== tree.texture) {
-                    mesh.geometry = new PlaneGeometry(treeSize.x, treeSize.y);
-                    mesh.material.map = tree.texture;
-                    mesh.material.needsUpdate = true;
+                if (mesh.texture !== tree.texture) {
+                    mesh.texture = tree.texture;
                 }
             } else {
                 mesh.visible = false;
@@ -81,9 +76,9 @@ const tileIndexToMeta = new Map<number, { index: number; x: number; y: number }>
 function getMeta(n: number): { index: number; x: number; y: number } {
     if (!tileIndexToMeta.has(n)) {
         tileIndexToMeta.set(n, {
-            index: Math.round(Math.random() * (TREES_COUNT - 1)),
-            x: randomSign() * Math.random() * 0.05,
-            y: Math.random() * 0.1,
+            index: round(random() * (TREES_COUNT - 1)),
+            x: randomSign() * randomArbitraryFloat(0, 0.2),
+            y: randomSign() * randomArbitraryFloat(0, 0.2),
         });
     }
 
