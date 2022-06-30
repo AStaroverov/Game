@@ -1,10 +1,12 @@
 import { getComponentStruct } from '../../lib/ECS/Entity';
 import { addEntity, getEntities } from '../../lib/ECS/Heap';
 import Enumerable from '../../lib/linq';
+import { UnspawnReason } from '../Components/AutoRemovable';
 import { DialogID } from '../Components/Dialogs/data';
 import { DirectionComponentID } from '../Components/DirectionComponent';
 import { TilesMatrix, TilesMatrixID } from '../Components/Matrix/TilesMatrix';
 import { isPassableTileType, Tile } from '../Components/Matrix/TilesMatrix/def';
+import { getRandomPerson } from '../Components/Person';
 import { PlayerStoryComponentID, PlayerStoryStep } from '../Components/PlayerStoryProgress';
 import { PositionComponentID } from '../Components/Position';
 import { TypeComponentID } from '../Components/Type';
@@ -76,11 +78,13 @@ function tryAddFirstNpc(
     if (tileItem === undefined) return;
 
     const npc = createNpcEntity({
+        ...getRandomPerson(),
         type: NPCType.First,
         action: {
             type: CommonAction.Dialog,
             dialogID: DialogID.FirstMeeting,
         },
+        unspawnReason: [UnspawnReason.OutOfCard],
     });
     const position = getComponentStruct(npc, PositionComponentID);
 

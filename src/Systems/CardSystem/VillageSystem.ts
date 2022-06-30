@@ -5,6 +5,7 @@ import { getRenderMatrixSide } from '../../Components/Matrix/TilesMatrix/fillers
 import { isLastRoadTile } from '../../Components/Matrix/TilesMatrix/fillers/utils/is';
 import { mergeMatrix } from '../../Components/Matrix/TilesMatrix/fillers/utils/mergeMatrix';
 import { createVillage } from '../../Components/Matrix/TilesMatrix/fillers/village';
+import { getRandomPerson } from '../../Components/Person';
 import { TVillage, Village, VillagesComponent } from '../../Components/Villages';
 import {
     CARD_RECT,
@@ -17,6 +18,7 @@ import { getWorldRenderRect } from '../../utils/getWorldRenderRect';
 import { floor } from '../../utils/math';
 import { Matrix, TMatrix } from '../../utils/Matrix';
 import { random, randomArbitraryInt } from '../../utils/random';
+import { range } from '../../utils/range';
 import { negateVector, TVector, Vector } from '../../utils/shape';
 import { Rect } from '../../utils/shapes/rect';
 
@@ -162,6 +164,7 @@ export function spawnVillage(
             villageMatrix.h,
         ),
         matrix: villageMatrix,
+        people: range(randomArbitraryInt(5, 10), getRandomPerson),
     });
 }
 

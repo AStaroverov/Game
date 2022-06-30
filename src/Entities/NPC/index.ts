@@ -1,31 +1,43 @@
+import { pick } from 'lodash';
+
 import { createEntity } from '../../../lib/ECS/Entity';
 import { ActionableComponentProps, createActionableComponent } from '../../Components/Actionable';
 import { createAtlasAnimationComponent } from '../../Components/AtlasAnimation';
-import { atlases, AtlasName } from '../../Components/AtlasAnimation/atlases';
+import { AtlasName } from '../../Components/AtlasAnimation/atlases';
 import { createAutoUnspawnableComponent, UnspawnReason } from '../../Components/AutoRemovable';
 import { createDirectionComponent } from '../../Components/DirectionComponent';
+import { createPersonComponent, TPerson } from '../../Components/Person';
 import { createPositionComponent } from '../../Components/Position';
 import { createBaseMeshComponent } from '../../Components/Renders/BaseMeshComponent';
+import { createTagComponent } from '../../Components/Tag';
 import { createTypeComponent } from '../../Components/Type';
 import { createVelocityComponent } from '../../Components/Velocity';
 import { createVisualSizeComponent } from '../../Components/VisualSize';
-import { TILE_SIZE } from '../../CONST';
-import { newSize } from '../../utils/shape';
-
-const enemyAtlas = atlases[AtlasName.Skeleton];
+import { Size, TVector } from '../../utils/shape';
 
 export enum NPCType {
     First = 'First',
+    Common = 'Common',
 }
 
 export const NPCEntityID = 'NPC_ENTITY' as const;
 export type NpcEntity = ReturnType<typeof createNpcEntity>;
-export const createNpcEntity = (props: { type: NPCType; action: ActionableComponentProps }) => {
+export const createNpcEntity = (
+    props: TPerson & {
+        tags?: string[];
+        type?: NPCType;
+        action?: ActionableComponentProps;
+        position?: TVector;
+        unspawnReason?: UnspawnReason[];
+    },
+) => {
     return createEntity(NPCEntityID, [
-        createTypeComponent(props.type),
-        createAutoUnspawnableComponent([UnspawnReason.OutOfCard]),
-        createVisualSizeComponent(newSize(TILE_SIZE)),
-        createPositionComponent(),
+        createTagComponent(props.tags),
+        createTypeComponent(props.type ?? NPCType.Common),
+        createPersonComponent(pick(props, 'name', 'sex', 'age')),
+        createAutoUnspawnableComponent(props.unspawnReason),
+        createVisualSizeComponent(Size.create(1)),
+        createPositionComponent(props.position),
         createDirectionComponent(),
         createVelocityComponent(),
         createBaseMeshComponent(),

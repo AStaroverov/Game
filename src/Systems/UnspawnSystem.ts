@@ -30,16 +30,19 @@ export function UnspawnSystem(heap: GameHeap, ticker: TasksScheduler): void {
             },
         );
 
-        entities.forEach((entity) => {
+        for (const entity of entities) {
             const position = getComponentStruct(entity, PositionComponentID);
             const unspawn = getComponentStruct(entity, AutoUnspawnableComponentID);
+
+            if (unspawn.reasons === undefined) continue;
+
             const diff = sumVector(position, mulVector(CENTER_CARD_POSITION, -1), cardPosition);
             const dist = getDistance(unspawn.reasons);
 
             if (dist && (abs(diff.x) > HALF_CARD_SIZE || abs(diff.y) > HALF_CARD_SIZE)) {
                 deleteEntity(heap, entity);
             }
-        });
+        }
     }
 }
 
