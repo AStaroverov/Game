@@ -1,5 +1,6 @@
-import { getComponentStruct } from '../../lib/ECS/Entity';
-import { addEntity, deleteEntities, deleteEntity, getEntities } from '../../lib/ECS/Heap';
+import { UnknownComponent } from '../../lib/ECS/Component';
+import { getComponentStruct, SomeEntity } from '../../lib/ECS/Entity';
+import { addEntity, deleteEntity, getEntities } from '../../lib/ECS/Heap';
 import Enumerable from '../../lib/linq';
 import { RoadTile, Tile, TileType } from '../Components/Matrix/TilesMatrix/def';
 import { isBuildingTile } from '../Components/Matrix/TilesMatrix/fillers/utils/is';
@@ -8,8 +9,8 @@ import {
     matchNotBuilding,
     matchRoad,
 } from '../Components/Matrix/TilesMatrix/fillers/utils/patterns';
-import { PersonComponentID } from '../Components/Person';
 import { PositionComponentID } from '../Components/Position';
+import { TagComponent, TagComponentID } from '../Components/Tag';
 import { TVillage, TVillageActive, Village, VillagesComponentID } from '../Components/Villages';
 import { CardEntityID } from '../Entities/Card';
 import { createHouseEntity, HouseEntityID } from '../Entities/House';
@@ -85,8 +86,13 @@ export function VillageSpawnSystem(heap: GameHeap, ticker: TasksScheduler) {
     }
 
     function unspawn(village: TVillage) {
-        deleteEntities(heap, HouseEntityID);
-        unspawnNpc(village);
+        const filterByTag = (e: SomeEntity<TagComponent | UnknownComponent>) => {
+            return getComponentStruct(e, TagComponentID).tags?.includes(village.name);
+        };
+        const boundDeleteEntity = deleteEntity.bind(null, heap);
+
+        getEntities(heap, NPCEntityID).filter(filterByTag).forEach(boundDeleteEntity);
+        getEntities(heap, HouseEntityID).filter(filterByTag).forEach(boundDeleteEntity);
     }
 
     function spawnHouses(village: TVillageActive) {
@@ -96,7 +102,7 @@ export function VillageSpawnSystem(heap: GameHeap, ticker: TasksScheduler) {
             const tile = Matrix.get(place, 0, 0)!;
             const size = getBuildingAreaSize(place);
             const position = Vector.sum(village.area, tile, Vector.create(size.w / 2, size.h / 2));
-            const houseEntity = createHouseEntity(position, size);
+            const houseEntity = createHouseEntity({ tags: [village.name], position, size });
 
             addEntity(heap, houseEntity);
         }
@@ -116,22 +122,11 @@ export function VillageSpawnSystem(heap: GameHeap, ticker: TasksScheduler) {
                     heap,
                     createNpcEntity({
                         ...people[i++],
+                        tags: [village.name],
                         position: Vector.sum(area, Vector.extract(item)),
                     }),
                 );
             });
-    }
-
-    function unspawnNpc(village: TVillage) {
-        const names = village.people.map((p) => p.name);
-
-        for (const npc of getEntities(heap, NPCEntityID)) {
-            const person = getComponentStruct(npc, PersonComponentID);
-
-            if (names.includes(person.name)) {
-                deleteEntity(heap, npc);
-            }
-        }
     }
 }
 

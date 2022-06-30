@@ -9,6 +9,7 @@ import { createDirectionComponent } from '../../Components/DirectionComponent';
 import { createPersonComponent, TPerson } from '../../Components/Person';
 import { createPositionComponent } from '../../Components/Position';
 import { createBaseMeshComponent } from '../../Components/Renders/BaseMeshComponent';
+import { createTagComponent } from '../../Components/Tag';
 import { createTypeComponent } from '../../Components/Type';
 import { createVelocityComponent } from '../../Components/Velocity';
 import { createVisualSizeComponent } from '../../Components/VisualSize';
@@ -23,6 +24,7 @@ export const NPCEntityID = 'NPC_ENTITY' as const;
 export type NpcEntity = ReturnType<typeof createNpcEntity>;
 export const createNpcEntity = (
     props: TPerson & {
+        tags?: string[];
         type?: NPCType;
         action?: ActionableComponentProps;
         position?: TVector;
@@ -30,6 +32,7 @@ export const createNpcEntity = (
     },
 ) => {
     return createEntity(NPCEntityID, [
+        createTagComponent(props.tags),
         createTypeComponent(props.type ?? NPCType.Common),
         createPersonComponent(pick(props, 'name', 'sex', 'age')),
         createAutoUnspawnableComponent(props.unspawnReason),

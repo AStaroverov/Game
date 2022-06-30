@@ -23,6 +23,7 @@ export type Component<
 > = ComponentTag<Tag> & ComponentStruct<Struct> & ComponentInherited<Inherited>;
 
 export type AnyComponent = Component<any, any, any>;
+export type UnknownComponent = Component<unknown, object, unknown>;
 
 export type InheritedComponent<C extends Component<any, any, any>> = ComponentTag<unknown> &
     ComponentInherited<ExtractTag<C>> &
