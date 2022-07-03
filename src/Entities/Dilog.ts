@@ -71,7 +71,8 @@ export function renderDialogNode(
 
     if (textContainer === undefined) return;
 
-    const text = `${speakers[node.character[1]]}:\n` + node.text?.[lang];
+    const name = node.character[1] === 0 ? speakers[0] : speakers[1];
+    const text = `${name}:\n` + node.text?.[lang];
     const textTexture = new Text(text, {
         fontSize: 18,
         fill: 0xffffff,
