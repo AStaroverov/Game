@@ -1,3 +1,4 @@
+import { EDialogueName } from '../../assets/dialogue/dialogue';
 import { UnknownComponent } from '../../lib/ECS/Component';
 import { getComponentStruct, SomeEntity } from '../../lib/ECS/Entity';
 import { addEntity, deleteEntity, getEntities } from '../../lib/ECS/Heap';
@@ -27,6 +28,7 @@ import { random } from '../utils/random';
 import { range } from '../utils/range';
 import { Size, TSize, TVector, Vector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
+import { CommonAction } from './ActionSystem';
 
 const createBuildingPattern = (
     s1: number,
@@ -123,6 +125,10 @@ export function VillageSpawnSystem(heap: GameHeap, ticker: TasksScheduler) {
                     createNpcEntity({
                         ...people[i++],
                         tags: [village.name],
+                        action: {
+                            type: CommonAction.Dialog,
+                            dialogID: EDialogueName.Some_villager,
+                        },
                         position: Vector.sum(area, Vector.extract(item)),
                     }),
                 );

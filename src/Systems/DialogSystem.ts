@@ -1,74 +1,102 @@
-import { filter, finalize, interval, map, takeUntil, takeWhile, tap } from 'rxjs';
+import { firstValueFrom, mapTo, merge } from 'rxjs';
 
+import { dialogMap, ENodeType, TDialogueNode } from '../../assets/dialogue/dialogue';
 import { getComponentStruct } from '../../lib/ECS/Entity';
 import { deleteEntity, getEntities } from '../../lib/ECS/Heap';
-import { dialogs } from '../Components/Dialogs/data';
-import { DialogComponentID, updateDialogComponent } from '../Components/Dialogs/Dialog';
+import { DialogComponentID, setDialogNode } from '../Components/Dialogs/Dialog';
 import {
-    PlayerStoryComponentID,
-    PlayerStoryStep,
-    updatePlayerStoryStep,
-} from '../Components/PlayerStoryProgress';
+    DialogConstantsComponentID,
+    EDialogConstant,
+    TDialogConstants,
+} from '../Components/Dialogs/DialogConstants';
 import { PositionComponentID } from '../Components/Position';
 import { DialogEntity, DialogEntityID } from '../Entities/Dilog';
-import { GameStoryEntityID } from '../Entities/GameStory';
 import { PlayerEntityID } from '../Entities/Player';
 import { GameHeap } from '../heap';
-import { abs } from '../utils/math';
+import { booleanToString } from '../utils/booleanToString';
+import { iterateDialog } from '../utils/dialogue';
 import { fromKeyPress } from '../utils/RX/keypress';
-import { negateVector, newVector, setVector, sumVector, widthVector } from '../utils/shape';
+import { TVector, Vector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
+import { throwingError } from '../utils/throwingError';
 
-const startPosition = newVector(0, 0);
 const ranDialogs = new Set<DialogEntity>();
 
-export function runDialogSystem(heap: GameHeap, ticker: TasksScheduler): void {
-    const story = getEntities(heap, GameStoryEntityID)[0];
+export function DialogSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const player = getEntities(heap, PlayerEntityID)[0];
     const playerPosition = getComponentStruct(player, PositionComponentID);
 
-    ticker.addTimeInterval(() => {
-        const entity = getEntities(heap, DialogEntityID)[0];
+    ticker.addTimeInterval(async () => {
+        const dialogs = getEntities(heap, DialogEntityID);
 
-        if (entity && !ranDialogs.has(entity)) {
-            ranDialogs.add(entity);
+        if (dialogs.length === 0) return;
+        if (ranDialogs.has(dialogs[0])) return;
 
-            const dialog = getComponentStruct(entity, DialogComponentID);
-            const dialogLength = dialogs[dialog.id].length;
-
-            setVector(startPosition, playerPosition);
-
-            fromKeyPress('Space')
-                .pipe(
-                    map(() => dialog.step + 1),
-                    tap((step) => {
-                        updateDialogComponent(dialog, { step });
-                    }),
-                    finalize(() => {
-                        stopDialog(entity);
-
-                        if (dialog.step >= dialogLength) {
-                            updatePlayerStoryStep(
-                                getComponentStruct(story, PlayerStoryComponentID),
-                                PlayerStoryStep.SearchFirstVillage,
-                            );
-                        }
-                    }),
-                    takeUntil(interval(300).pipe(filter(shouldStopByDistance))),
-                    takeWhile((step) => step < dialogLength),
-                )
-                .subscribe();
-        }
+        ranDialogs.add(dialogs[0]);
+        await Promise.race([runDialog(dialogs[0]), isGoAway(ticker, playerPosition)]);
+        ranDialogs.delete(dialogs[0]);
+        deleteEntity(heap, dialogs[0]);
     }, 100);
+}
 
-    function shouldStopByDistance() {
-        const width = abs(widthVector(sumVector(startPosition, negateVector(playerPosition))));
+async function runDialog(entity: DialogEntity) {
+    const dialog = getComponentStruct(entity, DialogComponentID);
+    const constants = getComponentStruct(entity, DialogConstantsComponentID);
+    const dialogData = dialogMap[dialog.id];
 
-        return width > 1;
+    const dialogIterator = iterateDialog(dialogData.nodes);
+    let step = dialogIterator.next();
+    let node: undefined | TDialogueNode;
+    let nodeName: undefined | string;
+
+    while (!step.done) {
+        node = step.value!;
+
+        while (node.nodeType === ENodeType.ConditionBranch) {
+            const result = executeCondition(node.text, constants);
+
+            step = dialogIterator.next(node.branches[booleanToString(result)]);
+            node = step.value!;
+        }
+
+        setDialogNode(dialog, node);
+
+        if (node.nodeType === ENodeType.ShowMessage) {
+            if (node.choices !== undefined) {
+                const choice = await firstValueFrom(
+                    merge(
+                        ...node.choices.map((choice, i) =>
+                            fromKeyPress(`Digit${i + 1}`).pipe(mapTo(choice)),
+                        ),
+                    ),
+                );
+                nodeName = choice.next;
+            } else {
+                await firstValueFrom(fromKeyPress('Space'));
+                nodeName = node.next;
+            }
+        }
+
+        step = dialogIterator.next(nodeName);
     }
+}
 
-    function stopDialog(entity: DialogEntity) {
-        ranDialogs.delete(entity);
-        deleteEntity(heap, entity);
-    }
+async function isGoAway(ticker: TasksScheduler, playerPosition: TVector): Promise<void> {
+    const startPlayerPosition = Vector.copy(playerPosition);
+
+    return new Promise((resolve) => {
+        ticker.addFrameInterval(
+            () => Vector.distance(startPlayerPosition, playerPosition) > 1 && resolve(),
+            5,
+        );
+    });
+}
+
+function executeCondition(_code: string, constants: TDialogConstants): boolean {
+    const code = _code.replaceAll(/\{\{(.+)\}\}/g, (_, key) => {
+        return key in constants
+            ? constants[key as EDialogConstant]
+            : throwingError(`No existed variable in dialog: ${key}`);
+    });
+    return eval(code);
 }

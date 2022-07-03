@@ -2,7 +2,6 @@ import { Renderer as PixiRenderer } from '@pixi/core';
 import { Container, SCALE_MODES, settings } from 'pixi.js';
 
 import { RENDER_RECT, TILE_SIZE } from '../CONST';
-import { trunc } from '../utils/math';
 
 settings.SCALE_MODE = SCALE_MODES.NEAREST;
 
@@ -53,7 +52,7 @@ export class Renderer {
         const renderer = this.renderers[layer];
         const scene = this.scenes[layer];
 
-        scene.position.x = trunc(renderer.screen.width / 2 - (TILE_SIZE * RENDER_RECT.w) / 2);
-        scene.position.y = trunc(renderer.screen.height / 2 - (TILE_SIZE * RENDER_RECT.h) / 2);
+        scene.position.x = renderer.screen.width / 2 - (TILE_SIZE * RENDER_RECT.w) / 2 + TILE_SIZE;
+        scene.position.y = renderer.screen.height / 2 - (TILE_SIZE * RENDER_RECT.h) / 2 + TILE_SIZE;
     }
 }

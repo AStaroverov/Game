@@ -1,17 +1,26 @@
-import { defaults } from 'lodash';
-
+import { EDialogueName, TDialogueMessageNode } from '../../../assets/dialogue/dialogue';
 import { createComponent, ExtractStruct } from '../../../lib/ECS/Component';
-import { DialogID } from './data';
 
-export const DialogComponentID = 'Dialog' as const;
-export type DialogStruct = { id: DialogID; step: number };
+export type TDialogId = EDialogueName;
+
+export const DialogComponentID = 'DIALOG' as const;
 export type DialogComponent = ReturnType<typeof createDialogComponent>;
-export const createDialogComponent = (props: { id: DialogID; step?: number }) =>
-    createComponent(DialogComponentID, defaults({ step: 0 }, props) as DialogStruct);
+export const createDialogComponent = (props: {
+    id: TDialogId;
+    speakers: string[];
+    node?: TDialogueMessageNode;
+}) => createComponent(DialogComponentID, { ...props });
 
-export function updateDialogComponent(
+export function setDialogSpeakers(
     struct: ExtractStruct<DialogComponent>,
-    { step }: { step: number },
-) {
-    struct.step = step;
+    speakers: string[],
+): void {
+    struct.speakers = speakers;
+}
+
+export function setDialogNode(
+    struct: ExtractStruct<DialogComponent>,
+    node: TDialogueMessageNode,
+): void {
+    struct.node = node;
 }

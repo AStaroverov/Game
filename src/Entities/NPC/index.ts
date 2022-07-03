@@ -28,6 +28,7 @@ export const createNpcEntity = (
         type?: NPCType;
         action?: ActionableComponentProps;
         position?: TVector;
+        direction?: TVector;
         unspawnReason?: UnspawnReason[];
     },
 ) => {
@@ -38,7 +39,7 @@ export const createNpcEntity = (
         createAutoUnspawnableComponent(props.unspawnReason),
         createVisualSizeComponent(Size.create(1)),
         createPositionComponent(props.position),
-        createDirectionComponent(),
+        createDirectionComponent(props.direction),
         createVelocityComponent(),
         createBaseMeshComponent(),
         createAtlasAnimationComponent({

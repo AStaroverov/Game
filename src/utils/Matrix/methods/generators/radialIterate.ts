@@ -5,12 +5,14 @@ import { createGetItem, Item } from '../utils';
 
 export function* radialIterate<T>(
     matrix: TMatrix<T>,
-    sx: number,
-    sy: number,
+    sx?: number,
+    sy?: number,
     radius?: number,
 ): IterableIterator<Item<T>> {
-    const getItem = createGetItem(matrix, sx, sy);
+    sx = floor(matrix.w / 2);
+    sy = floor(matrix.h / 2);
     radius = (radius ?? floor(max(matrix.w, matrix.h) / 2)) - 1;
+    const getItem = createGetItem(matrix, sx, sy);
 
     yield getItem(0, 0);
 

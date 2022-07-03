@@ -1,11 +1,18 @@
 import { filter, fromEvent } from 'rxjs';
 
-import { getComponentStruct, hasComponent, SomeEntity } from '../../../lib/ECS/Entity';
+import {
+    getComponentStruct,
+    hasComponent,
+    SomeEntity,
+    tryGetComponentStruct,
+} from '../../../lib/ECS/Entity';
 import { addEntity, filterEntities, getEntities } from '../../../lib/ECS/Heap';
 import { ActionableComponent, ActionableComponentID } from '../../Components/Actionable';
+import { DialogComponentID, TDialogId } from '../../Components/Dialogs/Dialog';
 import { DirectionComponentID } from '../../Components/DirectionComponent';
+import { PersonComponentID, TPersonComponent } from '../../Components/Person';
 import { PositionComponent, PositionComponentID } from '../../Components/Position';
-import { createDialogEntity } from '../../Entities/Dilog';
+import { createDialogEntity, DialogEntityID } from '../../Entities/Dilog';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
 import { negateVector, sumVector, widthVector } from '../../utils/shape';
@@ -16,7 +23,7 @@ export enum CommonAction {
     Dialog = 'Dialog',
 }
 
-export function runActionSystem(heap: GameHeap): void {
+export function ActionSystem(heap: GameHeap): void {
     const player = getEntities(heap, PlayerEntityID)[0];
     const position = getComponentStruct(player, PositionComponentID);
     const direction = getComponentStruct(player, DirectionComponentID);
@@ -46,8 +53,24 @@ export function runActionSystem(heap: GameHeap): void {
                 const action = getComponentStruct(entity, ActionableComponentID);
 
                 if (action.type === CommonAction.Dialog) {
-                    addEntity(heap, createDialogEntity({ id: action.dialogID }));
+                    const person = tryGetComponentStruct<TPersonComponent>(
+                        entity,
+                        PersonComponentID,
+                    );
+
+                    addDialogEntity(heap, action.dialogID, person?.name ?? '');
                 }
             });
         });
+}
+
+function addDialogEntity(heap: GameHeap, id: TDialogId, name: string): void {
+    const dialogExist = getEntities(heap, DialogEntityID).some((dialog) => {
+        const struct = getComponentStruct(dialog, DialogComponentID);
+        return struct.id === id;
+    });
+
+    if (!dialogExist) {
+        addEntity(heap, createDialogEntity({ id, speakers: ['You', name] }));
+    }
 }

@@ -1,16 +1,18 @@
 import { GAME_VERSION } from '../CONST';
 import { createGameHeap } from '../heap';
 import { Renderer } from '../Renderer';
+import { ActionSystem } from '../Systems/ActionSystem';
 import { RunCardSystem } from '../Systems/CardSystem';
 import { colliderSystem } from '../Systems/colliderSystem';
 import { ControlsSystem } from '../Systems/controlsSystem';
+import { DialogSystem } from '../Systems/DialogSystem';
 import { GameTimeSystem } from '../Systems/gameTimeSystem';
 import { initCardSystem } from '../Systems/Init/initCardSystem';
-import { initGameStorySystem } from '../Systems/Init/initGameStorySystem';
 import { InitLightSystem } from '../Systems/Init/initLightSystem';
 import { initMatrixMeshesSystem } from '../Systems/Init/initMatrixMeshesSystem';
 import { initMeshesSystem } from '../Systems/Init/initMeshesSystem';
 import { initPlayerSystem } from '../Systems/Init/initPlayerSystem';
+import { initSettingsSystem } from '../Systems/Init/initSettingsSystem';
 import { initWorldSystem } from '../Systems/Init/initWorldSystem';
 import { NpcSpawnSystem } from '../Systems/NpcSpawnSystem';
 import { positionBodySystem } from '../Systems/positionBodySystem';
@@ -18,6 +20,7 @@ import { AtlasAnimationRenderSystem } from '../Systems/Renders/atlasAnimationRen
 import { CardMeshPositionSystem } from '../Systems/Renders/cardMeshPositionSystem';
 import { CardReliefSystem } from '../Systems/Renders/cardReliefSystem';
 import { CardSurfaceSystem } from '../Systems/Renders/cardSurfaceSystem';
+import { DialogRenderSystem } from '../Systems/Renders/DialogRenderSystem';
 import { GlobalLightRenderSystem } from '../Systems/Renders/globalLightRenderSystem';
 import { HouseRenderSystem } from '../Systems/Renders/HouseRenderSystem';
 import { MeshesPositionSystem } from '../Systems/Renders/MeshesPositionSystem';
@@ -42,8 +45,8 @@ export function game(): void {
     saveSystem(heap);
 
     // Init Systems
+    initSettingsSystem(heap);
     initWorldSystem(heap);
-    initGameStorySystem(heap);
     InitLightSystem(heap);
     initCardSystem(heap);
     initPlayerSystem(heap);
@@ -52,7 +55,7 @@ export function game(): void {
 
     // Systems
     ControlsSystem(heap, ticker);
-    // runActionSystem(heap);
+    ActionSystem(heap);
 
     GameTimeSystem(heap, ticker);
     colliderSystem(heap, ticker);
@@ -87,8 +90,8 @@ export function game(): void {
     // healBarRenderSystem(heap, ticker);
 
     // DIALOG
-    // runDialogSystem(heap, ticker);
-    // runDialogRenderSystem(heap, ticker);
+    DialogSystem(heap, ticker);
+    DialogRenderSystem(heap, ticker);
 
     document.body.append(renderer.renderers['Main'].view);
     document.body.append(renderer.renderers['Fixed'].view);

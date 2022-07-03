@@ -1,32 +1,36 @@
+import { TDialogueNode } from '../../../assets/dialogue/dialogue';
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { getEntities } from '../../../lib/ECS/Heap';
-import { dialogs } from '../../Components/Dialogs/data';
 import { DialogComponentID } from '../../Components/Dialogs/Dialog';
+import { LangComponentID } from '../../Components/Lang';
 import { MeshComponentID, shouldInitMesh } from '../../Components/Renders/MeshComponent';
-import { DialogEntityID, initDialogEntityMesh, setDialogText } from '../../Entities/Dilog';
+import { DialogEntityID, initRenderDialog, renderDialogNode } from '../../Entities/Dilog';
+import { SettingsEntityID } from '../../Entities/Settings';
 import { GameHeap } from '../../heap';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
-export function runDialogRenderSystem(heap: GameHeap, ticker: TasksScheduler): void {
-    let dialogStep = -1;
+export function DialogRenderSystem(heap: GameHeap, ticker: TasksScheduler): void {
+    const settings = getEntities(heap, SettingsEntityID)[0];
+    const lang = getComponentStruct(settings, LangComponentID);
+
+    let prevNode: undefined | TDialogueNode;
 
     ticker.addTimeInterval(() => {
         const entity = getEntities(heap, DialogEntityID)[0];
 
-        if (entity) {
-            const mesh = getComponentStruct(entity, MeshComponentID);
-            const dialog = getComponentStruct(entity, DialogComponentID);
+        if (entity === undefined) return;
 
-            if (shouldInitMesh(mesh)) {
-                dialogStep = -1;
-                initDialogEntityMesh(mesh);
-            }
+        const mesh = getComponentStruct(entity, MeshComponentID);
+        const dialog = getComponentStruct(entity, DialogComponentID);
 
-            if (dialogStep !== dialog.step) {
-                const dialogDataStep = dialogs[dialog.id][(dialogStep = dialog.step)];
-
-                setDialogText(entity, `${dialogDataStep.speaker}\n\n${dialogDataStep.content}`);
-            }
+        if (shouldInitMesh(mesh)) {
+            prevNode = undefined;
+            initRenderDialog(mesh);
         }
-    }, 300);
+
+        if (dialog.node && prevNode !== dialog.node) {
+            prevNode = dialog.node;
+            renderDialogNode(entity, dialog.speakers, dialog.node, lang.lang);
+        }
+    }, 100);
 }

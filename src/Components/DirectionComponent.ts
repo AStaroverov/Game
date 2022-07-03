@@ -1,12 +1,12 @@
 import { createComponent, ExtractStruct } from '../../lib/ECS/Component';
-import { newVector } from '../utils/shape';
+import { TVector, Vector } from '../utils/shape';
 
 export const DirectionComponentID = 'DIRECTION' as const;
 
 export type DirectionComponent = ReturnType<typeof createDirectionComponent>;
 
-export const createDirectionComponent = (x = 0, y = 0) =>
-    createComponent(DirectionComponentID, newVector(x, y));
+export const createDirectionComponent = (props?: TVector) =>
+    createComponent(DirectionComponentID, Vector.create(props?.x ?? 0, props?.y ?? 0));
 
 export function setDirection(
     struct: ExtractStruct<DirectionComponent>,

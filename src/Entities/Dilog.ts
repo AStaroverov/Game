@@ -1,9 +1,11 @@
-import { Container, Text } from 'pixi.js';
+import { Container, Graphics, Text } from 'pixi.js';
 
+import { TDialogueMessageNode } from '../../assets/dialogue/dialogue';
 import { ExtractStruct } from '../../lib/ECS/Component';
 import { createEntity, getComponentStruct } from '../../lib/ECS/Entity';
-import { DialogID } from '../Components/Dialogs/data';
-import { createDialogComponent } from '../Components/Dialogs/Dialog';
+import { createDialogComponent, DialogComponent } from '../Components/Dialogs/Dialog';
+import { createDialogConstantsComponent } from '../Components/Dialogs/DialogConstants';
+import { ELang } from '../Components/Lang';
 import {
     createMeshComponent,
     MeshComponent,
@@ -13,14 +15,15 @@ import { $ref } from '../CONST';
 import { StageName } from '../Renderer';
 
 type DialogGroup = Container & {
-    groupText: Container;
+    textContainer: Container;
 };
 
 export const DialogEntityID = 'DIALOG_ENTITY' as const;
 export type DialogEntity = ReturnType<typeof createDialogEntity>;
-export const createDialogEntity = (props: { id: DialogID }) => {
+export const createDialogEntity = (props: ExtractStruct<DialogComponent>) => {
     return createEntity(DialogEntityID, [
         createDialogComponent(props),
+        createDialogConstantsComponent(),
         createMeshComponent<DialogGroup>({ layer: StageName.Fixed }),
     ]);
 };
@@ -30,45 +33,61 @@ const HEIGHT = 200;
 const PADDING = 10;
 export const TEXT_MAX_WIDTH = WIDTH - 2 * PADDING;
 
-export function initDialogEntityMesh(struct: ExtractStruct<MeshComponent>): void {
-    const group = new Container();
-    // const groupText = new Group();
-    // const background = new Mesh(
-    //     new PlaneGeometry(WIDTH, HEIGHT),
-    //     new MeshLambertMaterial({
-    //         color: 0x0,
-    //         opacity: 0.7,
-    //         transparent: true,
-    //     }),
-    // );
-    //
-    // group.position.x = 0;
-    // group.position.y = HEIGHT - window.innerHeight / 2;
-    // group.position.z = 1;
-    //
-    // groupText.position.x = -WIDTH / 2 + PADDING;
-    // groupText.position.y = HEIGHT / 2 - PADDING;
-    // groupText.position.z = 2;
-    //
-    // group.groupText = groupText;
-    // group.add(background, groupText);
+export function initRenderDialog(struct: ExtractStruct<MeshComponent>): void {
+    const group = new Container() as DialogGroup;
+    const background = (() => {
+        const g = new Graphics();
 
-    // struct[$ref] = group;
+        g.beginFill(0x0, 0.7);
+        g.drawRect(0, 0, 3000, HEIGHT);
+        g.endFill();
+
+        return g;
+    })();
+    const textContainer = (() => {
+        const g = new Container();
+
+        g.position.x = window.innerWidth / 2 - WIDTH / 2 + PADDING;
+        g.position.y = PADDING;
+
+        return g;
+    })();
+
+    group.textContainer = textContainer;
+    group.position.y = window.innerHeight - HEIGHT + PADDING;
+
+    group.addChild(background, textContainer);
+    struct[$ref] = group;
 }
 
-export function setDialogText(entity: DialogEntity, text: string): void {
+export function renderDialogNode(
+    entity: DialogEntity,
+    speakers: string[],
+    node: TDialogueMessageNode,
+    lang: ELang,
+): void {
     const struct = getComponentStruct(entity, MeshComponentID);
-    const groupText = struct[$ref]?.groupText;
+    const textContainer = struct[$ref]?.textContainer;
 
-    if (groupText === undefined) return;
+    if (textContainer === undefined) return;
 
-    const object = new Text(text, {
+    const text = `${speakers[node.character[1]]}:\n` + node.text?.[lang];
+    const textTexture = new Text(text, {
+        fontSize: 18,
+        fill: 0xffffff,
+        wordWrap: true,
+        wordWrapWidth: TEXT_MAX_WIDTH,
+    });
+    const choices = node.choices?.map((c, i) => `${i + 1}: ${c.text[lang]}`).join('\n') ?? '';
+    const choicesTexture = new Text(choices, {
         fontSize: 18,
         fill: 0xffffff,
         wordWrap: true,
         wordWrapWidth: TEXT_MAX_WIDTH,
     });
 
-    groupText.removeChildren();
-    groupText.addChild(object);
+    choicesTexture.y = textTexture.height;
+
+    textContainer.removeChildren();
+    textContainer.addChild(textTexture, choicesTexture);
 }
