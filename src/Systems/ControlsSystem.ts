@@ -1,4 +1,4 @@
-import { filter, fromEvent } from 'rxjs';
+import { filter, fromEvent, scan } from 'rxjs';
 
 import { getComponentStruct } from '../../lib/ECS/Entity';
 import { getEntities } from '../../lib/ECS/Heap';
@@ -6,8 +6,10 @@ import { DirectionComponentID } from '../Components/DirectionComponent';
 import { setVelocityByVector, VelocityComponentID } from '../Components/Velocity';
 import { PlayerEntityID } from '../Entities/Player';
 import { GameHeap } from '../heap';
+import { fromKeyPress } from '../utils/RX/keypress';
 import { mulVector, TVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
+import { BackpackRenderSystem } from './Renders/UI/BackpackRenderSystem';
 
 export function ControlsSystem(heap: GameHeap, ticker: TasksScheduler): void {
     const playerEntity = getEntities(heap, PlayerEntityID)[0];
@@ -25,6 +27,15 @@ export function ControlsSystem(heap: GameHeap, ticker: TasksScheduler): void {
         .subscribe((e) => {
             onArrowUp(e, playerDirection);
         });
+
+    fromKeyPress('KeyO')
+        .pipe(
+            scan(
+                (off) => (off ? off() : BackpackRenderSystem(heap)),
+                undefined as void | VoidFunction,
+            ),
+        )
+        .subscribe();
 
     ticker.addFrameInterval(() => {
         setVelocityByVector(playerVelocity, mulVector(playerDirection, 0.005));

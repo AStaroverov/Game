@@ -15,7 +15,7 @@ import { initPlayerSystem } from '../Systems/Init/initPlayerSystem';
 import { initSettingsSystem } from '../Systems/Init/initSettingsSystem';
 import { initWorldSystem } from '../Systems/Init/initWorldSystem';
 import { NpcSpawnSystem } from '../Systems/NpcSpawnSystem';
-import { positionBodySystem } from '../Systems/positionBodySystem';
+import { PositionBodySystem } from '../Systems/positionBodySystem';
 import { AtlasAnimationRenderSystem } from '../Systems/Renders/atlasAnimationRenderSystem';
 import { CardMeshPositionSystem } from '../Systems/Renders/cardMeshPositionSystem';
 import { CardReliefSystem } from '../Systems/Renders/cardReliefSystem';
@@ -31,14 +31,13 @@ import { RotateRenderSystem } from '../Systems/Renders/rotateRenderSystem';
 import { UnspawnSystem } from '../Systems/unspawnSystem';
 import { saveSystem } from '../Systems/Utils/saveSystem';
 import { VillageSpawnSystem } from '../Systems/VillageSpawnSystem';
-import { tasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
+import { ticker } from '../utils/ticker';
 
 export function game(): void {
     const saveString = localStorage.getItem(`SAVE_${GAME_VERSION}`);
     const saveObject = saveString ? JSON.parse(saveString) : undefined;
 
     const heap = createGameHeap(saveObject);
-    const ticker = tasksScheduler;
     const renderer = new Renderer();
 
     // Utils
@@ -60,7 +59,7 @@ export function game(): void {
     GameTimeSystem(heap, ticker);
     colliderSystem(heap, ticker);
 
-    positionBodySystem(heap, ticker);
+    PositionBodySystem(heap, ticker);
 
     RunCardSystem(heap, ticker);
     // playerSystem(heap, ticker);
@@ -86,8 +85,6 @@ export function game(): void {
 
     PlayerRenderSystem(heap, ticker);
     HouseRenderSystem(heap, ticker);
-
-    // healBarRenderSystem(heap, ticker);
 
     // DIALOG
     DialogSystem(heap, ticker);

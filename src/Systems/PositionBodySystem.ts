@@ -8,7 +8,7 @@ import { TICK_TIME } from '../utils/fps';
 import { mulVector, setVector, sumVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 
-export function positionBodySystem(heap: GameHeap, ticker: TasksScheduler): void {
+export function PositionBodySystem(heap: GameHeap, ticker: TasksScheduler): void {
     ticker.addFrameInterval(tick, 1);
 
     function tick() {
