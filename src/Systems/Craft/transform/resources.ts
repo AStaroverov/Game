@@ -1,27 +1,17 @@
-import { Arr } from '../../../utils/ArrayUtils';
 import { ECraftAction } from '../actions';
 import { createName } from '../names';
 import { TCraftResource } from '../resources';
+import { mixDna, transformDna } from './dna';
 import { mixFeatures, transformFeatures } from './features';
 
-export function transformResources(
+export function mixResources(
     resources: TCraftResource[],
-    action: ECraftAction,
-    name: string = createName(resources, action),
+    name: string = createName(resources, ECraftAction.Mix),
 ): TCraftResource {
-    const transformedResources =
-        action === ECraftAction.Mix
-            ? resources
-            : resources.map((r) => transformResource(r, action, '__transformResources__'));
-    const transformedFeatures = transformedResources.map(({ features }) => features);
-
     return {
-        dna: resources[0].dna,
         name,
-        features:
-            transformedFeatures.length === 1
-                ? Arr.flat(transformedFeatures)
-                : mixFeatures(transformedFeatures),
+        dna: mixDna(resources.map((r) => r.dna)),
+        features: mixFeatures(resources.map((r) => r.features)),
     };
 }
 
@@ -31,8 +21,8 @@ export function transformResource(
     name: string = createName([resource], action),
 ): TCraftResource {
     return {
-        dna: resource.dna,
         name,
+        dna: transformDna(resource.dna, action),
         features: transformFeatures(resource.features, action),
     };
 }

@@ -10,8 +10,15 @@ export enum ECraftResourceFeature {
     Crushed = 'Crushed',
 }
 
+export const MAX_CRAFT_RESOURCE_SIZE = 100;
+
+export type TCraftResourceDna = {
+    size: number;
+    sequence: string;
+};
+
 export type TCraftResource = {
     name: string;
     features: ECraftResourceFeature[];
-    dna: number;
+    dna: TCraftResourceDna;
 };

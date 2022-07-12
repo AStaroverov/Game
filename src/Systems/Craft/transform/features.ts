@@ -83,14 +83,14 @@ const MIX_RULES = [
     },
     {
         match: overEvery([
-            some((f) => f === ECraftResourceFeature.Wet || ECraftResourceFeature.Watery),
+            some((f) => f === ECraftResourceFeature.Wet || f === ECraftResourceFeature.Watery),
             every((f) => f !== ECraftResourceFeature.Dry && f !== ECraftResourceFeature.Liquid),
         ]),
         replace: (fs: ECraftResourceFeature[]) => [ECraftResourceFeature.Wet],
     },
     {
         match: overEvery([
-            some((f) => f === ECraftResourceFeature.Wet || ECraftResourceFeature.Watery),
+            some((f) => f === ECraftResourceFeature.Wet || f === ECraftResourceFeature.Watery),
             some((f) => f === ECraftResourceFeature.Dry),
             every((f) => f !== ECraftResourceFeature.Liquid),
         ]),

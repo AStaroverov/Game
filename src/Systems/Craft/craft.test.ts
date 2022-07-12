@@ -1,13 +1,15 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { seedResourceMap } from '../../Components/Backpack/resources';
+import { ESeedResourceName, getSeedResources } from '../../Components/CraftResources/resources';
 import { ECraftAction, getFeaturesAvailableActions, getResourcesAvailableActions } from './actions';
 import { ECraftResourceFeature } from './resources';
 import { transformResource, transformResources } from './transform/resources';
 
+const { resourcesMap } = getSeedResources();
+
 describe('Craft ', () => {
     it('transform Lemon', () => {
-        const resource = seedResourceMap.Lemon;
+        const resource = resourcesMap.Lemon;
         const actions = getFeaturesAvailableActions(resource.features);
 
         expect(actions.sort()).toEqual([
@@ -39,7 +41,7 @@ describe('Craft ', () => {
     });
 
     it('transform Gross', () => {
-        const resource = seedResourceMap.Gross;
+        const resource = resourcesMap.Gross;
         const actions = getFeaturesAvailableActions(resource.features);
 
         expect(actions.sort()).toEqual([ECraftAction.Dry, ECraftAction.Grind]);
@@ -61,7 +63,7 @@ describe('Craft ', () => {
     });
 
     it('transform Carnation', () => {
-        const resource = seedResourceMap.Carnation;
+        const resource = resourcesMap.Carnation;
         const actions = getFeaturesAvailableActions(resource.features);
 
         expect(actions.sort()).toEqual([ECraftAction.Grind]);
@@ -74,85 +76,71 @@ describe('Craft ', () => {
         ]);
     });
 
-    it('transform double dry', () => {
-        const res = [seedResourceMap.Garlic, seedResourceMap['Cocoa beans']];
-        const actions = getResourcesAvailableActions(res);
-
-        expect(actions.sort()).toEqual([ECraftAction.Grind]);
-
-        const result = transformResources(res, ECraftAction.Grind, '');
-
-        expect(result.features.slice().sort()).toEqual([
-            ECraftResourceFeature.Crushed,
-            ECraftResourceFeature.Dry,
-        ]);
-    });
-
-    it('transform double wet', () => {
-        const res = [seedResourceMap.Lemon, seedResourceMap.Gross];
-        const actions = getResourcesAvailableActions(res);
-
-        expect(actions.sort()).toEqual([ECraftAction.Grind]);
-
-        const result = transformResources(res, ECraftAction.Grind, 'Ground Lemon, Gross');
-
-        expect(result.features.slice().sort()).toEqual([
-            ECraftResourceFeature.Crushed,
-            ECraftResourceFeature.Viscous,
-            ECraftResourceFeature.Wet,
-        ]);
-    });
-
-    it('transform Garlic,Lemon,Gross', () => {
-        const res = [seedResourceMap.Garlic, seedResourceMap.Lemon, seedResourceMap.Gross];
-        const actions = getResourcesAvailableActions(res);
-
-        expect(actions.sort()).toEqual([ECraftAction.Grind]);
-
-        const result = transformResources(res, ECraftAction.Grind, '');
-
-        expect(result.features.slice().sort()).toEqual([
-            ECraftResourceFeature.Crushed,
-            ECraftResourceFeature.Viscous,
-            ECraftResourceFeature.Wet,
-        ]);
-    });
-
-    it('transform Water,Garlic', () => {
-        const res = [seedResourceMap.Water, seedResourceMap.Garlic];
-        const actions = getResourcesAvailableActions(res);
-
-        expect(actions.sort()).toEqual([ECraftAction.Mix]);
-
-        const result = transformResources(res, ECraftAction.Mix, '');
-
-        expect(result.features.slice().sort()).toEqual([ECraftResourceFeature.Liquid]);
-    });
-
-    it('transform Water,Lemon', () => {
-        const res = [seedResourceMap.Water, seedResourceMap.Lemon];
-        const actions = getResourcesAvailableActions(res);
-
-        expect(actions.sort()).toEqual([ECraftAction.Mix]);
-
-        const result = transformResources(res, ECraftAction.Mix, '');
-
-        expect(result.features.slice().sort()).toEqual([ECraftResourceFeature.Liquid]);
-    });
-
-    it('transform Garlic,Lemon,Gross + Water', () => {
-        const seedResources = [
-            seedResourceMap.Garlic,
-            seedResourceMap.Lemon,
-            seedResourceMap.Gross,
-        ];
-        const resource1 = transformResources(seedResources, ECraftAction.Grind, '');
-        const resource2 = transformResources(
-            [resource1, seedResourceMap.Water],
-            ECraftAction.Mix,
-            '',
+    it('cant mix', () => {
+        expect([]).toEqual(
+            getResourcesAvailableActions([
+                resourcesMap.Garlic,
+                resourcesMap[ESeedResourceName.CocoaBeans],
+            ]),
         );
+        expect([]).toEqual(getResourcesAvailableActions([resourcesMap.Lemon, resourcesMap.Gross]));
+    });
 
-        expect(resource2.features.slice().sort()).toEqual([ECraftResourceFeature.Liquid]);
+    it('Mix Water,Garlic', () => {
+        const res = [resourcesMap.Water, resourcesMap.Garlic];
+        const actions = getResourcesAvailableActions(res);
+
+        expect(actions.sort()).toEqual([ECraftAction.Mix]);
+
+        const result = transformResources(res, ECraftAction.Mix, '');
+
+        expect(result.features.slice().sort()).toEqual([ECraftResourceFeature.Liquid]);
+    });
+
+    it('Mix Water,Lemon', () => {
+        const res = [resourcesMap.Water, resourcesMap.Lemon];
+        const actions = getResourcesAvailableActions(res);
+
+        expect(actions.sort()).toEqual([ECraftAction.Mix]);
+
+        const result = transformResources(res, ECraftAction.Mix, '');
+
+        expect(result.features.slice().sort()).toEqual([ECraftResourceFeature.Liquid]);
+    });
+
+    it('Mix Ground Lemon,Garlic', () => {
+        const res = [
+            transformResource(resourcesMap.Lemon, ECraftAction.Grind),
+            transformResource(resourcesMap.Garlic, ECraftAction.Grind),
+        ];
+        const actions = getResourcesAvailableActions(res);
+
+        expect(actions.sort()).toEqual([ECraftAction.Mix]);
+
+        const result = transformResources(res, ECraftAction.Mix, '');
+
+        expect(result.features.slice().sort()).toEqual([
+            ECraftResourceFeature.Crushed,
+            ECraftResourceFeature.Viscous,
+            ECraftResourceFeature.Wet,
+        ]);
+    });
+
+    it('transform Ground Garlic,Lemon + Water', () => {
+        const res = [
+            resourcesMap.Water,
+            transformResource(resourcesMap.Lemon, ECraftAction.Grind),
+            transformResource(resourcesMap.Garlic, ECraftAction.Grind),
+        ];
+        const actions = getResourcesAvailableActions(res);
+
+        expect(actions.sort()).toEqual([ECraftAction.Mix]);
+
+        const result = transformResources(res, ECraftAction.Mix, '');
+
+        expect(result.features.slice().sort()).toEqual([
+            ECraftResourceFeature.Crushed,
+            ECraftResourceFeature.Liquid,
+        ]);
     });
 });

@@ -1,5 +1,14 @@
-import { ECraftResourceFeature, TCraftResource } from '../../Systems/Craft/resources';
-import { random } from '../../utils/random';
+import { uniq } from 'lodash';
+import { map, pipe } from 'lodash/fp';
+
+import {
+    ECraftResourceFeature,
+    MAX_CRAFT_RESOURCE_SIZE,
+    TCraftResource,
+    TCraftResourceDna,
+} from '../../Systems/Craft/resources';
+import { getRandomChar } from '../../utils/random';
+import { range } from '../../utils/range';
 
 export enum ESeedResourceName {
     Water = 'Water',
@@ -10,21 +19,26 @@ export enum ESeedResourceName {
     Carnation = 'Carnation',
 }
 
-type TDna = {
-    type: 'A';
-    size: 1e6;
-};
+const getRandomSequence = () =>
+    range(3)
+        .map(() => getRandomChar())
+        .join('');
 
 export const getSeedResources = () => {
-    const resourcesDna = Array(1e3)
-        .fill(0)
-        .map(() => random());
+    const resourcesDna: TCraftResourceDna[] = pipe(
+        map(getRandomSequence),
+        uniq,
+        map((sequence) => ({ sequence, size: MAX_CRAFT_RESOURCE_SIZE })),
+    )(range(1e3));
 
     const resourcesMap: Record<string, TCraftResource> = {
         [ESeedResourceName.Water]: {
             name: 'Water',
             features: [ECraftResourceFeature.Liquid],
-            dna: resourcesDna[0],
+            dna: {
+                size: 0,
+                sequence: resourcesDna[0].sequence,
+            },
         },
         [ESeedResourceName.Lemon]: {
             name: 'Lemon',
