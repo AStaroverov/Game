@@ -48,7 +48,9 @@ const canBeMixed = pipe(
 );
 
 export function getResourcesAvailableActions(resources: TCraftResource[]): ECraftAction[] {
-    return resources.length === 1
+    return resources.length === 0
+        ? []
+        : resources.length === 1
         ? getFeaturesAvailableActions(resources[0].features)
         : canBeMixed(resources)
         ? [ECraftAction.Mix]
