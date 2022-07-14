@@ -6,18 +6,20 @@ import {
     MAX_CRAFT_RESOURCE_SIZE,
     TCraftResource,
     TCraftResourceDna,
+    TCraftResourceID,
 } from '../../Systems/Craft/resources';
 import { getRandomChar } from '../../utils/random';
 import { range } from '../../utils/range';
+import { createResource } from './utils';
 
-export enum ESeedResourceName {
-    Water = 'Water',
-    Lemon = 'Lemon',
-    Gross = 'Gross',
-    Garlic = 'Garlic',
-    CocoaBeans = 'Cocoa beans',
-    Carnation = 'Carnation',
-}
+export const ESeedResourceId: Record<string, TCraftResourceID> = {
+    Water: 'Water' as TCraftResourceID,
+    Lemon: 'Lemon' as TCraftResourceID,
+    Gross: 'Gross' as TCraftResourceID,
+    Garlic: 'Garlic' as TCraftResourceID,
+    CocoaBeans: 'CocoaBeans' as TCraftResourceID,
+    Carnation: 'Carnation' as TCraftResourceID,
+};
 
 const getRandomSequence = () =>
     range(3)
@@ -32,39 +34,45 @@ export const getSeedResources = () => {
     )(range(1e3));
 
     const resourcesMap: Record<string, TCraftResource> = {
-        [ESeedResourceName.Water]: {
+        [ESeedResourceId.Water]: createResource({
+            id: ESeedResourceId.Water,
             name: 'Water',
             features: [ECraftResourceFeature.Liquid],
             dna: {
                 size: 0,
                 sequence: resourcesDna[0].sequence,
             },
-        },
-        [ESeedResourceName.Lemon]: {
+        }),
+        [ESeedResourceId.Lemon]: createResource({
+            id: ESeedResourceId.Lemon,
             name: 'Lemon',
             features: [ECraftResourceFeature.Watery, ECraftResourceFeature.Elastic],
             dna: resourcesDna[1],
-        },
-        [ESeedResourceName.Gross]: {
+        }),
+        [ESeedResourceId.Gross]: createResource({
+            id: ESeedResourceId.Gross,
             name: 'Gross',
             features: [ECraftResourceFeature.Wet, ECraftResourceFeature.Elastic],
             dna: resourcesDna[2],
-        },
-        [ESeedResourceName.Garlic]: {
+        }),
+        [ESeedResourceId.Garlic]: createResource({
+            id: ESeedResourceId.Garlic,
             name: 'Garlic',
             features: [ECraftResourceFeature.Dry],
             dna: resourcesDna[3],
-        },
-        [ESeedResourceName.CocoaBeans]: {
+        }),
+        [ESeedResourceId.CocoaBeans]: createResource({
+            id: ESeedResourceId.CocoaBeans,
             name: 'Cocoa beans',
             features: [ECraftResourceFeature.Dry],
             dna: resourcesDna[4],
-        },
-        [ESeedResourceName.Carnation]: {
+        }),
+        [ESeedResourceId.Carnation]: createResource({
+            id: ESeedResourceId.Carnation,
             name: 'Carnation',
             features: [ECraftResourceFeature.Dry, ECraftResourceFeature.Brittle],
             dna: resourcesDna[5],
-        },
+        }),
     };
 
     return { resourcesDna, resourcesMap };

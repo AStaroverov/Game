@@ -1,13 +1,17 @@
 import * as Tabs from '@radix-ui/react-tabs';
-import clsx from 'clsx';
 import cxs from 'cxs';
 import React, { MouseEvent, ReactElement } from 'react';
 
 import { useSelectable } from '../../../../../lib/UI/hooks/useSelectable';
+import { getResourceName, renameCraftResource } from '../../../../Components/CraftResources';
+import { isRenameableResource } from '../../../../Components/CraftResources/utils';
 import { getPlayerBackpack } from '../../../../Entities/Player';
+import { getCraftResources } from '../../../../Entities/World';
 import { useFunction } from '../../../../utils/React/hook/useFunction';
 import { useMutableMemo } from '../../../../utils/React/hook/useMutableMemo';
+import { TCraftResourceID } from '../../../Craft/resources';
 import { useGameHeap } from '../Context/useGameHeap';
+import { BackpackItem } from './BackpackItem';
 import { Craft } from './Craft';
 
 const cns = {
@@ -21,29 +25,31 @@ const cns = {
         background: 'white',
         opacity: 0.8,
     }),
-    listItem: cxs({
-        cursor: 'pointer',
-        padding: '8px',
-    }),
-    selectedListItem: cxs({
-        background: 'red',
-    }),
 };
 
 export function Backpack(): ReactElement {
     const gameHeap = useGameHeap();
     const backpack = getPlayerBackpack(gameHeap);
-    const resourcesCount = useMutableMemo(
+    const resources = getCraftResources(gameHeap);
+    const items = useMutableMemo(
         () =>
-            Object.entries(backpack.resourcesCount)
+            (Object.entries(backpack.resourcesCount) as [TCraftResourceID, number][])
                 .filter(([_, count]) => count > 0)
-                .map(([name, count]) => ({ name, count })),
-        [backpack.resourcesCount],
+                .map(([id, count]) => ({
+                    id,
+                    count,
+                    name: getResourceName(resources, id),
+                    isRenameable: isRenameableResource(id),
+                })),
+        [backpack.resourcesCount, resources.resourcesMap],
     );
-    const { selected, toggleSelect, resetSelected } = useSelectable([] as string[]);
-    const handleClickItem = useFunction((event: MouseEvent, name: string) => {
+    const { selected, toggleSelect, resetSelected } = useSelectable([] as TCraftResourceID[]);
+    const handleItemClick = useFunction((id: TCraftResourceID, event: MouseEvent) => {
         if (!event.shiftKey) resetSelected();
-        toggleSelect(name);
+        toggleSelect(id);
+    });
+    const handleItemRename = useFunction((id: TCraftResourceID, name: string) => {
+        renameCraftResource(resources, id, name);
     });
 
     return (
@@ -53,12 +59,13 @@ export function Backpack(): ReactElement {
                 <Tabs.Trigger value="Instruments">Instruments</Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content value="Resources">
+                <Craft resourceIds={selected} />
                 <BackpackItems
-                    items={resourcesCount}
+                    items={items}
                     selected={selected}
-                    onClickItem={handleClickItem}
+                    onItemClick={handleItemClick}
+                    onItemRename={handleItemRename}
                 />
-                <Craft resourceNames={selected} />
             </Tabs.Content>
             <Tabs.Content value="Instruments">Instruments</Tabs.Content>
         </Tabs.Root>
@@ -66,40 +73,26 @@ export function Backpack(): ReactElement {
 }
 
 function BackpackItems(props: {
-    items: { name: string; count: number }[];
-    selected: string[];
-    onClickItem: (e: MouseEvent, name: string) => unknown;
+    items: { id: TCraftResourceID; name: string; count: number; isRenameable: boolean }[];
+    selected: TCraftResourceID[];
+    onItemClick: (id: TCraftResourceID, e: MouseEvent) => unknown;
+    onItemRename: (id: TCraftResourceID, name: string) => unknown;
 }) {
     return (
         <>
-            {props.items.map(({ name, count }) => {
+            {props.items.map(({ id, name, count, isRenameable }) => {
                 return (
                     <BackpackItem
-                        key={name}
+                        key={id}
                         name={name}
                         count={count}
-                        isSelected={props.selected.includes(name)}
-                        onClick={(event) => props.onClickItem(event, name)}
+                        isSelected={props.selected.includes(id)}
+                        isRenameable={isRenameable}
+                        onClick={(event) => props.onItemClick(id, event)}
+                        onRename={(name) => props.onItemRename(id, name)}
                     />
                 );
             })}
         </>
-    );
-}
-
-function BackpackItem(props: {
-    name: string;
-    count: number;
-    isSelected: boolean;
-    onClick: (e: MouseEvent, name: string) => unknown;
-}) {
-    const cn = clsx(cns.listItem, {
-        [cns.selectedListItem]: props.isSelected,
-    });
-
-    return (
-        <div className={cn} onClick={(event) => props.onClick(event, props.name)}>
-            {props.name}: {props.count}
-        </div>
     );
 }

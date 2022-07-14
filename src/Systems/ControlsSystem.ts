@@ -6,7 +6,7 @@ import { DirectionComponentID } from '../Components/DirectionComponent';
 import { setVelocityByVector, VelocityComponentID } from '../Components/Velocity';
 import { PlayerEntityID } from '../Entities/Player';
 import { GameHeap } from '../heap';
-import { fromKeyPress } from '../utils/RX/keypress';
+import { fromKeyUp } from '../utils/RX/keypress';
 import { mulVector, TVector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 import { BackpackRenderSystem } from './Renders/UI/BackpackRenderSystem';
@@ -28,7 +28,7 @@ export function ControlsSystem(heap: GameHeap, ticker: TasksScheduler): void {
             onArrowUp(e, playerDirection);
         });
 
-    fromKeyPress('KeyO')
+    fromKeyUp('KeyO')
         .pipe(
             scan(
                 (off) => (off ? off() : BackpackRenderSystem(heap)),

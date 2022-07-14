@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { ESeedResourceName, getSeedResources } from '../../Components/CraftResources/resources';
+import { ESeedResourceId, getSeedResources } from '../../Components/CraftResources/resources';
 import { ECraftAction, getFeaturesAvailableActions, getResourcesAvailableActions } from './actions';
 import { ECraftResourceFeature } from './resources';
 import { transformResource, transformResources } from './transform/resources';
@@ -80,7 +80,7 @@ describe('Craft ', () => {
         expect([]).toEqual(
             getResourcesAvailableActions([
                 resourcesMap.Garlic,
-                resourcesMap[ESeedResourceName.CocoaBeans],
+                resourcesMap[ESeedResourceId.CocoaBeans],
             ]),
         );
         expect([]).toEqual(getResourcesAvailableActions([resourcesMap.Lemon, resourcesMap.Gross]));

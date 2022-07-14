@@ -1,3 +1,5 @@
+import { Opaque } from '../../types';
+
 export enum ECraftResourceFeature {
     Dry = 'Dry',
     Wet = 'Wet',
@@ -17,7 +19,10 @@ export type TCraftResourceDna = {
     sequence: string;
 };
 
+export type TCraftResourceID = Opaque<'CraftResource', string>;
+
 export type TCraftResource = {
+    id: TCraftResourceID;
     name: string;
     features: ECraftResourceFeature[];
     dna: TCraftResourceDna;

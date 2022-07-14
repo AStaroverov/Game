@@ -1,6 +1,6 @@
 import { createComponent, ExtractStruct } from '../../../lib/ECS/Component';
 import { ECraftAction } from '../../Systems/Craft/actions';
-import { TCraftResource } from '../../Systems/Craft/resources';
+import { TCraftResource, TCraftResourceID } from '../../Systems/Craft/resources';
 import { mixResources, transformResource } from '../../Systems/Craft/transform/resources';
 import { getSeedResources } from './resources';
 
@@ -15,7 +15,17 @@ export const createCraftResourcesComponent = () => {
     });
 };
 
-export function createResource(
+export function getResource(
+    { resourcesMap }: ExtractStruct<CraftResourcesComponent>,
+    id: TCraftResourceID,
+): TCraftResource {
+    return resourcesMap[id];
+}
+
+export const getResourceName = (a: ExtractStruct<CraftResourcesComponent>, b: TCraftResourceID) =>
+    getResource(a, b).name;
+
+export function createCraftResource(
     { resourcesMap }: ExtractStruct<CraftResourcesComponent>,
     resourceNames: string[],
     action: ECraftAction,
@@ -27,5 +37,13 @@ export function createResource(
             ? mixResources(resources)
             : transformResource(resources[0], action, name);
 
-    return (resourcesMap[resource.name] = resource);
+    return (resourcesMap[resource.id] = resource);
+}
+
+export function renameCraftResource(
+    { resourcesMap }: ExtractStruct<CraftResourcesComponent>,
+    id: TCraftResourceID,
+    name: string,
+) {
+    resourcesMap[id].name = name;
 }
