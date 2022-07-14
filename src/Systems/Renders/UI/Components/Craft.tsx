@@ -32,7 +32,10 @@ export function Craft(props: TCraftProps): ReactElement {
     });
 
     allAction.forEach((action) => {
-        useKeyUp(mapActionToKey[action], () => activeActions.includes(action) && craft(action));
+        useKeyUp(
+            mapActionToKey[action],
+            useFunction(() => activeActions.includes(action) && craft(action)),
+        );
     });
 
     return (

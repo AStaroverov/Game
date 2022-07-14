@@ -48,6 +48,9 @@ export function BackpackItem(props: {
             props.onRename?.(event.currentTarget.value);
             toggleRenaming();
         }
+        if (event.code === 'Escape') {
+            toggleRenaming();
+        }
     });
 
     return (
