@@ -1,15 +1,15 @@
 import { uniq } from 'lodash';
 import { map, pipe } from 'lodash/fp';
 
+import { getRandomChar } from '../../utils/random';
+import { range } from '../../utils/range';
 import {
     ECraftResourceFeature,
     MAX_CRAFT_RESOURCE_SIZE,
     TCraftResource,
     TCraftResourceDna,
     TCraftResourceID,
-} from '../../Systems/Craft/resources';
-import { getRandomChar } from '../../utils/random';
-import { range } from '../../utils/range';
+} from './def';
 import { createResource } from './utils';
 
 export const ESeedResourceId: Record<string, TCraftResourceID> = {

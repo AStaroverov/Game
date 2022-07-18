@@ -1,7 +1,7 @@
 import { negate, overSome } from 'lodash';
 import { every, includes, map, overEvery, pipe, some } from 'lodash/fp';
 
-import { ECraftResourceFeature, TCraftResource } from './resources';
+import { ECraftResourceFeature, TCraftResource } from '../../Components/WorldResources/def';
 
 export enum ECraftAction {
     Mix = 'Mix',

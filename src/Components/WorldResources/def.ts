@@ -23,7 +23,7 @@ export type TCraftResourceID = Opaque<'CraftResource', string>;
 
 export type TCraftResource = {
     id: TCraftResourceID;
+    dna: TCraftResourceDna;
     name: string;
     features: ECraftResourceFeature[];
-    dna: TCraftResourceDna;
 };

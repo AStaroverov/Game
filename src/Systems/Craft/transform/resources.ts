@@ -1,7 +1,7 @@
+import { TCraftResource } from '../../../Components/WorldResources/def';
 import { createResource } from '../../../Components/WorldResources/utils';
 import { ECraftAction } from '../actions';
 import { createName } from '../names';
-import { TCraftResource } from '../resources';
 import { mixDna, transformDna } from './dna';
 import { mixFeatures, transformFeatures } from './features';
 

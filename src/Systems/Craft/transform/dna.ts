@@ -1,5 +1,5 @@
+import { TCraftResourceDna } from '../../../Components/WorldResources/def';
 import { ECraftAction } from '../actions';
-import { TCraftResourceDna } from '../resources';
 
 const DNA_TRANSFORMS = {
     [ECraftAction.Dry]: (dna: TCraftResourceDna): TCraftResourceDna => ({

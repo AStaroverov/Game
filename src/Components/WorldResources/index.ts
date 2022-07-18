@@ -1,7 +1,7 @@
 import { createComponent, ExtractStruct } from '../../../lib/ECS/Component';
 import { ECraftAction } from '../../Systems/Craft/actions';
-import { TCraftResource, TCraftResourceID } from '../../Systems/Craft/resources';
 import { mixResources, transformResource } from '../../Systems/Craft/transform/resources';
+import { TCraftResource, TCraftResourceID } from './def';
 import { getSeedResources } from './resources';
 
 export const WorldResourcesComponentID = 'WORLD_RESOURCES' as const;

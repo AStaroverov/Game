@@ -1,6 +1,6 @@
-import { TCraftResource, TCraftResourceID } from '../../Systems/Craft/resources';
 import { Assign } from '../../types';
 import { getRandomId } from '../../utils/random';
+import { TCraftResource, TCraftResourceID } from './def';
 import { ESeedResourceId } from './resources';
 
 export function createResourceID() {

@@ -4,12 +4,12 @@ import React, { MouseEvent, ReactElement } from 'react';
 
 import { useSelectable } from '../../../../../lib/UI/hooks/useSelectable';
 import { getResourceName, renameWorldResource } from '../../../../Components/WorldResources';
+import { TCraftResourceID } from '../../../../Components/WorldResources/def';
 import { isRenameableResource } from '../../../../Components/WorldResources/utils';
 import { getPlayerBackpack } from '../../../../Entities/Player';
 import { getCraftResources } from '../../../../Entities/World';
 import { useFunction } from '../../../../utils/React/hook/useFunction';
 import { useMutableMemo } from '../../../../utils/React/hook/useMutableMemo';
-import { TCraftResourceID } from '../../../Craft/resources';
 import { useGameHeap } from '../Context/useGameHeap';
 import { BackpackItem } from './BackpackItem';
 import { Craft } from './Craft';

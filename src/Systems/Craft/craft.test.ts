@@ -1,9 +1,9 @@
 import { describe, expect, it } from '@jest/globals';
 
+import { ECraftResourceFeature } from '../../Components/WorldResources/def';
 import { ESeedResourceId, getSeedResources } from '../../Components/WorldResources/resources';
 import { ECraftAction, getFeaturesAvailableActions, getResourcesAvailableActions } from './actions';
-import { ECraftResourceFeature } from './resources';
-import { transformResource, transformResources } from './transform/resources';
+import { transformResource } from './transform/resources';
 
 const { resourcesMap } = getSeedResources();
 

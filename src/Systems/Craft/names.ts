@@ -1,5 +1,5 @@
+import { TCraftResource } from '../../Components/WorldResources/def';
 import { ECraftAction } from './actions';
-import { TCraftResource } from './resources';
 
 const map1to2 = {
     [ECraftAction.Grind]: 'Ground',

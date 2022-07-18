@@ -1,5 +1,5 @@
 import { createComponent, ExtractStruct } from '../../../lib/ECS/Component';
-import { TCraftResourceID } from '../../Systems/Craft/resources';
+import { TCraftResourceID } from '../WorldResources/def';
 import { ESeedResourceId } from '../WorldResources/resources';
 
 export const BackpackComponentID = 'BACKPACK' as const;

@@ -1,8 +1,8 @@
 import { every, includes, overEvery, some } from 'lodash/fp';
 
+import { ECraftResourceFeature } from '../../../Components/WorldResources/def';
 import { Arr } from '../../../utils/ArrayUtils';
 import { ECraftAction } from '../actions';
-import { ECraftResourceFeature } from '../resources';
 
 const FEATURE_TRANSFORMS = {
     [ECraftAction.Dry]: [

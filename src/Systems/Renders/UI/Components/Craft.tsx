@@ -1,10 +1,10 @@
 import React, { ReactElement, useMemo } from 'react';
 
+import { TCraftResourceID } from '../../../../Components/WorldResources/def';
 import { useFunction } from '../../../../utils/React/hook/useFunction';
 import { useKeyUp } from '../../../../utils/React/hook/useKey';
 import { craftResource, getCraftActions } from '../../../Craft';
 import { ECraftAction } from '../../../Craft/actions';
-import { TCraftResourceID } from '../../../Craft/resources';
 import { useGameHeap } from '../Context/useGameHeap';
 
 export type TCraftProps = {
