@@ -18,3 +18,8 @@ export function randomSign(): number {
 export function getRandomId(): string {
     return String(trunc(Date.now() * Math.random()));
 }
+
+const CHARACTERS = 'abcdefghijklmnopqrstuvwxyz';
+export function getRandomChar(): string {
+    return CHARACTERS[randomArbitraryInt(0, CHARACTERS.length - 1)];
+}

@@ -1,4 +1,6 @@
-import { filter, fromEvent } from 'rxjs';
+import { filter, fromEvent, share } from 'rxjs';
 
-export const fromKeyPress = (...codes: KeyboardEvent['code'][]) =>
-    fromEvent<KeyboardEvent>(document, 'keypress').pipe(filter((e) => codes.includes(e.code)));
+const keypress$ = fromEvent<KeyboardEvent>(document, 'keyup').pipe(share());
+
+export const fromKeyUp = (...codes: KeyboardEvent['code'][]) =>
+    keypress$.pipe(filter((e) => codes.includes(e.code)));

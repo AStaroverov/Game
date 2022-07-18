@@ -1,12 +1,15 @@
-import { createEntity } from '../../../lib/ECS/Entity';
+import { createEntity, getComponentStruct } from '../../../lib/ECS/Entity';
+import { getEntities } from '../../../lib/ECS/Heap';
 import { createAtlasAnimationComponent } from '../../Components/AtlasAnimation';
 import { AtlasName } from '../../Components/AtlasAnimation/atlases';
+import { BackpackComponentID, createBackpackComponent } from '../../Components/Backpack';
 import { createDirectionComponent } from '../../Components/DirectionComponent';
 import { createPositionComponent } from '../../Components/Position';
 import { createBaseMeshComponent } from '../../Components/Renders/BaseMeshComponent';
 import { createVelocityComponent } from '../../Components/Velocity';
 import { createVisualSizeComponent } from '../../Components/VisualSize';
 import { PLAYER_START_POSITION } from '../../CONST';
+import { GameHeap } from '../../heap';
 import { Size } from '../../utils/shape';
 
 export const PlayerEntityID = 'PLAYER_ENTITY' as const;
@@ -23,7 +26,11 @@ export const createPlayerEntity = () => {
             duration: 100,
             atlasName: AtlasName.Player,
         }),
-        // createHealComponent(100),
-        // createHealBarMeshComponent(),
+        createBackpackComponent(),
     ]);
 };
+
+export function getPlayerBackpack(gameHeap: GameHeap) {
+    const player = getEntities(gameHeap, PlayerEntityID)[0];
+    return getComponentStruct(player, BackpackComponentID);
+}

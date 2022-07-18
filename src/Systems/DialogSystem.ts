@@ -15,7 +15,7 @@ import { PlayerEntityID } from '../Entities/Player';
 import { GameHeap } from '../heap';
 import { booleanToString } from '../utils/booleanToString';
 import { iterateDialog } from '../utils/dialogue';
-import { fromKeyPress } from '../utils/RX/keypress';
+import { fromKeyUp } from '../utils/RX/keypress';
 import { TVector, Vector } from '../utils/shape';
 import { TasksScheduler } from '../utils/TasksScheduler/TasksScheduler';
 import { throwingError } from '../utils/throwingError';
@@ -66,13 +66,13 @@ async function runDialog(entity: DialogEntity) {
                 const choice = await firstValueFrom(
                     merge(
                         ...node.choices.map((choice, i) =>
-                            fromKeyPress(`Digit${i + 1}`).pipe(mapTo(choice)),
+                            fromKeyUp(`Digit${i + 1}`).pipe(mapTo(choice)),
                         ),
                     ),
                 );
                 nodeName = choice.next;
             } else {
-                await firstValueFrom(fromKeyPress('Space'));
+                await firstValueFrom(fromKeyUp('Space'));
                 nodeName = node.next;
             }
         }
