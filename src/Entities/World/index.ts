@@ -3,7 +3,7 @@ import { getEntities } from '../../../lib/ECS/Heap';
 import { createGameTimeComponent } from '../../Components/GameTime';
 import { createPlayerStoryComponent } from '../../Components/PlayerStoryProgress';
 import {
-    createCraftResourcesComponent,
+    createWorldResourcesComponent,
     WorldResourcesComponentID,
 } from '../../Components/WorldResources';
 import { GameHeap } from '../../heap';
@@ -14,7 +14,7 @@ export const createWorldEntity = () =>
     createEntity(WorldEntityID, [
         createGameTimeComponent(),
         createPlayerStoryComponent(),
-        createCraftResourcesComponent(),
+        createWorldResourcesComponent(),
     ]);
 
 export function getCraftResources(gameHeap: GameHeap) {
