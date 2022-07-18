@@ -44,6 +44,7 @@ export function BackpackItem(props: {
     });
     const handleRename = useFunction((event: KeyboardEvent<HTMLInputElement>) => {
         handleStopProp(event);
+
         if (event.code === 'Enter') {
             props.onRename?.(event.currentTarget.value);
             toggleRenaming();
@@ -58,12 +59,7 @@ export function BackpackItem(props: {
             <div className={cns.item}>
                 <div className={cns.itemContent}>
                     {renaming && (
-                        <input
-                            autoFocus
-                            onClick={handleStopProp}
-                            onKeyUp={handleStopProp}
-                            onKeyUpCapture={handleRename}
-                        />
+                        <input autoFocus onClick={handleStopProp} onKeyUpCapture={handleRename} />
                     )}
                     {!renaming && `${props.name}: ${props.count}`}
                 </div>

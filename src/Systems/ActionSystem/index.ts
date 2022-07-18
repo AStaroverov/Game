@@ -1,5 +1,3 @@
-import { filter, fromEvent } from 'rxjs';
-
 import {
     getComponentStruct,
     hasComponent,
@@ -15,6 +13,7 @@ import { PositionComponent, PositionComponentID } from '../../Components/Positio
 import { createDialogEntity, DialogEntityID } from '../../Entities/Dilog';
 import { PlayerEntityID } from '../../Entities/Player';
 import { GameHeap } from '../../heap';
+import { fromKeyUp } from '../../utils/RX/keypress';
 import { negateVector, sumVector, widthVector } from '../../utils/shape';
 
 export enum CommonAction {
@@ -28,40 +27,32 @@ export function ActionSystem(heap: GameHeap): void {
     const position = getComponentStruct(player, PositionComponentID);
     const direction = getComponentStruct(player, DirectionComponentID);
 
-    fromEvent<KeyboardEvent>(document, 'keydown')
-        .pipe(filter((e) => e.code === 'KeyE'))
-        .subscribe(() => {
-            const playerLookingAtPosition = sumVector(position, direction);
-            const actionableEntities = filterEntities(
-                heap,
-                (e): e is SomeEntity<PositionComponent | ActionableComponent> => {
-                    return (
-                        hasComponent(e, PositionComponentID) &&
-                        hasComponent(e, ActionableComponentID)
-                    );
-                },
-            );
-
-            actionableEntities.forEach((entity) => {
-                const position = getComponentStruct(entity, PositionComponentID);
-                const dist = widthVector(
-                    sumVector(playerLookingAtPosition, negateVector(position)),
+    fromKeyUp('KeyE').subscribe(() => {
+        const playerLookingAtPosition = sumVector(position, direction);
+        const actionableEntities = filterEntities(
+            heap,
+            (e): e is SomeEntity<PositionComponent | ActionableComponent> => {
+                return (
+                    hasComponent(e, PositionComponentID) && hasComponent(e, ActionableComponentID)
                 );
+            },
+        );
 
-                if (dist > 1) return;
+        actionableEntities.forEach((entity) => {
+            const position = getComponentStruct(entity, PositionComponentID);
+            const dist = widthVector(sumVector(playerLookingAtPosition, negateVector(position)));
 
-                const action = getComponentStruct(entity, ActionableComponentID);
+            if (dist > 1) return;
 
-                if (action.type === CommonAction.Dialog) {
-                    const person = tryGetComponentStruct<TPersonComponent>(
-                        entity,
-                        PersonComponentID,
-                    );
+            const action = getComponentStruct(entity, ActionableComponentID);
 
-                    addDialogEntity(heap, action.dialogID, person?.name ?? '');
-                }
-            });
+            if (action.type === CommonAction.Dialog) {
+                const person = tryGetComponentStruct<TPersonComponent>(entity, PersonComponentID);
+
+                addDialogEntity(heap, action.dialogID, person?.name ?? '');
+            }
         });
+    });
 }
 
 function addDialogEntity(heap: GameHeap, id: TDialogId, name: string): void {
