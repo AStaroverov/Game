@@ -48,5 +48,6 @@ export const createNpcEntity = (
             atlasName: AtlasName.Skeleton,
         }),
         createActionableComponent(props.action),
+        createActionableComponent(props.action),
     ]);
 };

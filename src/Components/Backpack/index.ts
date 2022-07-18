@@ -1,6 +1,6 @@
 import { createComponent, ExtractStruct } from '../../../lib/ECS/Component';
 import { TCraftResourceID } from '../../Systems/Craft/resources';
-import { ESeedResourceId } from '../CraftResources/resources';
+import { ESeedResourceId } from '../WorldResources/resources';
 
 export const BackpackComponentID = 'BACKPACK' as const;
 export type BackpackComponent = ReturnType<typeof createBackpackComponent>;

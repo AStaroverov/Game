@@ -3,8 +3,8 @@ import cxs from 'cxs';
 import React, { MouseEvent, ReactElement } from 'react';
 
 import { useSelectable } from '../../../../../lib/UI/hooks/useSelectable';
-import { getResourceName, renameCraftResource } from '../../../../Components/CraftResources';
-import { isRenameableResource } from '../../../../Components/CraftResources/utils';
+import { getResourceName, renameWorldResource } from '../../../../Components/WorldResources';
+import { isRenameableResource } from '../../../../Components/WorldResources/utils';
 import { getPlayerBackpack } from '../../../../Entities/Player';
 import { getCraftResources } from '../../../../Entities/World';
 import { useFunction } from '../../../../utils/React/hook/useFunction';
@@ -49,7 +49,7 @@ export function Backpack(): ReactElement {
         toggleSelect(id);
     });
     const handleItemRename = useFunction((id: TCraftResourceID, name: string) => {
-        renameCraftResource(resources, id, name);
+        renameWorldResource(resources, id, name);
     });
 
     return (

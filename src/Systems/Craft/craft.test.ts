@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { ESeedResourceId, getSeedResources } from '../../Components/CraftResources/resources';
+import { ESeedResourceId, getSeedResources } from '../../Components/WorldResources/resources';
 import { ECraftAction, getFeaturesAvailableActions, getResourcesAvailableActions } from './actions';
 import { ECraftResourceFeature } from './resources';
 import { transformResource, transformResources } from './transform/resources';

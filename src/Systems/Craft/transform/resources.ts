@@ -1,4 +1,4 @@
-import { createResource } from '../../../Components/CraftResources/utils';
+import { createResource } from '../../../Components/WorldResources/utils';
 import { ECraftAction } from '../actions';
 import { createName } from '../names';
 import { TCraftResource } from '../resources';

@@ -1,5 +1,5 @@
 import { enoughResources, pullResources, pushResources } from '../../Components/Backpack';
-import { createCraftResource } from '../../Components/CraftResources';
+import { createWorldResource } from '../../Components/WorldResources';
 import { getPlayerBackpack } from '../../Entities/Player';
 import { getCraftResources } from '../../Entities/World';
 import { GameHeap } from '../../heap';
@@ -23,7 +23,7 @@ export function craftResource(
     const craftResources = getCraftResources(heap);
 
     if (enoughResources(backpack, resourceIds)) {
-        const resource = createCraftResource(craftResources, resourceIds, action, name);
+        const resource = createWorldResource(craftResources, resourceIds, action, name);
         pullResources(backpack, ...resourceIds);
         pushResources(backpack, resource.id);
     }

@@ -4,29 +4,29 @@ import { TCraftResource, TCraftResourceID } from '../../Systems/Craft/resources'
 import { mixResources, transformResource } from '../../Systems/Craft/transform/resources';
 import { getSeedResources } from './resources';
 
-export const CraftResourcesComponentID = 'CRAFT_RESOURCES' as const;
-export type CraftResourcesComponent = ReturnType<typeof createCraftResourcesComponent>;
-export const createCraftResourcesComponent = () => {
+export const WorldResourcesComponentID = 'WORLD_RESOURCES' as const;
+export type WorldResourcesComponent = ReturnType<typeof createWorldResourcesComponent>;
+export const createWorldResourcesComponent = () => {
     const { resourcesDna, resourcesMap } = getSeedResources();
 
-    return createComponent(CraftResourcesComponentID, {
+    return createComponent(WorldResourcesComponentID, {
         resourcesDna,
         resourcesMap,
     });
 };
 
 export function getResource(
-    { resourcesMap }: ExtractStruct<CraftResourcesComponent>,
+    { resourcesMap }: ExtractStruct<WorldResourcesComponent>,
     id: TCraftResourceID,
 ): TCraftResource {
     return resourcesMap[id];
 }
 
-export const getResourceName = (a: ExtractStruct<CraftResourcesComponent>, b: TCraftResourceID) =>
+export const getResourceName = (a: ExtractStruct<WorldResourcesComponent>, b: TCraftResourceID) =>
     getResource(a, b).name;
 
-export function createCraftResource(
-    { resourcesMap }: ExtractStruct<CraftResourcesComponent>,
+export function createWorldResource(
+    { resourcesMap }: ExtractStruct<WorldResourcesComponent>,
     resourceNames: string[],
     action: ECraftAction,
     name?: string,
@@ -40,8 +40,8 @@ export function createCraftResource(
     return (resourcesMap[resource.id] = resource);
 }
 
-export function renameCraftResource(
-    { resourcesMap }: ExtractStruct<CraftResourcesComponent>,
+export function renameWorldResource(
+    { resourcesMap }: ExtractStruct<WorldResourcesComponent>,
     id: TCraftResourceID,
     name: string,
 ) {
