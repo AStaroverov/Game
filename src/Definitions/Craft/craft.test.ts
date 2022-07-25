@@ -1,9 +1,9 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { ECraftResourceFeature } from '../../Components/WorldResources/def';
-import { ESeedResourceId, getSeedResources } from '../../Components/WorldResources/resources';
-import { ECraftAction, getFeaturesAvailableActions, getResourcesAvailableActions } from './actions';
-import { transformResource } from './transform/resources';
+import { ESeedResourceId, getSeedResources } from '../Resources';
+import { EResourceFeature } from '../Resources/def';
+import { ECraftAction, getFeaturesAvailableActions, getResourcesAvailableActions } from './index';
+import { mixResources, transformResource } from './transform/resources';
 
 const { resourcesMap } = getSeedResources();
 
@@ -22,22 +22,22 @@ describe('Craft ', () => {
 
         expect(dried.name).toBe('Dried Lemon');
         expect(dried.features.slice().sort()).toEqual([
-            ECraftResourceFeature.Brittle,
-            ECraftResourceFeature.Dry,
+            EResourceFeature.Brittle,
+            EResourceFeature.Dry,
         ]);
 
         const ground = transformResource(resource, ECraftAction.Grind);
 
         expect(ground.name).toBe('Ground Lemon');
         expect(ground.features.slice().sort()).toEqual([
-            ECraftResourceFeature.Crushed,
-            ECraftResourceFeature.Watery,
+            EResourceFeature.Crushed,
+            EResourceFeature.Watery,
         ]);
 
         const squeezed = transformResource(resource, ECraftAction.Squeeze);
 
         expect(squeezed.name).toBe('Squeezed Lemon');
-        expect(squeezed.features.slice().sort()).toEqual([ECraftResourceFeature.Liquid]);
+        expect(squeezed.features.slice().sort()).toEqual([EResourceFeature.Liquid]);
     });
 
     it('transform Gross', () => {
@@ -49,16 +49,16 @@ describe('Craft ', () => {
         const dried = transformResource(resource, ECraftAction.Dry, 'Dried Gross');
 
         expect(dried.features.slice().sort()).toEqual([
-            ECraftResourceFeature.Brittle,
-            ECraftResourceFeature.Dry,
+            EResourceFeature.Brittle,
+            EResourceFeature.Dry,
         ]);
 
         const ground = transformResource(resource, ECraftAction.Grind, 'Ground Gross');
 
         expect(ground.features.slice().sort()).toEqual([
-            ECraftResourceFeature.Crushed,
-            ECraftResourceFeature.Viscous,
-            ECraftResourceFeature.Wet,
+            EResourceFeature.Crushed,
+            EResourceFeature.Viscous,
+            EResourceFeature.Wet,
         ]);
     });
 
@@ -71,8 +71,8 @@ describe('Craft ', () => {
         const ground = transformResource(resource, ECraftAction.Grind, 'Ground Gross');
 
         expect(ground.features.slice().sort()).toEqual([
-            ECraftResourceFeature.Crushed,
-            ECraftResourceFeature.Dry,
+            EResourceFeature.Crushed,
+            EResourceFeature.Dry,
         ]);
     });
 
@@ -92,9 +92,9 @@ describe('Craft ', () => {
 
         expect(actions.sort()).toEqual([ECraftAction.Mix]);
 
-        const result = transformResources(res, ECraftAction.Mix, '');
+        const result = mixResources(res, '');
 
-        expect(result.features.slice().sort()).toEqual([ECraftResourceFeature.Liquid]);
+        expect(result.features.slice().sort()).toEqual([EResourceFeature.Liquid]);
     });
 
     it('Mix Water,Lemon', () => {
@@ -103,9 +103,9 @@ describe('Craft ', () => {
 
         expect(actions.sort()).toEqual([ECraftAction.Mix]);
 
-        const result = transformResources(res, ECraftAction.Mix, '');
+        const result = mixResources(res, '');
 
-        expect(result.features.slice().sort()).toEqual([ECraftResourceFeature.Liquid]);
+        expect(result.features.slice().sort()).toEqual([EResourceFeature.Liquid]);
     });
 
     it('Mix Ground Lemon,Garlic', () => {
@@ -117,12 +117,12 @@ describe('Craft ', () => {
 
         expect(actions.sort()).toEqual([ECraftAction.Mix]);
 
-        const result = transformResources(res, ECraftAction.Mix, '');
+        const result = mixResources(res, '');
 
         expect(result.features.slice().sort()).toEqual([
-            ECraftResourceFeature.Crushed,
-            ECraftResourceFeature.Viscous,
-            ECraftResourceFeature.Wet,
+            EResourceFeature.Crushed,
+            EResourceFeature.Viscous,
+            EResourceFeature.Wet,
         ]);
     });
 
@@ -136,11 +136,11 @@ describe('Craft ', () => {
 
         expect(actions.sort()).toEqual([ECraftAction.Mix]);
 
-        const result = transformResources(res, ECraftAction.Mix, '');
+        const result = mixResources(res, '');
 
         expect(result.features.slice().sort()).toEqual([
-            ECraftResourceFeature.Crushed,
-            ECraftResourceFeature.Liquid,
+            EResourceFeature.Crushed,
+            EResourceFeature.Liquid,
         ]);
     });
 });

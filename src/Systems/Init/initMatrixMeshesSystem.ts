@@ -1,6 +1,5 @@
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { getEntities } from '../../../lib/ECS/Heap';
-import { Sprite } from '../../Classes/Sprite';
 import {
     ReliefMeshesMatrix,
     ReliefMeshesMatrixID,
@@ -13,6 +12,7 @@ import { $ref } from '../../CONST';
 import { CardEntityID } from '../../Entities/Card';
 import { GameHeap } from '../../heap';
 import { Matrix } from '../../utils/Matrix';
+import { Sprite } from '../../utils/Sprite';
 
 export function initMatrixMeshesSystem(heap: GameHeap) {
     const cardEntity = getEntities(heap, CardEntityID)[0];

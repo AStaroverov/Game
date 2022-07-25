@@ -1,7 +1,7 @@
 import { negate, overSome } from 'lodash';
 import { every, includes, map, overEvery, pipe, some } from 'lodash/fp';
 
-import { ECraftResourceFeature, TCraftResource } from '../../Components/WorldResources/def';
+import { EResourceFeature, TResource } from '../Resources/def';
 
 export enum ECraftAction {
     Mix = 'Mix',
@@ -14,25 +14,25 @@ const AVAILABLE_ACTIONS = [
     {
         match: overEvery([
             overSome([
-                includes(ECraftResourceFeature.Dry),
-                includes(ECraftResourceFeature.Wet),
-                includes(ECraftResourceFeature.Watery),
+                includes(EResourceFeature.Dry),
+                includes(EResourceFeature.Wet),
+                includes(EResourceFeature.Watery),
             ]),
-            negate(includes(ECraftResourceFeature.Crushed)),
+            negate(includes(EResourceFeature.Crushed)),
         ]),
         replace: () => [ECraftAction.Grind],
     },
     {
-        match: includes(ECraftResourceFeature.Wet),
+        match: includes(EResourceFeature.Wet),
         replace: () => [ECraftAction.Dry],
     },
     {
-        match: includes(ECraftResourceFeature.Watery),
+        match: includes(EResourceFeature.Watery),
         replace: () => [ECraftAction.Dry, ECraftAction.Squeeze],
     },
 ];
 
-export function getFeaturesAvailableActions(features: ECraftResourceFeature[]): ECraftAction[] {
+export function getFeaturesAvailableActions(features: EResourceFeature[]): ECraftAction[] {
     return AVAILABLE_ACTIONS.reduce((acc, { match, replace }) => {
         if (match(features)) acc.push(...replace());
         return acc;
@@ -40,14 +40,11 @@ export function getFeaturesAvailableActions(features: ECraftResourceFeature[]): 
 }
 
 const canBeMixed = pipe(
-    map((r: TCraftResource) => r.features),
-    overSome([
-        some(includes(ECraftResourceFeature.Liquid)),
-        every(includes(ECraftResourceFeature.Crushed)),
-    ]),
+    map((r: TResource) => r.features),
+    overSome([some(includes(EResourceFeature.Liquid)), every(includes(EResourceFeature.Crushed))]),
 );
 
-export function getResourcesAvailableActions(resources: TCraftResource[]): ECraftAction[] {
+export function getResourcesAvailableActions(resources: TResource[]): ECraftAction[] {
     return resources.length === 0
         ? []
         : resources.length === 1

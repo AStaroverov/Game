@@ -1,36 +1,36 @@
-import { createComponent, ExtractStruct } from '../../../lib/ECS/Component';
-import { ECraftAction } from '../../Systems/Craft/actions';
-import { mixResources, transformResource } from '../../Systems/Craft/transform/resources';
-import { TCraftResource, TCraftResourceID } from './def';
-import { getSeedResources } from './resources';
+import { createComponent, ExtractStruct } from '../../lib/ECS/Component';
+import { ECraftAction } from '../Definitions/Craft';
+import { mixResources, transformResource } from '../Definitions/Craft/transform/resources';
+import { getSeedResources } from '../Definitions/Resources';
+import { TResource, TResourceID } from '../Definitions/Resources/def';
+import { TSequence } from '../Definitions/Sequence/def';
 
 export const WorldResourcesComponentID = 'WORLD_RESOURCES' as const;
 export type WorldResourcesComponent = ReturnType<typeof createWorldResourcesComponent>;
-export const createWorldResourcesComponent = () => {
-    const { resourcesDna, resourcesMap } = getSeedResources();
+export const createWorldResourcesComponent = (sequences: TSequence[]) => {
+    const resourcesMap = getSeedResources(sequences);
 
     return createComponent(WorldResourcesComponentID, {
-        resourcesDna,
         resourcesMap,
     });
 };
 
 export function getResource(
     { resourcesMap }: ExtractStruct<WorldResourcesComponent>,
-    id: TCraftResourceID,
-): TCraftResource {
+    id: TResourceID,
+): TResource {
     return resourcesMap[id];
 }
 
-export const getResourceName = (a: ExtractStruct<WorldResourcesComponent>, b: TCraftResourceID) =>
-    getResource(a, b).name;
+export const getResourceName = (s: ExtractStruct<WorldResourcesComponent>, r: TResourceID) =>
+    getResource(s, r).name;
 
 export function createWorldResource(
     { resourcesMap }: ExtractStruct<WorldResourcesComponent>,
     resourceNames: string[],
     action: ECraftAction,
     name?: string,
-): TCraftResource {
+): TResource {
     const resources = resourceNames.map((name) => resourcesMap[name]);
     const resource =
         action === ECraftAction.Mix
@@ -42,7 +42,7 @@ export function createWorldResource(
 
 export function renameWorldResource(
     { resourcesMap }: ExtractStruct<WorldResourcesComponent>,
-    id: TCraftResourceID,
+    id: TResourceID,
     name: string,
 ) {
     resourcesMap[id].name = name;

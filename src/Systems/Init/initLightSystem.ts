@@ -4,7 +4,6 @@ import { BaseTexture, BLEND_MODES, BufferResource, Container } from 'pixi.js';
 import ambientImage from '../../../assets/sprites/ambient_light.png';
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { addEntity, getEntities } from '../../../lib/ECS/Heap';
-import { Sprite } from '../../Classes/Sprite';
 import {
     AmbientLightMeshComponentID,
     setLightStruct,
@@ -13,6 +12,7 @@ import { RENDER_RECT, TILE_SIZE } from '../../CONST';
 import { createGlobalLightEntity, GlobalLightEntityID } from '../../Entities/GlobalLight';
 import { GameHeap } from '../../heap';
 import { isLoaded } from '../../utils/Pixi/isLoaded';
+import { Sprite } from '../../utils/Sprite';
 
 export function InitLightSystem(heap: GameHeap) {
     initGlobalLightEntity(heap);

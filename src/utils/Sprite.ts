@@ -1,7 +1,7 @@
 import { Texture } from '@pixi/core';
 import { Sprite as Base } from 'pixi.js';
 
-import { TVector } from '../utils/shape';
+import { TVector } from './shape';
 
 export class Sprite extends Base {
     constructor(texture?: Texture, props?: { anchor: TVector }) {

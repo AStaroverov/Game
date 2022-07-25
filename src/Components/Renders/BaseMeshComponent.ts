@@ -1,7 +1,7 @@
 import { createComponent, ExtractStruct } from '../../../lib/ECS/Component';
-import { Sprite } from '../../Classes/Sprite';
 import { $ref } from '../../CONST';
 import { StageName } from '../../Renderer';
+import { Sprite } from '../../utils/Sprite';
 import { createMeshComponent } from './MeshComponent';
 
 type BaseMesh = Sprite;

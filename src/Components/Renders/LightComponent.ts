@@ -1,8 +1,8 @@
 import { DisplayObject } from '@pixi/display';
 
 import { createComponent, ReturnStruct } from '../../../lib/ECS/Component';
-import { Sprite } from '../../Classes/Sprite';
 import { $ref } from '../../CONST';
+import { Sprite } from '../../utils/Sprite';
 
 export const LightMeshComponentID = 'LIGHT_MESH' as const;
 export type LightMeshStruct = ReturnStruct<typeof createLightMeshComponent>;

@@ -1,14 +1,14 @@
 import React, { ReactElement, useMemo } from 'react';
 
-import { TCraftResourceID } from '../../../../Components/WorldResources/def';
+import { ECraftAction } from '../../../../Definitions/Craft';
+import { TResourceID } from '../../../../Definitions/Resources/def';
 import { useFunction } from '../../../../utils/React/hook/useFunction';
 import { useKeyUp } from '../../../../utils/React/hook/useKey';
 import { craftResource, getCraftActions } from '../../../Craft';
-import { ECraftAction } from '../../../Craft/actions';
 import { useGameHeap } from '../Context/useGameHeap';
 
 export type TCraftProps = {
-    resourceIds: TCraftResourceID[];
+    resourceIds: TResourceID[];
     onCraft?: VoidFunction;
 };
 

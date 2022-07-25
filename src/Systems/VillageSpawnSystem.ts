@@ -13,9 +13,11 @@ import {
 import { PositionComponentID } from '../Components/Position';
 import { TagComponent, TagComponentID } from '../Components/Tag';
 import { TVillage, TVillageActive, Village, VillagesComponentID } from '../Components/Villages';
+import { WorldDiseasesComponentID } from '../Components/WorldDiseases';
 import { CardEntityID } from '../Entities/Card';
 import { createHouseEntity, HouseEntityID } from '../Entities/House';
 import { createNpcEntity, NPCEntityID } from '../Entities/NPC';
+import { WorldEntityID } from '../Entities/World';
 import { GameHeap } from '../heap';
 import { isInsideWorldRenderRect } from '../utils/isInsideWorldRenderRect';
 import { floor } from '../utils/math';
@@ -58,6 +60,9 @@ const buildingPatterns = [
 ];
 
 export function VillageSpawnSystem(heap: GameHeap, ticker: TasksScheduler) {
+    const world = getEntities(heap, WorldEntityID)[0];
+    const diseases = getComponentStruct(world, WorldDiseasesComponentID);
+
     const cardEntity = getEntities(heap, CardEntityID)[0];
     const cardPosition = getComponentStruct(cardEntity, PositionComponentID);
     const cardVillages = getComponentStruct(cardEntity, VillagesComponentID);
@@ -125,11 +130,13 @@ export function VillageSpawnSystem(heap: GameHeap, ticker: TasksScheduler) {
                     createNpcEntity({
                         ...people[i++],
                         tags: [village.name],
+                        position: Vector.sum(area, Vector.extract(item)),
+                        diseaseId: diseases.disease[0].id,
                         action: {
                             type: CommonAction.Dialog,
-                            dialogID: EDialogueName.Some_villager,
+                            dialogID: EDialogueName.Seek_human,
+                            // dialogID: EDialogueName.Some_villager,
                         },
-                        position: Vector.sum(area, Vector.extract(item)),
                     }),
                 );
             });

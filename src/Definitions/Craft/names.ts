@@ -1,11 +1,11 @@
-import { TCraftResource } from '../../Components/WorldResources/def';
-import { ECraftAction } from './actions';
+import { TResource } from '../Resources/def';
+import { ECraftAction } from './index';
 
 const map1to2 = {
     [ECraftAction.Grind]: 'Ground',
 };
 
-export function createName(resources: TCraftResource[], action: ECraftAction): string {
+export function createName(resources: TResource[], action: ECraftAction): string {
     const state =
         action in map1to2
             ? map1to2[action as ECraftAction.Grind]

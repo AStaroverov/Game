@@ -18,7 +18,6 @@ import house_5x4_3 from '../../../assets/sprites/houses/houses_160x192_3.png';
 import house_5x4_4 from '../../../assets/sprites/houses/houses_160x192_4.png';
 import { getComponentStruct } from '../../../lib/ECS/Entity';
 import { getEntities } from '../../../lib/ECS/Heap';
-import { Sprite } from '../../Classes/Sprite';
 import {
     MeshComponentID,
     setMeshStruct,
@@ -33,6 +32,7 @@ import { getRandomGreyColor } from '../../utils/getRandomGreyColor';
 import { isLoaded } from '../../utils/Pixi/isLoaded';
 import { randomArbitraryInt, randomSign } from '../../utils/random';
 import { Size, Vector } from '../../utils/shape';
+import { Sprite } from '../../utils/Sprite';
 import { TasksScheduler } from '../../utils/TasksScheduler/TasksScheduler';
 
 const TEX_HOUSE_4x3 = [house_4x3_1, house_4x3_2, house_4x3_3, house_4x3_4].map(

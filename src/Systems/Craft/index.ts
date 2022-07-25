@@ -1,10 +1,10 @@
 import { enoughResources, pullResources, pushResources } from '../../Components/Backpack';
 import { createWorldResource } from '../../Components/WorldResources';
-import { TCraftResourceID } from '../../Components/WorldResources/def';
+import { ECraftAction, getResourcesAvailableActions } from '../../Definitions/Craft';
+import { TResourceID } from '../../Definitions/Resources/def';
 import { getPlayerBackpack } from '../../Entities/Player';
 import { getCraftResources } from '../../Entities/World';
 import { GameHeap } from '../../heap';
-import { ECraftAction, getResourcesAvailableActions } from './actions';
 
 export function getCraftActions(heap: GameHeap, resourceNames: string[]): ECraftAction[] {
     const { resourcesMap } = getCraftResources(heap);
@@ -15,7 +15,7 @@ export function getCraftActions(heap: GameHeap, resourceNames: string[]): ECraft
 
 export function craftResource(
     heap: GameHeap,
-    resourceIds: TCraftResourceID[],
+    resourceIds: TResourceID[],
     action: ECraftAction,
     name?: string,
 ): void {

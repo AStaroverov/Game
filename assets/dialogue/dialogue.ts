@@ -4,29 +4,28 @@ import { deepMapKeys } from '../../lib/deepMapKeys';
 import { ELang } from '../../src/Components/Lang';
 import First_meet from './_First_meet.json';
 import Look_at_backpack from './_Look_at_backpack.json';
+import Seek_human from './_Seek_human.json';
 import Some_villager from './_Some_villager.json';
 
 export enum EDialogueName {
     'First_meet' = 'First_meet',
     'Look_at_backpack' = 'First Look_at_backpack',
     'Some_villager' = 'Some_villager',
+    'Seek_human' = 'Seek_human',
 }
 
-export const dialogMap = {
-    [EDialogueName['First_meet']]: deepMapKeys(First_meet[0], camelCase) as unknown as TDialog,
-    [EDialogueName['Look_at_backpack']]: deepMapKeys(
-        Look_at_backpack[0],
-        camelCase,
-    ) as unknown as TDialog,
-    [EDialogueName['Some_villager']]: deepMapKeys(
-        Some_villager[0],
-        camelCase,
-    ) as unknown as TDialog,
+export const dialogMap: Record<EDialogueName, TDialog> = {
+    [EDialogueName['First_meet']]: prepareDialog(First_meet),
+    [EDialogueName['Look_at_backpack']]: prepareDialog(Look_at_backpack),
+    [EDialogueName['Some_villager']]: prepareDialog(Some_villager),
+    [EDialogueName['Seek_human']]: prepareDialog(Seek_human),
 };
 
 export type TNodeName = string;
 export enum ENodeType {
     Start = 'start',
+    // Доделать выполнимые диологи
+    Execute = 'execute',
     ShowMessage = 'show_message',
     ConditionBranch = 'condition_branch',
 }
@@ -71,3 +70,7 @@ export type TDialogueNodes = (TDialogueStartNode | TDialogueNode)[];
 export type TDialog = {
     nodes: TDialogueNodes;
 };
+
+function prepareDialog(json: any): TDialog {
+    return deepMapKeys(camelCase)(json[0]) as TDialog;
+}
